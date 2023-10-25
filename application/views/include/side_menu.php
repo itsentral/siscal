@@ -25,6 +25,7 @@
 	<link rel="stylesheet" href="<?php echo base_url('jquery-ui/jquery-ui.min.css') ?>">
 	<link rel="stylesheet" href="<?php echo base_url('adminlte/plugins/datatables/dataTables.bootstrap.css'); ?>">
 	<link rel="stylesheet" href="<?php echo base_url('assets/plugins/apexcharts/dist/apexcharts.css') ?>">
+	<script src="<?php echo base_url('adminlte/plugins/jQuery/jquery-2.2.3.min.js'); ?>"></script>
 	<style rel="stylesheet">
 		table.dataTable span.highlight {
 			background-color: #FFFF88;

@@ -322,7 +322,8 @@ class Invoice_process extends CI_Controller
 				(SELECT @row := 0) r 
 				WHERE " . $WHERE_Find . "
 				";
-		//print_r($sql);exit();
+		// print_r($sql);
+		// exit();
 		$fetch['totalData'] 		= $this->db->query($sql)->num_rows();
 		$fetch['totalFiltered']	= $this->db->query($sql)->num_rows();
 
@@ -386,6 +387,10 @@ class Invoice_process extends CI_Controller
 			$nestedData[]	= $No_Quot;
 			$nestedData[]	= $No_PO;
 			$nestedData[]	= $Name_Sales;
+			$origin = new DateTime($Tgl_Order);
+			$target = new DateTime('now');
+			$interval = $origin->diff($target);
+			$nestedData[]   =  '<td align="center"><span class="badge bg-red">' . $interval->format('%a days') . '</span></td>';
 			$nestedData[]	= $Template;
 
 			$data[] = $nestedData;
@@ -522,6 +527,10 @@ class Invoice_process extends CI_Controller
 			$Name_Customer	= $row['customer_name'];
 			$No_PO			= $row['pono'];
 
+			// $first = new DateTime($Tgl_Order);
+			// $data_tgl = new DateTime('now');
+			// $tglakhir = $first->diff($data_tgl);
+
 			$Template		= "<button type='button' class='btn btn-sm bg-navy-active' onClick='view_order(\"" . $Code_Quot . "\");'> <i class='fa fa-search'></i> </button>";
 			if ($rows_Akses['create'] == '1' || $rows_Akses['update'] == '1') {
 				$Template	.= "&nbsp;&nbsp;<button type='button' class='btn btn-sm bg-orange-active' id='proses_inv_" . $Code_Quot . "' title='CREATE INVOICE' onClick='return CreateInvoice(\"" . $Code_Quot . "\");'> <i class='fa fa-money'></i> </button>";
@@ -553,6 +562,7 @@ class Invoice_process extends CI_Controller
 			$nestedData[]	= $Name_Sales;
 			$nestedData[]	= $No_Order;
 			$nestedData[]	= $Tgl_Order;
+			// $nestedData[]   =  '<td align="center"><span class="badge bg-red">' . $tglakhir->format('%a days') . '</span></td>';
 			$nestedData[]	= $Template;
 
 			$data[] = $nestedData;
@@ -750,6 +760,9 @@ class Invoice_process extends CI_Controller
 									quotation_id
 							) x_invoice ON x_invoice.quotation_id = det_inv.quotation_id";
 		}
+		// var_dump($Query_process);
+		// die();
+		// print_r($Query_process);
 		return $Query_process;
 	}
 
@@ -860,6 +873,10 @@ class Invoice_process extends CI_Controller
 									customer_id
 								ORDER BY
 									customer_name ASC";
+
+
+			// var_dump($Query_Customer);
+			// die();
 		}
 
 		$rows_Customer	= $this->db->query($Query_Customer)->result();
@@ -941,6 +958,7 @@ class Invoice_process extends CI_Controller
 								trans_details
 							WHERE
 								" . $WHERE_Find;
+			// print_r($Query_Find);
 			$rows_Detail	= $this->db->query($Query_Find)->result();
 			if ($rows_Detail) {
 				$rows_Quotation	= $this->db->get_where('quotations', array('id' => $rows_Detail[0]->quotation_id))->result();

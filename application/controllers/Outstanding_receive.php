@@ -34,94 +34,139 @@ class Outstanding_receive extends CI_Controller {
 	}
 	
 	function get_data_display(){
-		include "ssp.class.php";
-		$WHERE		= "flag_insitu='N'";
-		$table 		= 'view_outstanding_order_details';
-		$primaryKey = 'detail_id';
-		$columns 	= array(
-			array( 'db' => 'detail_id', 'dt' => 'detail_id'),
-			 array(
-				'db' => 'detail_id',
-				'dt' => 'DT_RowId'
-			),
-			array( 'db' => 'id', 'dt' => 'id'),
-			array( 'db' => 'nomor', 'dt' => 'nomor'),
-			array( 'db' => 'customer_name', 'dt' => 'customer_name'),
-			array( 'db' => 'customer_id', 'dt' => 'customer_id'),
-			array( 'db' => 'address', 'dt' => 'address'),
-			array( 'db' => 'flag_insitu', 'dt' => 'flag_insitu'),
-			array( 'db' => 'pono', 'dt' => 'pono'),
-			array( 'db' => 'member_id', 'dt' => 'member_id'),
-			array( 'db' => 'member_name', 'dt' => 'member_name'),
-			array( 'db' => 'project_no', 'dt' => 'project_no'),
-			array( 'db' => 'tool_id', 'dt' => 'tool_id'),
-			array( 'db' => 'tool_name', 'dt' => 'tool_name'),
-			array( 'db' => 'cust_tool', 'dt' => 'cust_tool'),
-			array( 'db' => 'range', 'dt' => 'range'),
-			array( 'db' => 'piece_id', 'dt' => 'piece_id'),
-			array( 'db' => 'supplier_id', 'dt' => 'supplier_id'),
-			array( 'db' => 'supplier_name', 'dt' => 'supplier_name'),
-			array( 'db' => 'descr', 'dt' => 'descr'),
-			array( 'db' => 'qty', 'dt' => 'qty'),
-			array( 'db' => 'sisa_so', 'dt' => 'sisa_so'),
-			array(
-				'db' => 'datet',
-				'dt'=> 'datet',
-				'formatter' => function($d,$row){
-					return date('d F Y',strtotime($d));
-				}
-			),
-			array(
-				'db' => 'podate',
-				'dt'=> 'podate',
-				'formatter' => function($d,$row){
-					return date('d F Y',strtotime($d));
-				}
-			),
-			array(
-				'db' => 'grand_tot',
-				'dt'=> 'grand_tot',
-				'formatter' => function($d,$row){
-					return number_format($d);
-				}
-			),
-			array(
-				'db' => 'hpp',
-				'dt'=> 'hpp',
-				'formatter' => function($d,$row){
-					return number_format($d);
-				}
-			),
-			array(
-				'db' => 'price',
-				'dt'=> 'price',
-				'formatter' => function($d,$row){
-					return number_format($d);
-				}
-			),
-			array(
-				'db' => 'detail_id',
-				'dt'=> 'action',
-				'formatter' => function($d,$row){
-					return '';
-				}
-			)
-
-		);
-
-
-		$sql_details = array(
-			'user' => $this->db->username,
-			'pass' => $this->db->password,
-			'db'   => $this->db->database,
-			'host' => $this->db->hostname
+		$Arr_Akses		= $this->Arr_Akses;
+		
+		$WHERE			= "flag_insitu='N'";
+		
+		
+		$requestData	= $_REQUEST;
+		
+		$like_value     = $requestData['search']['value'];
+        $column_order   = $requestData['order'][0]['column'];
+        $column_dir     = $requestData['order'][0]['dir'];
+        $limit_start    = $requestData['start'];
+        $limit_length   = $requestData['length'];
+		
+		$columns_order_by = array(
+			0 => 'tool_id',
+			1 => 'tool_name',
+			2 => 'cust_tool',
+			3 => 'qty',
+			4 => 'sisa_so',
+			5 => 'nomor',
+			6 => 'datet',
+			7 => 'customer_name',
+			8 => 'pono',
+			9 => 'podate',
+			10 => 'supplier_name'
 		);
 		
+		
+		
+		if($like_value){
+			if(!empty($WHERE))$WHERE	.=" AND ";
+			$WHERE	.="(
+						  nomor LIKE '%".$this->db->escape_like_str($like_value)."%'
+						  OR DATE_FORMAT(datet, '%d-%m-%Y') LIKE '%".$this->db->escape_like_str($like_value)."%'
+						   OR DATE_FORMAT(podate, '%d-%m-%Y') LIKE '%".$this->db->escape_like_str($like_value)."%'
+						  OR tool_id LIKE '%".$this->db->escape_like_str($like_value)."%'
+						  OR tool_name LIKE '%".$this->db->escape_like_str($like_value)."%'
+						  OR cust_tool LIKE '%".$this->db->escape_like_str($like_value)."%'
+						  OR qty LIKE '%".$this->db->escape_like_str($like_value)."%'
+						  OR sisa_so LIKE '%".$this->db->escape_like_str($like_value)."%'
+						  OR supplier_name LIKE '%".$this->db->escape_like_str($like_value)."%'
+						  OR customer_name LIKE '%".$this->db->escape_like_str($like_value)."%'
+						  OR pono LIKE '%".$this->db->escape_like_str($like_value)."%'
+						  OR cust_tool LIKE '%".$this->db->escape_like_str($like_value)."%'
+						)";
+		}
+		
+		
+		
+		$sql = "SELECT
+					*,
+					(@row:=@row+1) AS urut
+				FROM
+					view_outstanding_order_details,
+				(SELECT @row:=0) r 
+				WHERE ".$WHERE;
+		//print_r($sql);exit();
+		$fetch['totalData'] 	= $this->db->query($sql)->num_rows();
+		$fetch['totalFiltered']	= $this->db->query($sql)->num_rows();
 
+		
 
-		echo json_encode(
-			SSP::complex ($_POST, $sql_details, $table, $primaryKey, $columns,null, $WHERE)
+		$sql .= " ORDER BY datet DESC,".$columns_order_by[$column_order]." ".$column_dir." ";
+		$sql .= " LIMIT ".$limit_start." ,".$limit_length." ";
+
+		$fetch['query'] = $this->db->query($sql);
+		
+		$totalData		= $fetch['totalData'];
+		$totalFiltered	= $fetch['totalFiltered'];
+		$query			= $fetch['query'];
+		
+		$data		= array();
+        $urut1  	= 1;
+        $urut2  	= 0;
+		$Periode_Now= date('Y-m');
+		$Tahun_Now	= date('Y');
+		foreach($query->result_array() as $row)
+		{
+			$total_data     = $totalData;
+            $start_dari     = $requestData['start'];
+            $asc_desc       = $requestData['order'][0]['dir'];
+            if($asc_desc == 'asc')
+            {
+                $nomor = $urut1 + $start_dari;
+            }
+            if($asc_desc == 'desc')
+            {
+                $nomor = ($total_data - $start_dari) - $urut2;
+            }
+			
+			$Code_Tool		= $row['tool_id'];
+			$Name_Tool		= $row['tool_name'];
+			$Cust_Tool		= $row['cust_tool'];
+			$Qty_Tool		= $row['qty'];
+			$Qty_SO			= '<span class="badge bg-green">'.$row['sisa_so'].'</span>';
+			$Quot_Nomor		= $row['nomor'];
+			$Quot_Date		= date('d-m-Y',strtotime($row['datet']));
+			$Nomor_PO		= $row['pono'];
+			$Date_PO		= date('d-m-Y',strtotime($row['podate']));
+			$Name_Cust		= $row['customer_name'];
+			$Name_Supp		= $row['supplier_name'];
+			
+			
+			
+			
+			
+			
+			$nestedData		= array();
+			$nestedData[]	= $Code_Tool;
+			$nestedData[]	= $Name_Tool;
+			$nestedData[]	= $Cust_Tool;
+			$nestedData[]	= $Qty_Tool;
+			$nestedData[]	= $Qty_SO;
+			$nestedData[]	= $Quot_Nomor;
+			$nestedData[]	= $Quot_Date;
+			$nestedData[]	= $Name_Cust;
+			$nestedData[]	= $Nomor_PO;
+			$nestedData[]	= $Date_PO;
+			$nestedData[]	= $Name_Supp;
+			$data[] = $nestedData;
+            $urut1++;
+            $urut2++;
+		}
+
+		$json_data = array(
+			"draw"            => intval( $requestData['draw'] ),  
+			"recordsTotal"    => intval( $totalData ),  
+			"recordsFiltered" => intval( $totalFiltered ), 
+			"data"            => $data
 		);
+
+		echo json_encode($json_data);
+		
 	}
 	
 	
@@ -209,7 +254,7 @@ class Outstanding_receive extends CI_Controller {
 		
 		$Row		= 1;
 		$NewRow		= $Row+1;
-		$Col_Akhir	= getColsChar(11);
+		$Col_Akhir	= getColsChar(12);
 		$sheet->setCellValue('A'.$Row, $Judul);
 		$sheet->getStyle('A'.$Row.':'.$Col_Akhir.$NewRow)->applyFromArray($style_header2);
 		$sheet->mergeCells('A'.$Row.':'.$Col_Akhir.$NewRow);
@@ -224,6 +269,7 @@ class Outstanding_receive extends CI_Controller {
 		$Arr_Judul	= array(
 			'tool_id'		=> 'Kode Alat',
 			'tool_name'		=> 'Nama Alat',
+			'cust_tool'		=> 'Cust Alat',
 			'qty'			=> 'Qty',
 			'sisa_so'		=> 'Qty Outstanding',
 			'nomor'			=> 'Quotation',

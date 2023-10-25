@@ -844,6 +844,7 @@ $this->load->view('include/side_menu');
 			close_spinner_new();
 			$('#MyModalSplitDetail').empty();	
 			$('#MyModalSplit').modal('hide');
+			$('#btn-modal-close2, #btn_proses_split').prop('disabled',false);
 	});
 	
 	$(document).on('click','#btn_simpan_schedule',async(e)=>{

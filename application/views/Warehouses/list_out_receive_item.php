@@ -17,6 +17,7 @@ $this->load->view('include/side_menu');
 				<tr class="bg-blue">
 					<th class="text-center">Tool ID</th>
 					<th class="text-center">Tool Name</th>
+					<th class="text-center">Cust Tool</th>
 					<th class="text-center">Qty</th>
 					<th class="text-center">Qty Outs</th>
 					<th class="text-center">Quotation</th>
@@ -40,53 +41,67 @@ $this->load->view('include/side_menu');
 <?php $this->load->view('include/footer'); ?>
 <!-- page script -->
 <script type="text/javascript">
-	var base_url			= '<?php echo base_url(); ?>';
+	var base_url			= '<?php echo site_url(); ?>';
 	var active_controller	= '<?php echo($this->uri->segment(1)); ?>';
 	
     $(function() {		
 		 $('#btn-excel').click(function(){
-			var Links		= base_url+active_controller+'/get_excel_outs_receive';
+			var Links		= base_url+'/'+active_controller+'/get_excel_outs_receive';
 			window.open(Links,'_blank');
 		 });
 		data_display();
 		
 	});
 	
-
 	function data_display(){
-		var cabang		= $('#kdcab').val();
-		var table_data = $('#my-grid').dataTable( {
-			"paging"	: true,
-			"processing": true,
-			"serverSide": true,
-			'destroy'	: true,
-			"ajax": {
-				"url"	:  base_url + active_controller+'/get_data_display',
-				"type"	: "POST"
-				/*
-				"data"	:{'cabang':cabang}
-				*/
-							
-			},		 
-			"columns": [
-				{"data":"tool_id","sClass":"text-center"},
-				{"data":"tool_name","sClass":"text-left"},
-				{"data":"qty","sClass":"text-center"},
-				{"data":"sisa_so","sClass":"text-center"},
-				{"data":"nomor","sClass":"text-left"},
-				{"data":"datet","sClass":"text-center"},
-				{"data":"customer_name","sClass":"text-left"},
-				{"data":"pono","sClass":"text-center"},
-				{"data":"podate","sClass":"text-center"},
-				{"data":"supplier_name","sClass":"text-left"}
-			],
-			"rowCallback": function(row,data,index,iDisplayIndexFull){
-				let Template	='<span class="badge bg-green">'+data.sisa_so+'</span>';
-				$('td:eq(3)',row).html(Template);
-			},			
-			"order": [[5,"desc"]]
-		});
 		
+		let table_data 		= $('#my-grid').DataTable({
+			"serverSide": true,
+			"destroy"	: true,
+			"stateSave" : false,
+			"bAutoWidth": false,
+			"oLanguage": {
+				"sSearch": "<b>Live Search : </b>",
+				"sLengthMenu": "_MENU_ &nbsp;&nbsp;<b>Records Per Page</b>&nbsp;&nbsp;",
+				"sInfo": "Showing _START_ to _END_ of _TOTAL_ entries",
+				"sInfoFiltered": "(filtered from _MAX_ total entries)", 
+				"sZeroRecords": "No matching records found", 
+				"sEmptyTable": "No data available in table", 
+				"sLoadingRecords": "Please wait - loading...", 
+				"oPaginate": {
+					"sPrevious": "Prev",
+					"sNext": "Next"
+				}
+			},
+			"aaSorting": [[ 6, "desc" ]],			
+			"columnDefs": [
+				{"targets":0,"sClass":"text-center","searchable":false,"orderable": false},
+				{"targets":1,"sClass":"text-left"},
+				{"targets":2,"sClass":"text-left"},
+				{"targets":3,"sClass":"text-center"},
+				{"targets":4,"sClass":"text-center"},
+				{"targets":5,"sClass":"text-center"},
+				{"targets":6,"sClass":"text-center"},
+				{"targets":7,"sClass":"text-left"},
+				{"targets":8,"sClass":"text-center"},
+				{"targets":9,"sClass":"text-center"},
+				{"targets":10,"sClass":"text-left"}
+			],
+			"sPaginationType": "simple_numbers", 
+			"iDisplayLength": 10,
+			"aLengthMenu": [[5, 10, 20, 50, 100, 150], [5, 10, 20, 50, 100, 150]],
+			"ajax":{
+				url 	: base_url +'/'+ active_controller+'/get_data_display',
+				type	: "post",
+				cache	: false,
+				data	: {},
+				error	: function(){ 
+					$(".my-grid-error").html("");
+					$("#my-grid").append('<tbody class="my-grid-error"><tr><th colspan="11">No data found in the server</th></tr></tbody>');
+					$("#my-grid_processing").css("display","none");
+				}
+			}
+		});
 	}
 	
 </script>

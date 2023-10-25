@@ -85,7 +85,13 @@ class Dashboard_process extends CI_Controller
 									det_so.tgl_so
 								) > 1";
 			$records		= $this->db->query($Query_Data)->result_array();
+		} else if ($kategori == 99) {
+			$Query_Sub						= "SELECT * FROM view_schedule_incomplete";
+			$records						= $this->db->query($Query_Sub)->result_array();
+			// var_dump($records);
+			// die();
 		}
+
 
 		$data			= array(
 			'kategori'		=> $kategori,
@@ -122,14 +128,67 @@ class Dashboard_process extends CI_Controller
 									det_so.tgl_so
 								) > 1";
 			$records		= $this->db->query($Query_Data)->result_array();
+
+			$data			= array(
+				'kategori'		=> $kategori,
+				'records'		=> $records
+			);
+
+			$this->load->view('view_dashboard/excel_other_dashboard', $data);
+		} else if ($kategori == 99) {
+			$sql = "SELECT 
+		trans.id,
+		trans.schedule_id,
+		trans.schedule_nomor,
+		trans.schedule_date,
+		trans.customer_id,
+		trans.customer_name,
+		trans.address_so,
+		trans.pic_so,
+		trans.letter_order_id,
+		trans.no_so,
+		trans.quotation_id,
+		trans.quotation_nomor,
+		trans.pono,
+		trans.marketing_id,
+		trans.marketing_name,
+		details.id as id_details,
+		details.tool_name,
+		details.keterangan,
+		details.actual_teknisi_name
+		FROM
+		trans_details trans
+		INNER JOIN 
+		trans_data_details details
+		ON 
+		trans.id = details.trans_detail_id
+		WHERE 
+		qty_reschedule > 0
+		AND 
+		pro_reschedule 
+		<> 
+		'Y'
+		AND
+		plan_reschedule ='Y'
+		AND 
+		flag_proses = 'N' 
+		AND NOT 
+		( details.keterangan IS NULL OR details.keterangan = '' OR details.keterangan = '-')
+		AND NOT 
+		( details.actual_teknisi_name IS NULL OR details.actual_teknisi_name = '' OR details.actual_teknisi_name = '-')
+		GROUP BY
+		id_details
+		ORDER BY
+		schedule_date DESC";
+			$records = $this->db->query($sql)->result_array();
+
+			$data			= array(
+				// 'kategori'		=> $kategori,
+				'records'		=> $records
+			);
+
+			$this->load->view('view_dashboard/v_export_excel', $data);
 		}
-
-		$data			= array(
-			'kategori'		=> $kategori,
-			'records'		=> $records
-		);
-
-		$this->load->view('view_dashboard/excel_other_dashboard', $data);
 	}
 	## END OTHER DASHBOARD ##
 
@@ -162,6 +221,11 @@ class Dashboard_process extends CI_Controller
 		$Query_Sub						= "SELECT * FROM view_late_send_customer_tools WHERE plan_delivery_date < '" . $sekarang . "'";
 		$Late_Kirim_Cust				= $this->db->query($Query_Sub)->num_rows();
 		$Arr_Return['late_kirim_cust']	= $Late_Kirim_Cust;
+
+		// VIEW SCHEDULE INCOMPLETE
+		$Query_Sub						= "SELECT * FROM view_schedule_incomplete";
+		$view_schedule				= $this->db->query($Query_Sub)->num_rows();
+		$Arr_Return['view_schedule_incomplete']	= $view_schedule;
 
 		## LATE SCHEDULE ##		
 		$Query_Sub						= "SELECT
@@ -203,6 +267,7 @@ class Dashboard_process extends CI_Controller
 			$Table_Name		= 'view_late_calibration_process_tools';
 			$Cond			= array(
 				//"plan_process_date <" => $Tgl_Telat
+				// "labs" => 'Y',
 				"receiving_date <" => $Telat
 			);
 		} else if ($tipe == 3) {
@@ -243,7 +308,9 @@ class Dashboard_process extends CI_Controller
 		$Tgl_Telat			= date('Y-m-d');
 		if ($tipe_late == 2) {
 			$Table_Name		= 'view_late_calibration_process_tools';
+			$Telat			= date('Y-m-d', strtotime($Tgl_Telat . ' - 2 days'));
 			$Cond			= array(
+				"labs" => 'Y',
 				"plan_process_date <" => $Tgl_Telat
 			);
 		} else if ($tipe_late == 3) {
@@ -260,6 +327,13 @@ class Dashboard_process extends CI_Controller
 			$Table_Name		= 'view_late_send_customer_tools';
 			$Cond			= array(
 				"plan_delivery_date <" => $Tgl_Telat
+			);
+		} else if ($tipe_late == 8) {
+			$Table_Name		= 'view_late_calibration_process_tools';
+			$Telat			= date('Y-m-d', strtotime($Tgl_Telat . ' - 2 days'));
+			$Cond			= array(
+				"insitu" => 'Y',
+				"plan_process_date <" => $Telat
 			);
 		}
 		$records		= $this->db->get_where($Table_Name, $Cond)->result_array();

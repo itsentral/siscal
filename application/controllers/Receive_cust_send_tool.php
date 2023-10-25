@@ -364,7 +364,7 @@ class Receive_cust_send_tool extends CI_Controller {
 		$data				= array(
 			'kategori'	=> $kategori
 		);
-		$this->load->view($this->folder . '/v_ajax_ambil_kamera', $data);
+		$this->load->view($this->folder . '/v_ajax_ambil_kamera2', $data);
 	}
 	
 	/* ------------------------------------------------------------------
@@ -616,7 +616,7 @@ class Receive_cust_send_tool extends CI_Controller {
 			
 			$Path_Loc       = $this->config->item('location_file').'receive_tool/';
 			$Pict_Inc_Front	= $Pic_Inc_Back ='';
-			
+			$Arr_ImgName	=  array();
 			## IMAGE FRONT ##
 			if($this->input->post('pic_webcam_depan')){
 				
@@ -631,6 +631,7 @@ class Receive_cust_send_tool extends CI_Controller {
 					chmod($Path_Loc.$Pict_Inc_Front, 0777);
 					unlink($Path_Loc.$Pict_Inc_Front);
 				}
+				
 				file_put_contents($Path_Loc.$Pict_Inc_Front, $image_base64);
 				
 				$Ins_Image_Front	= array(
@@ -643,51 +644,10 @@ class Receive_cust_send_tool extends CI_Controller {
 				if($Has_Ins_Image_FR !== TRUE){
 					$Pesan_Error	= 'Error Insert Driver Receive Image - Front';
 				}
+				
+				$Arr_ImgName['FR']	= 'FRONT';
+				
 			}
-			
-			if($_FILES && !empty($_FILES['files_depan']['name']) && $_FILES['files_depan']['name'] != ''){
-				$nama_image 	= $_FILES['files_depan']['name'];
-				$type_iamge		= $_FILES['files_depan']['type'];
-				$tmp_image 		= $_FILES['files_depan']['tmp_name'];
-				$error_image	= $_FILES['files_depan']['error'];
-				$size_image 	= $_FILES['files_depan']['size'];
-				
-				$cekExtensi 	= strtolower(getExtension($nama_image));
-				$Pict_Inc_Front = "FR-".$Code_File.".".$cekExtensi;
-				$Type_File		= $cekExtensi;
-				
-				
-				$Pesan_Error	= '';
-				if($error_image == '1'){
-					
-					$Pesan_Error	= 'File Size Exceeds The Maximum Limit';
-					
-				}else{					
-					$Data_File		= array(
-						'name'			=> $nama_image,
-						'type'			=> $type_iamge,
-						'tmp_name'		=> $tmp_image,
-						'error'			=> $error_image,
-						'size'			=> $size_image
-					);
-					$Del_Upload			= delFile_Kalibrasi('receive_tool',$Pict_Inc_Front);
-					$Has_Upload 		= ImageResizes_Kalibrasi($Data_File,'receive_tool',"FR-".$Code_File);
-					
-					$Ins_Image_Front	= array(
-						'driver_detail_receive'	=> $Code_Rec_Tools,
-						'file_name'				=> $Pict_Inc_Front,
-						'notes'					=> $Notes_Front,
-						'file_type'				=> $Type_File
-					);
-					$Has_Ins_Image_FR	= $this->db->insert('quotation_driver_detail_receive_file',$Ins_Image_Front);
-					if($Has_Ins_Image_FR !== TRUE){
-						$Pesan_Error	= 'Error Insert Driver Receive Image - Front';
-					}
-					
-				}					
-			}
-			
-			## END FRONT IMAGE ##
 			
 			## IMAGE BACK ##
 			if($this->input->post('pic_webcam_back')){
@@ -703,6 +663,7 @@ class Receive_cust_send_tool extends CI_Controller {
 					chmod($Path_Loc.$Pict_Inc_Back, 0777);
 					unlink($Path_Loc.$Pict_Inc_Back);
 				}
+				
 				file_put_contents($Path_Loc.$Pict_Inc_Back, $image_base64);
 				
 				$Ins_Image_Back	= array(
@@ -715,50 +676,9 @@ class Receive_cust_send_tool extends CI_Controller {
 				if($Has_Ins_Image_BC !== TRUE){
 					$Pesan_Error	= 'Error Insert Driver Receive Image - Back';
 				}
+				
+				$Arr_ImgName['BC']	= 'BACK';
 			}
-			
-			if($_FILES && !empty($_FILES['files_back']['name']) && $_FILES['files_back']['name'] != ''){
-				$nama_image 	= $_FILES['files_back']['name'];
-				$type_iamge		= $_FILES['files_back']['type'];
-				$tmp_image 		= $_FILES['files_back']['tmp_name'];
-				$error_image	= $_FILES['files_back']['error'];
-				$size_image 	= $_FILES['files_back']['size'];
-				
-				$cekExtensi 	= strtolower(getExtension($nama_image));
-				$Pict_Inc_Back  = "BC-".$Code_File.".".$cekExtensi;
-				$Type_File		= $cekExtensi;
-				
-				
-				$Pesan_Error	= '';
-				if($error_image == '1'){
-					
-					$Pesan_Error	= 'File Size Exceeds The Maximum Limit';
-					
-				}else{					
-					$Data_File		= array(
-						'name'			=> $nama_image,
-						'type'			=> $type_iamge,
-						'tmp_name'		=> $tmp_image,
-						'error'			=> $error_image,
-						'size'			=> $size_image
-					);
-					$Del_Upload			= delFile_Kalibrasi('receive_tool',$Pict_Inc_Back);
-					$Has_Upload 		= ImageResizes_Kalibrasi($Data_File,'receive_tool',"BC-".$Code_File);
-					
-					$Ins_Image_Back	= array(
-						'driver_detail_receive'	=> $Code_Rec_Tools,
-						'file_name'				=> $Pict_Inc_Back,
-						'notes'					=> $Notes_Back,
-						'file_type'				=> $Type_File
-					);
-					$Has_Ins_Image_BC	= $this->db->insert('quotation_driver_detail_receive_file',$Ins_Image_Back);
-					if($Has_Ins_Image_BC !== TRUE){
-						$Pesan_Error	= 'Error Insert Driver Receive Image - Back';
-					}
-					
-				}					
-			}				
-			## END BACK IMAGE ##
 			
 			## IMAGE RIGHT SIDE ##				
 			if($this->input->post('pic_webcam_kanan')){
@@ -774,6 +694,7 @@ class Receive_cust_send_tool extends CI_Controller {
 					chmod($Path_Loc.$Pict_Inc_Right, 0777);
 					unlink($Path_Loc.$Pict_Inc_Right);
 				}
+				
 				file_put_contents($Path_Loc.$Pict_Inc_Right, $image_base64);
 				
 				$Ins_Image_Right	= array(
@@ -786,50 +707,10 @@ class Receive_cust_send_tool extends CI_Controller {
 				if($Has_Ins_Image_RS !== TRUE){
 					$Pesan_Error	= 'Error Insert Driver Receive Image - Right Side';
 				}
+				
+				$Arr_ImgName['RS']	= 'RIGHT';
 			}
 			
-			if($_FILES && !empty($_FILES['files_kanan']['name']) && $_FILES['files_kanan']['name'] != ''){
-				$nama_image 	= $_FILES['files_kanan']['name'];
-				$type_iamge		= $_FILES['files_kanan']['type'];
-				$tmp_image 		= $_FILES['files_kanan']['tmp_name'];
-				$error_image	= $_FILES['files_kanan']['error'];
-				$size_image 	= $_FILES['files_kanan']['size'];
-				
-				$cekExtensi 	= strtolower(getExtension($nama_image));
-				$Pict_Inc_Right = "RS-".$Code_File.".".$cekExtensi;
-				$Type_File		= $cekExtensi;
-				
-				
-				$Pesan_Error	= '';
-				if($error_image == '1'){
-					
-					$Pesan_Error	= 'File Size Exceeds The Maximum Limit';
-					
-				}else{					
-					$Data_File		= array(
-						'name'			=> $nama_image,
-						'type'			=> $type_iamge,
-						'tmp_name'		=> $tmp_image,
-						'error'			=> $error_image,
-						'size'			=> $size_image
-					);
-					$Del_Upload			= delFile_Kalibrasi('receive_tool',$Pict_Inc_Right);
-					$Has_Upload 		= ImageResizes_Kalibrasi($Data_File,'receive_tool',"RS-".$Code_File);
-					
-					$Ins_Image_Right	= array(
-						'driver_detail_receive'	=> $Code_Rec_Tools,
-						'file_name'				=> $Pict_Inc_Right,
-						'notes'					=> $Notes_Right,
-						'file_type'				=> $Type_File
-					);
-					$Has_Ins_Image_RS	= $this->db->insert('quotation_driver_detail_receive_file',$Ins_Image_Right);
-					if($Has_Ins_Image_RS !== TRUE){
-						$Pesan_Error	= 'Error Insert Driver Receive Image - Right Side';
-					}
-					
-				}					
-			}				
-			## END RIGHT IMAGE ##
 			
 			## IMAGE LEFT SIDE ##				
 			if($this->input->post('pic_webcam_kiri')){
@@ -845,6 +726,7 @@ class Receive_cust_send_tool extends CI_Controller {
 					chmod($Path_Loc.$Pict_Inc_Left, 0777);
 					unlink($Path_Loc.$Pict_Inc_Left);
 				}
+				
 				file_put_contents($Path_Loc.$Pict_Inc_Left, $image_base64);
 				
 				$Ins_Image_Left	= array(
@@ -857,49 +739,95 @@ class Receive_cust_send_tool extends CI_Controller {
 				if($Has_Ins_Image_LS !== TRUE){
 					$Pesan_Error	= 'Error Insert Driver Receive Image - Left Side';
 				}
+				
+				$Arr_ImgName['LS']	= 'LEFT';
+				
 			}
-			if($_FILES && !empty($_FILES['files_kiri']['name']) && $_FILES['files_kiri']['name'] != ''){
-				$nama_image 	= $_FILES['files_kiri']['name'];
-				$type_iamge		= $_FILES['files_kiri']['type'];
-				$tmp_image 		= $_FILES['files_kiri']['tmp_name'];
-				$error_image	= $_FILES['files_kiri']['error'];
-				$size_image 	= $_FILES['files_kiri']['size'];
-				
-				$cekExtensi 	= strtolower(getExtension($nama_image));
-				$Pict_Inc_Left 	= "LS-".$Code_File.".".$cekExtensi;
-				$Type_File		= $cekExtensi;
-				
-				
-				$Pesan_Error	= '';
-				if($error_image == '1'){
+			
+			
+			if($_FILES && !empty($_FILES['files_depan']['name'][0]) && $_FILES['files_depan']['name'][0] != ''){
+				$Jumlah_File	= count($_FILES['files_depan']['name']);
+				if($Jumlah_File >= 4){
+					$New_Code	= array(0=>'FR','BC','RS','LS');
+				}else{
 					
-					$Pesan_Error	= 'File Size Exceeds The Maximum Limit';
-					
-				}else{					
-					$Data_File		= array(
-						'name'			=> $nama_image,
-						'type'			=> $type_iamge,
-						'tmp_name'		=> $tmp_image,
-						'error'			=> $error_image,
-						'size'			=> $size_image
-					);
-					$Del_Upload			= delFile_Kalibrasi('receive_tool',$Pict_Inc_Left);
-					$Has_Upload 		= ImageResizes_Kalibrasi($Data_File,'receive_tool',"LS-".$Code_File);
-					
-					$Ins_Image_Left	= array(
-						'driver_detail_receive'	=> $Code_Rec_Tools,
-						'file_name'				=> $Pict_Inc_Left,
-						'notes'					=> $Notes_Left,
-						'file_type'				=> $Type_File
-					);
-					$Has_Ins_Image_LS	= $this->db->insert('quotation_driver_detail_receive_file',$Ins_Image_Left);
-					if($Has_Ins_Image_LS !== TRUE){
-						$Pesan_Error	= 'Error Insert Driver Receive Image - Left Side';
+					$New_Code	= array();
+					$Temp_File	= array(1=>'FR','BC','RS','LS');
+					$IntL	= 0;
+					for($x=1;$x<=4;$x++){
+						$Code_X	= $Temp_File[$x];
+						$Ok_Ins	= 0;
+						if($Arr_ImgName){
+							if(!isset($Arr_ImgName[$Code_X]) || empty($Arr_ImgName[$Code_X])){
+								
+								$Ok_Ins	= 1;
+								$IntL++;
+															
+							}
+						}else{
+							
+							$Ok_Ins	= 1;
+							$IntL++;
+						}
+						
+						
+						if($Ok_Ins == 1 && $IntL <= $Jumlah_File){
+							$New_Code[]	= $Code_X;
+							
+						}
+						
+					}
+				}
+				
+				
+				
+				foreach($_FILES['files_depan']['name'] as $keyFile=>$Name_File){
+					if(isset($New_Code[$keyFile]) && !empty($New_Code[$keyFile])){
+						$Code_XFile		= $New_Code[$keyFile];
+						$nama_image 	= $_FILES['files_depan']['name'][$keyFile];
+						$type_iamge		= $_FILES['files_depan']['type'][$keyFile];
+						$tmp_image 		= $_FILES['files_depan']['tmp_name'][$keyFile];
+						$error_image	= $_FILES['files_depan']['error'][$keyFile];
+						$size_image 	= $_FILES['files_depan']['size'][$keyFile];
+						
+						$cekExtensi 	= strtolower(getExtension($nama_image));
+						$Pict_Inc_Front = $Code_XFile."-".$Code_File.".".$cekExtensi;
+						$Type_File		= $cekExtensi;
+						
+						$Pesan_Error	= '';
+						if($error_image == '1'){
+							
+							$Pesan_Error	= 'File Size Exceeds The Maximum Limit';
+							
+						}else{					
+							$Data_File		= array(
+								'name'			=> $nama_image,
+								'type'			=> $type_iamge,
+								'tmp_name'		=> $tmp_image,
+								'error'			=> $error_image,
+								'size'			=> $size_image
+							);
+							$Del_Upload			= delFile_Kalibrasi('receive_tool',$Pict_Inc_Front);
+							$Has_Upload 		= ImageResizes_Kalibrasi($Data_File,'receive_tool',$Code_XFile."-".$Code_File);
+							
+							$Ins_Image_Front	= array(
+								'driver_detail_receive'	=> $Code_Rec_Tools,
+								'file_name'				=> $Pict_Inc_Front,
+								'notes'					=> $Notes_Front,
+								'file_type'				=> $Type_File
+							);
+							$Has_Ins_Image_FR	= $this->db->insert('quotation_driver_detail_receive_file',$Ins_Image_Front);
+							if($Has_Ins_Image_FR !== TRUE){
+								$Pesan_Error	= 'Error Insert Driver Receive Image - '.$Code_XFile;
+							}
+							
+						}
 					}
 					
-				}					
-			}				
-			## END LEFT IMAGE ##
+				}
+			}
+			
+			
 			
 			
 			

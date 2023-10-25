@@ -10,6 +10,7 @@ $this->load->view('include/side_menu');
 				if($akses_menu['create'] == 1){
 				?>
 					<button type='button' class='btn btn-md' id='btn-add-inv'  style='background-color:#37474f;color:white;'> ADD INVOICE <i class='fa fa-arrow-right fa-lg' style="width:50px;"></i> </button>
+					&nbsp;&nbsp;<button type='button' class='btn btn-md bg-maroon-active' id='btn-add-quot' > ADD QUOTATION INVOICE PROFORMA <i class='fa fa-arrow-right fa-lg' style="width:50px;"></i> </button>
 				<?php
 				}
 				?>
@@ -93,6 +94,11 @@ $this->load->view('include/side_menu');
 			window.location.href	= base_url +'/'+ active_controller+'/outstanding_invoice';
 		});
 		
+	});
+	
+	$(document).on('click','#btn-add-quot',()=>{
+		loading_spinner();
+		window.location.href	= base_url +'/'+ active_controller+'/outs_invoice_quotation';
 	});
 	
 	function data_display(){

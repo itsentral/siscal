@@ -117,6 +117,24 @@ $this->load->view('include/side_menu');
 				</div>
 			</div>
 
+			<div class='col-md-4'>
+				<div class="info-box bg-purple">
+					<span class="info-box-icon">
+						<i class="fa fa-refresh"></i>
+					</span>
+					<div class="info-box-content">
+						<span class="info-box-text">Schedule Incomplete</span>
+						<span class="info-box-number" id='schedule_incomplete'>
+							<?php
+							$view_schedule_incomplete	= "<a href='#' onClick='return view_other_dashboard(\"99\");' style='color:white !important' id='link_schedule_incomplete'>" . number_format($rows_data['view_schedule_incomplete']) . "</a>";
+							echo $view_schedule_incomplete;
+
+							?>
+						</span>
+					</div>
+				</div>
+			</div>
+
 		</div>
 	</div>
 </div>
@@ -177,13 +195,14 @@ $this->load->view('include/side_menu');
 				var late_kirim_subcon = parseInt(datas.late_kirim_subcon);
 				var late_kirim_cust = parseInt(datas.late_kirim_cust);
 				var late_schedule = parseInt(datas.late_schedule);
-
+				var view_schedule_incomplete = parseInt(datas.view_schedule_incomplete)
 
 				$('#link_send_late').text(late_kirim_cust);
 				$('#link_late_process').text(late_kalibrasi);
 				$('#link_late_subcon_pick').text(late_ambil_subcon);
 				$('#link_late_subcon_send').text(late_kirim_subcon);
 				$('#link_late_schedule').text(late_schedule);
+				$('#link_schedule_incomplete').text(view_schedule_incomplete);
 
 			},
 			'error': function(data) {
@@ -235,6 +254,8 @@ $this->load->view('include/side_menu');
 		$('#judul').text('');
 		if (kode == 7) {
 			var ket = 'List Late Schedule Process';
+		} else if (kode == 99) {
+			var ket = 'Schedule Incomplete'
 		}
 
 

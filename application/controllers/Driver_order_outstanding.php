@@ -323,9 +323,13 @@ class Driver_order_outstanding extends CI_Controller {
 						
 						$Upd_Order[]	= $Code_Order;
 						
-						##  MODIFIED BY ALI ~ 2022-12-10  ##
-						$Flag_Process	= 'N';						
-						$num_Bast		= $this->db->get_where('bast_headers',array('order_code'=>$Code_Order,'status !='=>'CNC'))->num_rows();
+						##  MODIFIED BY ALI ~ 2023-01-28  ##
+						$Flag_Process	= 'N';	
+						if($Order_Type === 'INS'){
+							$num_Bast		= $this->db->get_where('insitu_letters',array('order_code'=>$Code_Order))->num_rows();
+						}else{
+							$num_Bast		= $this->db->get_where('bast_headers',array('order_code'=>$Code_Order,'status !='=>'CNC'))->num_rows();						
+						}
 						if($num_Bast > 0){
 							$Flag_Process	= 'Y';
 						}
@@ -366,7 +370,7 @@ class Driver_order_outstanding extends CI_Controller {
 								
 								
 								
-								##  MODIFIED BY ALI ~ 2022-12-10  ##
+								##  MODIFIED BY ALI ~ 2023-01-28  ##
 								$Code_Bast			= '';
 								$OK_Trans			= 0;
 								if($Cust_Type === 'CUST' && $Order_Type === 'REC'){
@@ -381,7 +385,11 @@ class Driver_order_outstanding extends CI_Controller {
 										$Letter_Order	= $rows_SO->letter_order_id;
 										$Teknisi		= $rows_SO->teknisi_name;
 										
-										$rows_Bast		= $this->db->get_where('bast_headers',array('order_code'=>$Code_Order,'status !='=>'CNC','letter_order_id'=>$Letter_Order))->row();
+										if($Order_Type === 'INS'){
+											$rows_Bast		= $this->db->get_where('insitu_letters',array('order_code'=>$Code_Order,'letter_order_id'=>$Letter_Order))->row();
+										}else{
+											$rows_Bast		= $this->db->get_where('bast_headers',array('order_code'=>$Code_Order,'status !='=>'CNC','letter_order_id'=>$Letter_Order))->row();
+										}
 										if($rows_Bast){
 											$Code_Bast	= $rows_Bast->id;
 											unset($rows_Bast);
@@ -614,19 +622,28 @@ class Driver_order_outstanding extends CI_Controller {
 							}
 						}	
 						
-						##  MODIFIED BY ALI ~ 2022-12-10  ##
+						##  MODIFIED BY ALI ~ 2023-01-28  ##
 						if($Flag_Process === 'Y'){
-							$Field_Upd_Bast	= "spk_driver_id = '".$Code_SPK."'";
-							if($Order_Type === 'REC'){
-								$Field_Upd_Bast	.= ", receive_by = '".$Name_Driver."'";
+							if($Order_Type === 'INS'){
+								$Field_Upd_Bast		= "spk_driver_id = '".$Code_SPK."', status = 'CLS'";
+								$Upd_Bast_Head		= "UPDATE insitu_letters SET ".$Field_Upd_Bast." WHERE order_code = '".$Code_Order."'";
+								$Has_Upd_Bast_Head 	= $this->db->query($Upd_Bast_Head);
+								if($Has_Upd_Bast_Head !== TRUE){
+									$Pesan_Error	= 'Error Update Bast Insitu Header';
+								}
 							}else{
-								$Field_Upd_Bast	.= ", sending_by = '".$Name_Driver."'";
-							}
-							
-							$Upd_Bast_Head		= "UPDATE bast_headers SET ".$Field_Upd_Bast." WHERE order_code = '".$Code_Order."' AND status <> 'CNC'";
-							$Has_Upd_Bast_Head 	= $this->db->query($Upd_Bast_Head);
-							if($Has_Upd_Bast_Head !== TRUE){
-								$Pesan_Error	= 'Error Update Bast Header Header';
+								$Field_Upd_Bast	= "spk_driver_id = '".$Code_SPK."'";
+								if($Order_Type === 'REC'){
+									$Field_Upd_Bast	.= ", receive_by = '".$Name_Driver."'";
+								}else{
+									$Field_Upd_Bast	.= ", sending_by = '".$Name_Driver."'";
+								}
+								
+								$Upd_Bast_Head		= "UPDATE bast_headers SET ".$Field_Upd_Bast." WHERE order_code = '".$Code_Order."' AND status <> 'CNC'";
+								$Has_Upd_Bast_Head 	= $this->db->query($Upd_Bast_Head);
+								if($Has_Upd_Bast_Head !== TRUE){
+									$Pesan_Error	= 'Error Update Bast Header Header';
+								}
 							}
 						}
 						
@@ -682,10 +699,9 @@ class Driver_order_outstanding extends CI_Controller {
 				}
 				
 				if($Arr_Det){
-					$Urut_Det = 0;
+					$Urut_Det	= 0;
 					foreach($Arr_Det as $keyDet=>$valDet){
 						$Urut_Det++;
-						
 						$Ins_Detail					= array();
 						$Ins_Detail					= $valDet;
 						unset($Ins_Detail['urut']);

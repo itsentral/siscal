@@ -40,6 +40,7 @@ class Sales_order_insitu extends CI_Controller {
 		
 		$Month_Find		= $this->input->post('bulan');
 		$Year_Find		= $this->input->post('tahun');
+		$Status_Find	= $this->input->post('sts_so');
 		$requestData	= $_REQUEST;
 		
 		$like_value     = $requestData['search']['value'];
@@ -77,6 +78,11 @@ class Sales_order_insitu extends CI_Controller {
 		if($Year_Find){
 			if(!empty($WHERE))$WHERE .=" AND ";
 			$WHERE	.="YEAR(head_so.tgl_so) = '".$Year_Find."'";
+		}
+		if($Status_Find){
+			if(!empty($WHERE))$WHERE .=" AND ";
+			
+			$WHERE	.="head_so.sts_so = '".$Status_Find."'";
 		}
 		
 		$sql = "SELECT
@@ -154,12 +160,52 @@ class Sales_order_insitu extends CI_Controller {
 				$Lable_Status	= 'REVISION';
 				$Color_Status	= 'bg-navy-active';
 			}else if($Status_SO === 'SCH'){
-				$Lable_Status	= 'CLOSE';
+				$Lable_Status	= 'SCHEDULED';
 				$Color_Status	= 'bg-maroon-active';
+				
+				$Query_Outs		= "SELECT * FROM letter_order_details WHERE letter_order_id = '".$Code_SO."' AND (qty - qty_schedule) > 0";
+				$Num_Outs		= $this->db->query($Query_Outs)->num_rows();
+				if($Num_Outs > 0){
+					$Lable_Status	= 'PARTIAL SCHEDULED';
+					$Color_Status	= 'bg-blue-active';
+				}
 			}
 			$Ket_Status		= '<span class="badge '.$Color_Status.'">'.$Lable_Status.'</span>';
 			
-			
+			$Ket_Type		= '-';
+			$Query_Type		= "SELECT
+									SUM(
+										CASE
+										WHEN supplier_id = 'COMP-001' THEN
+											1
+										ELSE
+											0
+										END
+									) AS total_lab,
+									SUM(
+										CASE
+										WHEN supplier_id <> 'COMP-001' THEN
+											1
+										ELSE
+											0
+										END
+									) AS total_subcon
+								FROM
+									letter_order_details
+								WHERE
+									letter_order_id = '".$Code_SO."'";
+			$rows_Type		= $this->db->query($Query_Type)->row();
+			if($rows_Type){
+				$Jum_Labs		= $rows_Type->total_lab;
+				$Jum_Subcon		= $rows_Type->total_subcon;
+				if($Jum_Labs > 0 && $Jum_Subcon > 0){
+					$Ket_Type		= '<span class="badge bg-navy-active">Labs & Subcon</span>';
+				}else if($Jum_Labs > 0 && $Jum_Subcon <= 0){
+					$Ket_Type		= '<span class="badge bg-maroon-active">Labs</span>';
+				}else if($Jum_Labs <= 0 && $Jum_Subcon > 0){
+					$Ket_Type		= '<span class="badge bg-orange-active">Subcon</span>';
+				}
+			}
 			
 			$Template		= '<button type="button" class="btn btn-sm btn-primary" onClick = "ActionPreview({code:\''.$Code_SO.'\',action :\'detail_letter_order\',title:\'VIEW SALES ORDER - RECEIVE\'});" title="VIEW SALES ORDER - RECEIVE"> <i class="fa fa-search"></i> </button>';			
 			if(($Arr_Akses['create'] == '1' || $Arr_Akses['update'] == '1') && $Status_SO === 'OPN'){
@@ -177,6 +223,7 @@ class Sales_order_insitu extends CI_Controller {
 			$nestedData[]	= $Customer;
 			$nestedData[]	= $Quot_Nomor;
 			$nestedData[]	= $Quot_PO;
+			$nestedData[]	= $Ket_Type;
 			$nestedData[]	= $Ket_Status;
 			$nestedData[]	= $Template;
 			$data[] = $nestedData;
@@ -350,7 +397,7 @@ class Sales_order_insitu extends CI_Controller {
 	}
 	
 	function create_sales_order(){
-		$rows_Header	= $rows_Customer = $rows_Detail = array();
+		$rows_Header	= $rows_Customer = $rows_Detail = $rows_Plant = array();
 		if($this->input->get()){
 			$Code_Quot		= urldecode($this->input->get('nomor_quot'));
 			$rows_Header	= $this->db->get_where('quotations',array('id'=>$Code_Quot))->row();
@@ -367,6 +414,9 @@ class Sales_order_insitu extends CI_Controller {
 								AND flag_insitu	= 'Y'";
 			$rows_Detail	= $this->db->query($Query_Detail)->result();
 			
+			$Query_Plant	= "SELECT id,branch FROM plants WHERE customer_id = '".$rows_Header->customer_id."' AND NOT(branch IS NULL OR branch ='' OR branch='-')";
+			$rows_Plant		= $this->db->query($Query_Plant)->result();
+			
 		}
 		$rows_Supplier		= $this->master_model->getArray('suppliers',array('id !='=>'COMP-001'),'id','supplier');
 		$rows_Delivery		= $this->master_model->getArray('quotation_deliveries',array('quotation_id'=>$Code_Quot),'delivery_id','delivery_name');
@@ -378,7 +428,8 @@ class Sales_order_insitu extends CI_Controller {
 			'rows_detail'	=> $rows_Detail,
 			'rows_cust'		=> $rows_Customer,
 			'rows_supplier'	=> $rows_Supplier,
-			'rows_delivery'	=> $rows_Delivery
+			'rows_delivery'	=> $rows_Delivery,
+			'rows_plant'	=> $rows_Plant
 		);
 		
 		$this->load->view($this->folder.'/v_sales_order_insitu_add',$data);
@@ -764,7 +815,7 @@ class Sales_order_insitu extends CI_Controller {
 	
 	
 	function revisi_sales_order(){
-		$rows_Header	= $rows_Quot = $rows_Detail = $rows_Outs = array();
+		$rows_Header	= $rows_Quot = $rows_Detail = $rows_Outs = $rows_Plant = array();
 		$Tgl_Old		= date('Y-m-d');
 		$Noso_Rev		= '';
 		$Urut_Rev		= '';
@@ -774,6 +825,9 @@ class Sales_order_insitu extends CI_Controller {
 			$rows_Header	= $this->db->get_where('letter_orders',array('id'=>$Code_Process))->row();
 			$rows_Detail	= $this->db->get_where('letter_order_details',array('letter_order_id'=>$Code_Process))->result();
 			$rows_Quot		= $this->db->get_where('quotations',array('id'=>$rows_Header->quotation_id))->row();
+			
+			$Query_Plant	= "SELECT id,branch FROM plants WHERE customer_id = '".$rows_Header->customer_id."' AND NOT(branch IS NULL OR branch ='' OR branch='-')";
+			$rows_Plant		= $this->db->query($Query_Plant)->result();
 			
 			$Nomor_SO		= $rows_Header->no_so;
 			$Code_Old		= (isset($rows_Header->old_id) && !empty($rows_Header->old_id))?$rows_Header->old_id:$Code_Process;
@@ -816,7 +870,8 @@ class Sales_order_insitu extends CI_Controller {
 			'urut_rev'		=> $Urut_Rev,
 			'code_old'		=> $Code_Old,
 			'rows_outs'		=> $rows_Outs,
-			'rows_delivery'	=> $rows_Delivery
+			'rows_delivery'	=> $rows_Delivery,
+			'rows_plant'	=> $rows_Plant
 		);
 		
 		$this->load->view($this->folder.'/v_sales_order_insitu_revisi',$data);
@@ -1074,5 +1129,33 @@ class Sales_order_insitu extends CI_Controller {
 		}
 		
 		echo json_encode($rows_Return);
+	}
+	
+	function get_detail_comp_plant(){
+		$response	= array(
+			'alamat'	=> '',
+			'nama'		=> '',
+			'phone'		=> ''	
+		);
+		
+		if($this->input->post()){
+			$Code_Cari	= $this->input->post('plant');
+			$Code_Cust	= $this->input->post('nocust');
+			$WHERE_Code	= array(
+				'id'				=> $Code_Cari,
+				'customer_id'		=> $Code_Cust
+			);
+			
+			$rows_Find	= $this->db->get_where('plants',$WHERE_Code)->row();
+			if($rows_Find){
+				$response	= array(
+					'alamat'	=> $rows_Find->address,
+					'nama'		=> strtoupper($rows_Find->pic),
+					'phone'		=> $rows_Find->phone	
+				);
+				
+			}
+		}
+		echo json_encode($response);
 	}
 }

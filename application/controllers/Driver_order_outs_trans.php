@@ -184,6 +184,7 @@ class Driver_order_outs_trans extends CI_Controller {
 		if($Type_Find){
 			if(!empty($WHERE))$WHERE	.=" AND ";
 			if(strtolower($Type_Find) == 'ins'){
+				
 				$WHERE	.="(
 								insitu = 'Y'
 								AND (
@@ -193,6 +194,7 @@ class Driver_order_outs_trans extends CI_Controller {
 							)";
 			}else if(strtolower($Type_Find) == 'del'){
 				if($Cat_Find == 'SUB'){
+					
 					$WHERE	.="
 							(
 								location = 'Warehouse'
@@ -221,7 +223,8 @@ class Driver_order_outs_trans extends CI_Controller {
 								*/
 							)
 							";
-				}else{				
+				}else{			
+					
 					$WHERE	.="
 							(
 								qty_rec > 0
@@ -257,6 +260,7 @@ class Driver_order_outs_trans extends CI_Controller {
 				}
 			}else{
 				if($Cat_Find == 'SUB'){
+					
 					$WHERE	.="
 								(
 									location = 'Subcon'
@@ -313,14 +317,17 @@ class Driver_order_outs_trans extends CI_Controller {
 						)";
 		}
 		
-		
+		$WHERE_FROM		= "";
+		if($WHERE){
+			$WHERE_FROM	= " WHERE ".$WHERE;
+		}
 		$sql = "SELECT
 					*,
 					(@row:=@row+1) AS urut
 				FROM
 					trans_details,
 				(SELECT @row:=0) r 
-				WHERE ".$WHERE;
+				".$WHERE_FROM;
 		//print_r($sql);exit();
 		$fetch['totalData'] 	= $this->db->query($sql)->num_rows();
 		$fetch['totalFiltered']	= $this->db->query($sql)->num_rows();
@@ -435,10 +442,12 @@ class Driver_order_outs_trans extends CI_Controller {
 						}
 					}
 				}
+				if($nestedData){
+					$data[] = $nestedData;
+					$urut1++;
+					$urut2++;
+				}
 				
-				$data[] = $nestedData;
-				$urut1++;
-				$urut2++;
 			}
 			
 			
@@ -853,6 +862,18 @@ class Driver_order_outs_trans extends CI_Controller {
 					'created_by'	=> $Created_By,
 					'created_date'	=> $Created_Date
 				);
+			}else if($Type_Process === 'INS'){
+				$OK_Bast			= 1;
+				$arr_Bast_Header	= array(
+					'order_code'	=> $Code_Order,
+					'customer_id'	=> $Nocust,
+					'customer_name'	=> $Customer,
+					'address'		=> $Address,
+					'pic'			=> $PIC_Name,
+					'status'		=> 'OPN',
+					'created_by'	=> $Created_By,
+					'created_date'	=> $Created_Date
+				);
 			}
 			
 			$Ins_Upd_Quot	= array();
@@ -911,14 +932,27 @@ class Driver_order_outs_trans extends CI_Controller {
 							$rows_Trans		= $this->db->get_where('trans_details',array('id'=>$Code_QuotDet))->row();
 							if($rows_Trans){
 								$Code_SO		= $rows_Trans->letter_order_id;
-								$arr_Bast_Det[$Code_SO][]	= array(
-									'quotation_detail_id'	=> $Code_QuotDet,
-									'tool_id'				=> $Code_Tool,
-									'tool_name'				=> $Name_Tool,
-									'qty'					=> $Qty_Pros,
-									'qty_io'				=> 0,
-									'qty_sisa'				=> $Qty_Pros
-								);
+								if($Type_Process === 'INS'){
+									$arr_Bast_Det[$Code_SO][]	= array(
+										'quotation_detail_id'	=> $Code_QuotDet,
+										'tool_id'				=> $Code_Tool,
+										'tool_name'				=> $Name_Tool,
+										'qty'					=> $Qty_Pros,
+										'flag_tech_letter'		=> 'N',
+										'member_id'				=> $rows_Trans->teknisi_id,
+										'member_name'			=> $rows_Trans->teknisi_name
+									);
+								}else{
+									$arr_Bast_Det[$Code_SO][]	= array(
+										'quotation_detail_id'	=> $Code_QuotDet,
+										'tool_id'				=> $Code_Tool,
+										'tool_name'				=> $Name_Tool,
+										'qty'					=> $Qty_Pros,
+										'qty_io'				=> 0,
+										'qty_sisa'				=> $Qty_Pros
+									);
+								}
+								
 							}
 						}
 												
@@ -928,108 +962,243 @@ class Driver_order_outs_trans extends CI_Controller {
 			
 			##  MODIFIED BY ALI ~ 2022-12-10  ##
 			if($OK_Bast === 1){
-				$Urut_Code_Bast	= $Urut_Nomor_Bast = 1;
-				$YearMonth	= date('Y-m',strtotime($Plan_Date));
-				$YM_Short	= date('Ym',strtotime($Plan_Date));
-				$Year		= date('Y',strtotime($Plan_Date));
-				$Month		= date('n',strtotime($Plan_Date));
-				
-				$CodePros	= ($Category == 'CUST')?'C':'S';
-				$TypePros	= ($Type_Process == 'REC')?'R':'S';
-				$romawi		= getRomawi($Month);
-				
-				
-				$Query_Urut	= "SELECT MAX(CAST(SUBSTRING_INDEX(id, '-', -1) AS UNSIGNED)) as urut FROM bast_headers WHERE datet LIKE '".$YearMonth."-%' LIMIT 1";
-				$rows_Urut	= $this->db->query($Query_Urut)->result();
-				if($rows_Urut){
-					$Urut_Code_Bast	= intval($rows_Urut[0]->urut) + 1;
-				}
-				
-				
-				
-				
-				$Urut_Nomor	= 1;
-				$Query_Nomor	= "SELECT MAX(CAST(SUBSTRING_INDEX(nomor, '/', 1) AS UNSIGNED)) as urut FROM bast_headers WHERE datet LIKE '".$Year."-%' AND flag_type = '".(($Category == 'CUST')?'CUST':'SUPP')."' AND type_bast = '".(($Type_Process == 'REC')?'REC':'DEL')."' LIMIT 1";
-				$rows_Nomor	= $this->db->query($Query_Nomor)->result();
-				if($rows_Nomor){
-					$Urut_Nomor_Bast	= intval($rows_Nomor[0]->urut) + 1;
-				}
-				
-				
-				foreach($arr_Bast_Det as $keyLet=>$valLet){
-					$Nomor_Baru	= $Urut_Nomor_Bast;
-					$Urut_Code	= $Urut_Code_Bast;
-					if($Urut_Code_Bast < 10000){
-						$Urut_Code	= sprintf('%04d',$Urut_Code_Bast);
+				if($Type_Process === 'INS'){
+					$Urut_Code_Bast	= $Urut_Nomor_Bast = 1;
+					$YearMonth	= date('Y-m',strtotime($Plan_Date));
+					$YM_Short	= date('Ym',strtotime($Plan_Date));
+					$Year		= date('Y',strtotime($Plan_Date));
+					$Year_Short	= date('y',strtotime($Plan_Date));
+					$Month		= date('n',strtotime($Plan_Date));
+					
+					$romawi		= getRomawi($Month);
+					
+					$Query_Urut	= "SELECT MAX(CAST(SUBSTRING_INDEX(id, '-', -1) AS UNSIGNED)) as urut FROM insitu_letters WHERE datet LIKE '".$Year."-%' LIMIT 1";
+					$rows_Urut	= $this->db->query($Query_Urut)->row();
+					if($rows_Urut){
+						$Urut_Code_Bast	= intval($rows_Urut->urut) + 1;
 					}
 					
-					if($Urut_Nomor_Bast < 1000){
-						$Nomor_Baru	= sprintf('%03d',$Urut_Nomor_Bast);
-					}
-					$Code_Bast			= 'BAST-'.$YM_Short.'-'.sprintf('%04d',$Urut_Code_Bast);
-					$Nomor_Bast			= $Nomor_Baru.'/N-BAST.'.$TypePros.'/'.$CodePros.'-'.$romawi.'/'.$Year;
 					
-					$Ins_Bast_Header					= $arr_Bast_Header;
-					$Ins_Bast_Header['id']				= $Code_Bast;
-					$Ins_Bast_Header['nomor']			= $Nomor_Bast;
-					$Ins_Bast_Header['datet']			= $Plan_Date;
-					$Ins_Bast_Header['letter_order_id']	= $keyLet;
 					
-					$Nomor_SO			= '-';
-					$rows_LetterOrder	= $this->db->get_where('letter_orders',array('id'=>$keyLet))->row();
-					if($rows_LetterOrder){
-						$Nomor_SO		= $rows_LetterOrder->no_so;
+					
+					$Urut_Nomor	= 1;
+					$Query_Nomor	= "SELECT MAX(CAST(SUBSTRING_INDEX(nomor, '/', 1) AS UNSIGNED)) as urut FROM insitu_letters WHERE datet LIKE '".$YearMonth."-%' LIMIT 1";
+					$rows_Nomor	= $this->db->query($Query_Nomor)->row();
+					if($rows_Nomor){
+						$Urut_Nomor_Bast	= intval($rows_Nomor->urut) + 1;
 					}
-					$Ins_Bast_Header['no_so']	= $Nomor_SO;
-					$intBast	= 0;
-					foreach($valLet as $keyTool=>$valTool){
-						$intBast++;
-						$Code_BastDetail					= $Code_Bast.'-'.$intBast;
-						$Ins_Bast_Detail					= $valTool;
-						$Ins_Bast_Detail['id']				= $Code_BastDetail;
-						$Ins_Bast_Detail['bast_header_id']	= $Code_Bast;
-						
-						$Has_Ins_Bast_Detail	= $this->db->insert('bast_details',$Ins_Bast_Detail);
-						if($Has_Ins_Bast_Detail !== true){
-							$Pesan_Error	= 'Error Insert BAST Detail...';
+					
+					foreach($arr_Bast_Det as $keyLet=>$valLet){
+						$Nomor_Baru	= $Urut_Nomor_Bast;
+						$Urut_Code	= $Urut_Code_Bast;
+						if($Urut_Code_Bast < 100000){
+							$Urut_Code	= sprintf('%05d',$Urut_Code_Bast);
 						}
-						$Qty_process		= $valTool['qty'];
-						$Code_Trans			= $valTool['quotation_detail_id'];
 						
-						$Query_Trans	= "SELECT qty_send, qty_send_real, qty_subcon_send, qty_subcon_send_real, qty_subcon_rec, qty_subcon_rec_real FROM trans_details WHERE id = '".$Code_Trans."'";
-						$Data_Trans		= $this->db->query($Query_Trans)->result_array();
+						if($Urut_Nomor_Bast < 100000){
+							$Nomor_Baru	= sprintf('%05d',$Urut_Nomor_Bast);
+						}
+						$Code_Bast			= 'BAST-'.$YM_Short.'-I-'.$Urut_Code;
+						$Nomor_Bast			= $Nomor_Baru.'/N.BAST-I/CAL/'.$romawi.'/'.$Year_Short;
 						
-						if($Category == 'CUST'){
-							if($Type_Process == 'REC'){
-								$Upd_Trans		= "bast_rec_id = '".$Code_Bast."', bast_rec_no = '".$Nomor_Bast."', bast_rec_date = '".$Plan_Date."', bast_rec_by = '".$Created_By."'";
-							}else{
-								$Upd_Trans		= "bast_send_id = '".$Code_Bast."', bast_send_no = '".$Nomor_Bast."', bast_send_date = '".$Plan_Date."', bast_send_by = '".$Created_By."'";
+						$Ins_Bast_Header					= $arr_Bast_Header;
+						$Ins_Bast_Header['id']				= $Code_Bast;
+						$Ins_Bast_Header['nomor']			= $Nomor_Bast;
+						$Ins_Bast_Header['datet']			= $Plan_Date;
+						$Ins_Bast_Header['letter_order_id']	= $keyLet;
+						
+						$Nomor_SO			= '-';
+						$Code_Quotation		= '-';
+						$rows_LetterOrder	= $this->db->get_where('letter_orders',array('id'=>$keyLet))->row();
+						if($rows_LetterOrder){
+							$Nomor_SO		= $rows_LetterOrder->no_so;
+							$Code_Quotation	= $rows_LetterOrder->quotation_id;
+						}
+						$Ins_Bast_Header['quotation_id']	= $Code_Quotation;
+						$intBast	= 0;
+						foreach($valLet as $keyTool=>$valTool){
+							$intBast++;
+							$Code_BastDetail					= $Code_Bast.'-'.sprintf('%03d',$intBast);
+							$Ins_Bast_Detail					= $valTool;
+							$Ins_Bast_Detail['id']				= $Code_BastDetail;
+							$Ins_Bast_Detail['insitu_letter_id']	= $Code_Bast;
+							
+							$Has_Ins_Bast_Detail	= $this->db->insert('insitu_letter_details',$Ins_Bast_Detail);
+							if($Has_Ins_Bast_Detail !== true){
+								$Pesan_Error	= 'Error Insert BAST Insitu Detail...';
 							}
-						}else{
-							if($Type_Process == 'REC'){
-								$Upd_Trans		= "subcon_bast_rec_id = '".$Code_Bast."', subcon_bast_rec_no = '".$Nomor_Bast."', subcon_bast_rec_date = '".$Plan_Date."', subcon_bast_rec_by = '".$Created_By."'";
-							}else{
-								$Upd_Trans		= "subcon_bast_send_id = '".$Code_Bast."', subcon_bast_send_no = '".$Nomor_Bast."', subcon_bast_send_date = '".$Plan_Date."', subcon_bast_send_by = '".$Created_By."'";
+							$Qty_process		= $valTool['qty'];
+							$Code_Trans			= $valTool['quotation_detail_id'];
+							$Query_Trans		= "SELECT * FROM trans_details WHERE id = '".$Code_Trans."'";
+							$Data_Trans			= $this->db->query($Query_Trans)->row();
+							
+							## UPDATE TRANS DETAILS ##
+							$Qry_Upd_Trans	= "UPDATE trans_details SET bast_rec_id = '".$Code_Bast."', bast_rec_no = '".$Nomor_Bast."', bast_rec_date = '".$Plan_Date."', bast_rec_by = '".$Created_By."' WHERE id ='".$Code_Trans."'";							
+							$Has_Upd_Trans	= $this->db->query($Qry_Upd_Trans);
+							if($Has_Upd_Trans !== true){
+								$Pesan_Error	= 'Error Update Trans Detail - BAST...';
 							}
+							
+							## INSERT TRANS DATA DETAILS ##
+							for($x=1;$x<=$Qty_process;$x++){
+								$Code_TransDet	= $Code_Trans.'-'.$x;
+								
+								## FIND EXIST ##
+								$rows_ExistTrans	= $this->db->get_where('trans_data_details',array('id'=>$Code_TransDet))->num_rows();
+								if($rows_ExistTrans > 0){
+									$Ins_TransDet	= array(
+										'trans_detail_id'		=> $Code_Trans,
+										'tool_id'				=> $Data_Trans->tool_id,
+										'tool_name'				=> $Data_Trans->tool_name,
+										'actual_teknisi_id'		=> $Data_Trans->teknisi_id,
+										'actual_teknisi_name'	=> $Data_Trans->teknisi_name,
+										'datet'					=> $Plan_Date,
+										'quotation_detail_id'	=> $Data_Trans->quotation_detail_id
+									);
+									
+									$Has_Ins_Trans_Det	= $this->db->update('trans_data_details',$Ins_TransDet,array('id'=>$Code_TransDet));
+									if($Has_Ins_Trans_Det !== true){
+										$Pesan_Error	= 'Error Update Trans Data Detail...';
+									}
+								}else{
+									$Ins_TransDet	= array(
+										'id'					=> $Code_TransDet,
+										'trans_detail_id'		=> $Code_Trans,
+										'tool_id'				=> $Data_Trans->tool_id,
+										'tool_name'				=> $Data_Trans->tool_name,
+										'actual_teknisi_id'		=> $Data_Trans->teknisi_id,
+										'actual_teknisi_name'	=> $Data_Trans->teknisi_name,
+										'datet'					=> $Plan_Date,
+										'quotation_detail_id'	=> $Data_Trans->quotation_detail_id
+									);
+									
+									$Has_Ins_Trans_Det	= $this->db->insert('trans_data_details',$Ins_TransDet);
+									if($Has_Ins_Trans_Det !== true){
+										$Pesan_Error	= 'Error Insert Trans Data Detail...';
+									}
+								}
+								
+								
+							}
+							
 						}
 						
-						$Qry_Upd_Trans	= "UPDATE trans_details SET ".$Upd_Trans." WHERE id ='".$Code_Trans."'";
-						
-						$Has_Upd_Trans	= $this->db->query($Qry_Upd_Trans);
-						if($Has_Upd_Trans !== true){
-							$Pesan_Error	= 'Error Update Trans Detail - BAST...';
+						$Has_Ins_Bast_Header	= $this->db->insert('insitu_letters',$Ins_Bast_Header);
+						if($Has_Ins_Bast_Header !== true){
+							$Pesan_Error	= 'Error Insert BAST Insitu Header...';
 						}
 						
+						$Urut_Nomor_Bast++;
+						$Urut_Code_Bast++;
 					}
 					
-					$Has_Ins_Bast_Header	= $this->db->insert('bast_headers',$Ins_Bast_Header);
-					if($Has_Ins_Bast_Header !== true){
-						$Pesan_Error	= 'Error Insert BAST Header...';
+					
+				}else{
+					
+					$Urut_Code_Bast	= $Urut_Nomor_Bast = 1;
+					$YearMonth	= date('Y-m',strtotime($Plan_Date));
+					$YM_Short	= date('Ym',strtotime($Plan_Date));
+					$Year		= date('Y',strtotime($Plan_Date));
+					$Month		= date('n',strtotime($Plan_Date));
+					
+					$CodePros	= ($Category == 'CUST')?'C':'S';
+					$TypePros	= ($Type_Process == 'REC')?'R':'S';
+					$romawi		= getRomawi($Month);
+					
+					
+					$Query_Urut	= "SELECT MAX(CAST(SUBSTRING_INDEX(id, '-', -1) AS UNSIGNED)) as urut FROM bast_headers WHERE datet LIKE '".$YearMonth."-%' LIMIT 1";
+					$rows_Urut	= $this->db->query($Query_Urut)->result();
+					if($rows_Urut){
+						$Urut_Code_Bast	= intval($rows_Urut[0]->urut) + 1;
 					}
 					
-					$Urut_Nomor_Bast++;
-					$Urut_Code_Bast++;
+					
+					
+					
+					$Urut_Nomor	= 1;
+					$Query_Nomor	= "SELECT MAX(CAST(SUBSTRING_INDEX(nomor, '/', 1) AS UNSIGNED)) as urut FROM bast_headers WHERE datet LIKE '".$Year."-%' AND flag_type = '".(($Category == 'CUST')?'CUST':'SUPP')."' AND type_bast = '".(($Type_Process == 'REC')?'REC':'DEL')."' LIMIT 1";
+					$rows_Nomor	= $this->db->query($Query_Nomor)->result();
+					if($rows_Nomor){
+						$Urut_Nomor_Bast	= intval($rows_Nomor[0]->urut) + 1;
+					}
+					
+					
+					foreach($arr_Bast_Det as $keyLet=>$valLet){
+						$Nomor_Baru	= $Urut_Nomor_Bast;
+						$Urut_Code	= $Urut_Code_Bast;
+						if($Urut_Code_Bast < 10000){
+							$Urut_Code	= sprintf('%04d',$Urut_Code_Bast);
+						}
+						
+						if($Urut_Nomor_Bast < 1000){
+							$Nomor_Baru	= sprintf('%03d',$Urut_Nomor_Bast);
+						}
+						$Code_Bast			= 'BAST-'.$YM_Short.'-'.$Urut_Code;
+						$Nomor_Bast			= $Nomor_Baru.'/N-BAST.'.$TypePros.'/'.$CodePros.'-'.$romawi.'/'.$Year;
+						
+						$Ins_Bast_Header					= $arr_Bast_Header;
+						$Ins_Bast_Header['id']				= $Code_Bast;
+						$Ins_Bast_Header['nomor']			= $Nomor_Bast;
+						$Ins_Bast_Header['datet']			= $Plan_Date;
+						$Ins_Bast_Header['letter_order_id']	= $keyLet;
+						
+						$Nomor_SO			= '-';
+						$rows_LetterOrder	= $this->db->get_where('letter_orders',array('id'=>$keyLet))->row();
+						if($rows_LetterOrder){
+							$Nomor_SO		= $rows_LetterOrder->no_so;
+						}
+						$Ins_Bast_Header['no_so']	= $Nomor_SO;
+						$intBast	= 0;
+						foreach($valLet as $keyTool=>$valTool){
+							$intBast++;
+							$Code_BastDetail					= $Code_Bast.'-'.$intBast;
+							$Ins_Bast_Detail					= $valTool;
+							$Ins_Bast_Detail['id']				= $Code_BastDetail;
+							$Ins_Bast_Detail['bast_header_id']	= $Code_Bast;
+							
+							$Has_Ins_Bast_Detail	= $this->db->insert('bast_details',$Ins_Bast_Detail);
+							if($Has_Ins_Bast_Detail !== true){
+								$Pesan_Error	= 'Error Insert BAST Detail...';
+							}
+							$Qty_process		= $valTool['qty'];
+							$Code_Trans			= $valTool['quotation_detail_id'];
+							
+							$Query_Trans	= "SELECT qty_send, qty_send_real, qty_subcon_send, qty_subcon_send_real, qty_subcon_rec, qty_subcon_rec_real FROM trans_details WHERE id = '".$Code_Trans."'";
+							$Data_Trans		= $this->db->query($Query_Trans)->result_array();
+							
+							if($Category == 'CUST'){
+								if($Type_Process == 'REC'){
+									$Upd_Trans		= "bast_rec_id = '".$Code_Bast."', bast_rec_no = '".$Nomor_Bast."', bast_rec_date = '".$Plan_Date."', bast_rec_by = '".$Created_By."'";
+								}else{
+									$Upd_Trans		= "bast_send_id = '".$Code_Bast."', bast_send_no = '".$Nomor_Bast."', bast_send_date = '".$Plan_Date."', bast_send_by = '".$Created_By."'";
+								}
+							}else{
+								if($Type_Process == 'REC'){
+									$Upd_Trans		= "subcon_bast_rec_id = '".$Code_Bast."', subcon_bast_rec_no = '".$Nomor_Bast."', subcon_bast_rec_date = '".$Plan_Date."', subcon_bast_rec_by = '".$Created_By."'";
+								}else{
+									$Upd_Trans		= "subcon_bast_send_id = '".$Code_Bast."', subcon_bast_send_no = '".$Nomor_Bast."', subcon_bast_send_date = '".$Plan_Date."', subcon_bast_send_by = '".$Created_By."'";
+								}
+							}
+							
+							$Qry_Upd_Trans	= "UPDATE trans_details SET ".$Upd_Trans." WHERE id ='".$Code_Trans."'";
+							
+							$Has_Upd_Trans	= $this->db->query($Qry_Upd_Trans);
+							if($Has_Upd_Trans !== true){
+								$Pesan_Error	= 'Error Update Trans Detail - BAST...';
+							}
+							
+						}
+						
+						$Has_Ins_Bast_Header	= $this->db->insert('bast_headers',$Ins_Bast_Header);
+						if($Has_Ins_Bast_Header !== true){
+							$Pesan_Error	= 'Error Insert BAST Header...';
+						}
+						
+						$Urut_Nomor_Bast++;
+						$Urut_Code_Bast++;
+					}
 				}
+				
 			}
 			
 			if ($this->db->trans_status() != TRUE || !empty($Pesan_Error)){

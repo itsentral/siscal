@@ -30,6 +30,24 @@
 								echo form_input(array('id'=>'code_so','name'=>'code_so','type'=>'hidden'),$rows_header[0]->letter_order_id);
 								echo form_input(array('id'=>'subcon','name'=>'subcon','type'=>'hidden'),$rows_header[0]->subcon);
 								echo form_input(array('id'=>'code_back','name'=>'code_back','type'=>'hidden'),$Code_Back);
+								
+								$Default_Val	= $rows_detail[0]->take_image;
+								$File_Before	= $rows_detail[0]->before_cals_image;
+								
+								$Style_Div		="style='display:none !important;'";
+								if($Default_Val == 'Y'){
+									$Style_Div		="";
+								}
+								
+								$Ok_Exist	= 'N';
+								$Link_Source	= '';
+								$Style_Add		="display:none !important;";
+								if(!empty($File_Before) && $File_Before !== '-'){
+									$Ok_Exist	= 'Y';
+									$Link_Source	= $this->file_attachement.'hasil_kalibrasi/'.$File_Before;
+									$Style_Add		="";
+								}
+								
 							?>
 						</div>
 					</div>
@@ -113,72 +131,99 @@
 						</div>
 					</div>	
 				</div>
-				<div class="row">
-					<div class="col-sm-12 col-xs-12 text-center sub-heading" style="color:white;">
-						<h5>DETAIL TOOL PICTURE </h5>
-					</div>					
-				</div>
 				<div class='row'>
 					<div class="col-sm-6">
 						<div class="form-group">
-							<label>
-								<strong>Before Calibration</strong>
-							</label>
+							<label class="control-label">Allow Take Picture <span class="text-red"> *</span></label>
 							<div>
-								<button type="button" class="btn btn-sm bg-green-active" onclick="ambil_kamera('depan')">
-									<i class="fa fa-camera"></i> Take Picture
-								</button>
-								<button type="button" class="btn btn-sm btn-danger btn-hapus-foto_depan" style="display: none;" onclick="hapus_foto('depan')">
-									<i class="fa fa-trash"></i> Delete Picture
-								</button>
-							</div>					
-							 <input type="hidden" name="pic_webcam_depan" id="pic_webcam_depan" value="">
-							 <input type="hidden" name="pic_webcam_back" id="pic_webcam_back" value="">
+								<select name="take_image" id="take_image" class="form-control chosen-select">
+									<option value=""> - Select An Option - </option>
+									<?php
+									
+									$Arr_Option	= array('Y'=>'YES','N'=>'NO');
+									foreach($Arr_Option as $keyOpt=>$valOpt){
+										$Yuup	= ($keyOpt == $Default_Val)?'selected':'';
+										echo'<option value="'.$keyOpt.'" '.$Yuup.'>'.$valOpt.'</option>';
+									}
+														
+									?>
+								</select>
+							</div>
 						</div>
-						<div class="form-group">
-							<p class="text-center">
-								<div id="result_camera_depan"></div>
-								<img src="" id="pic_upload_preview_depan" style="display: none;max-width: 100%;">
-							</p>
-						</div>
-						<div class="form-group">
-							<label>
-								<strong>Upload Before Cals Image</strong>
-							</label>
-						   <input class="form-control" type="file" name="files_depan" id="files_depan" onChange="ValidateSingleInput2(this);">					   
-						</div>							
-						<hr></hr>
 					</div>
 					<div class="col-sm-6">
-						<div class="form-group">
-							<label>
-								<strong>After Calibration</strong>
-							</label>
-							<div>
-								<button type="button" class="btn btn-sm bg-blue-active" onclick="ambil_kamera('back')">
-									<i class="fa fa-camera"></i> Take Picture
-								</button>
-								<button type="button" class="btn btn-sm btn-danger btn-hapus-foto_back" style="display: none;" onclick="hapus_foto('back')">
-									<i class="fa fa-trash"></i> Delete Picture
-								</button>
-							</div>
-							
-						</div>
-						<div class="form-group">
-							<p class="text-center">
-								<div id="result_camera_back"></div>
-								<img src="" id="pic_upload_preview_back" style="display: none;max-width: 100%;">
-							</p>
-						</div>
-						<div class="form-group">
-							<label>
-								<strong>Upload After Cals Image</strong>
-							</label>
-						   <input class="form-control" type="file" name="files_back" id="files_back" onChange="ValidateSingleInput2(this);">					   
-						</div>						
-						<hr></hr>
-					</div>
 					
+					</div>
+				</div>
+				<div id="div_gambar" <?php echo $Style_Div;?>>
+					<div class="row">
+						<div class="col-sm-12 col-xs-12 text-center sub-heading" style="color:white;">
+							<h5>DETAIL TOOL PICTURE </h5>
+						</div>					
+					</div>
+					<div class='row'>
+						<div class="col-sm-6">
+							<div class="form-group">
+								<label>
+									<strong>Before Calibration</strong>
+								</label>
+								<div>
+									<button type="button" class="btn btn-sm bg-green-active" onclick="ambil_kamera('depan')">
+										<i class="fa fa-camera"></i> Take Picture
+									</button>
+									<button type="button" class="btn btn-sm btn-danger btn-hapus-foto_depan" style="<?php echo $Style_Add;?>" onclick="hapus_foto('depan')">
+										<i class="fa fa-trash"></i> Delete Picture
+									</button>
+								</div>					
+								 <input type="hidden" name="pic_webcam_depan" id="pic_webcam_depan" value="">
+								 <input type="hidden" name="pic_webcam_back" id="pic_webcam_back" value="">
+								 <input type="hidden" name="exist_depan" id="exist_depan" value="<?php echo $Ok_Exist;?>">
+							</div>
+							<div class="form-group">
+								<p class="text-center">
+									<div id="result_camera_depan"></div>
+									<img src="<?php echo $Link_Source;?>" id="pic_upload_preview_depan" style="max-width: 100%;<?php echo $Style_Add;?>">
+								</p>
+							</div>
+							<div class="form-group">
+								<label>
+									<strong>Upload Before Cals Image</strong>
+								</label>
+							   <input class="form-control" type="file" name="files_depan" id="files_depan" onChange="ValidateSingleInput2(this);">					   
+							</div>							
+							<hr></hr>
+						</div>
+						<div class="col-sm-6">
+							<div class="form-group">
+								<label>
+									<strong>After Calibration</strong>
+								</label>
+								<div>
+									<button type="button" class="btn btn-sm bg-blue-active" onclick="ambil_kamera('back')">
+										<i class="fa fa-camera"></i> Take Picture
+									</button>
+									<button type="button" class="btn btn-sm btn-danger btn-hapus-foto_back" style="display: none;" onclick="hapus_foto('back')">
+										<i class="fa fa-trash"></i> Delete Picture
+									</button>
+								</div>
+								
+							</div>
+							<div class="form-group">
+								<p class="text-center">
+									<div id="result_camera_back"></div>
+									<img src="" id="pic_upload_preview_back" style="display: none;max-width: 100%;">
+								</p>
+							</div>
+							<div class="form-group">
+								<label>
+									<strong>Upload After Cals Image</strong>
+								</label>
+							   <input class="form-control" type="file" name="files_back" id="files_back" onChange="ValidateSingleInput2(this);">					   
+							</div>						
+							<hr></hr>
+						</div>
+						
+					</div>
 				</div>
 				<div id="div_gagal" style="display:none !important;">
 					<div class="row">
@@ -459,6 +504,15 @@
 		}else{
 			$('#div_berhasil').hide();
 			$('#div_gagal').hide();
+		}
+	});
+	
+	$(document).on('change','#take_image',()=>{
+		let Ambil_Gambar = $('#take_image').val();
+		if(Ambil_Gambar == 'Y'){
+			$('#div_gambar').show();
+		}else{
+			$('#div_gambar').hide();
 		}
 	});
 	

@@ -129,6 +129,7 @@
 									<th class="text-center">Tool Name</th>
 									<th class="text-center">Range</th>				
 									<th class="text-center">Description</th>
+									<th class="text-center">Quotation<br>Notes</th>
 									
 								</tr>
 							</thead>
@@ -144,9 +145,11 @@
 										$Cust_Alat		= $valD->tool_name;
 										$Range_Alat		= '-';
 										$Keterangan		= $valD->descr;
+										$Notes_Quot		= '-';
 										$rows_QuotDet	= $this->db->get_where('quotation_details',array('id'=>$valD->quotation_detail_id))->row();
 										if($rows_QuotDet){
 											$Range_Alat		= $rows_QuotDet->range.' '.$rows_QuotDet->piece_id;
+											$Notes_Quot		= $rows_QuotDet->descr;
 										}
 										
 												
@@ -156,7 +159,8 @@
 											<td class="text-center">'.$Code_Alat.'</td>
 											<td class="text-left">'.$Cust_Alat.'</td>
 											<td class="text-center">'.$Range_Alat.'</td>
-											<td class="text-left">'.$Keterangan.'</td>											
+											<td class="text-left">'.$Keterangan.'</td>
+											<td class="text-left">'.$Notes_Quot.'</td>
 										</tr>
 										';
 											

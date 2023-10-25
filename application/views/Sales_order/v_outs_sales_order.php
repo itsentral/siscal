@@ -240,5 +240,9 @@ $this->load->view('include/side_menu');
             return false;
 		}
 	});
-
+	
+	function printReceive(code_receive){
+		let LinkPrint = base_url +'/'+ active_controller+'/print_warehouse_receive?code='+encodeURIComponent(code_receive);
+		window.open(LinkPrint,'_blank');
+	}
 </script>

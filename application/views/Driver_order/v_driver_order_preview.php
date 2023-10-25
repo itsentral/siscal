@@ -272,7 +272,7 @@
 										<td class="text-left">'.$Cust_Alat.'</td>
 										<td class="text-center">'.$Range_Alat.'</td>
 										<td class="text-center">'.$Qty_Ord.'</td>
-										<td class="text-center">'.$Qty_Pros.'</td>	
+										<td class="text-center">'.$Qty_Pros.'</td>
 										<td class="text-center">'.$No_SO.'</td>
 									</tr>
 									';									

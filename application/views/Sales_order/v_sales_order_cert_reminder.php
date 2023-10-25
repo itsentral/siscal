@@ -23,6 +23,7 @@ $this->load->view('include/side_menu');
 						<th class="text-center">Quotation</th>
 						<th class="text-center">PO No</th>
 						<th class="text-center">Marketing</th>
+						<th class="text-center">CRM Status</th>
 						<th class="text-center">Action</th>
 					</tr>
 				</thead>
@@ -104,7 +105,8 @@ $this->load->view('include/side_menu');
 				{"targets":3,"sClass":"text-center"},
 				{"targets":4,"sClass":"text-center"},
 				{"targets":5,"sClass":"text-center"},
-				{"targets":6,"sClass":"text-center","searchable":false,"orderable": false}
+				{"targets":6,"sClass":"text-center","searchable":false,"orderable": false},
+				{"targets":7,"sClass":"text-center","searchable":false,"orderable": false}
 				
 			],
 			"sPaginationType": "simple_numbers", 
@@ -123,7 +125,7 @@ $this->load->view('include/side_menu');
 				},
 				error	: function(){ 
 					$(".my-grid-error").html("");
-					$("#my-grid").append('<tbody class="my-grid-error"><tr><th colspan="7">No data found in the server</th></tr></tbody>');
+					$("#my-grid").append('<tbody class="my-grid-error"><tr><th colspan="8">No data found in the server</th></tr></tbody>');
 					$("#my-grid_processing").css("display","none");
 				}
 			}

@@ -811,6 +811,63 @@ if ($rows_invletter) {
 }
 ## END TANDA TERIMA INVOICE ##
 
+## NOTES INVOICE ##
+$Imp_Order		= implode("','",$arr_SO);
+$Query_Notes	= "SELECT * FROM letter_orders WHERE no_so IN('".$Imp_Order."') AND NOT(notes_invoice IS NULL OR notes_invoice = '' OR notes_invoice ='-')";
+
+$rows_Notes		= $this->db->query($Query_Notes)->result();
+if($rows_Notes){
+	$Header3  = "
+				<div id='space'></div>
+				<div id='space'></div>
+				<table class='noborder2' width='100%'>
+					<tr>
+						<td width='30%' align='left' rowspan='2'>
+							<img src='" . $img_file . "' width='160' height='70'/>
+						</td>
+						<td><div style='font-size:18px;font-weight: bold;'>PT. SENTRAL TEHNOLOGI MANAGEMEN</div></td>
+					</tr>
+					<tr>
+						<td valign='bottom'><div style='font-size:9px;font-weight: bold;'>TEMPERATURE, PRESSURE, MASS, DIMENSION, ANALITICAL INSTRUMENT, FORCE, ISO 17025</div></td>
+					</tr>
+					<tr>
+						<td colspan='2'><img src='" . $img_file2 . "'/></td>
+					</tr>
+					<tr>
+						<td class='textcenter bold' colspan='2'><div style='font-size:18px;font-weight: bold;'>Notes Invoice</div></td>
+					</tr>
+					<tr>
+						<td height='20px' colspan='2'></td>
+					</tr>
+				</table>";
+	echo "<pagebreak>";
+	echo $Header3;
+	
+	echo"
+		<table class='gridtable' width='100%'>
+			<tr>
+				<td align='left' valign='top' colspan='3' width='100%'>Detail Notes :</td>
+			</tr>
+			<tr>
+				<th width='5%' align='center'>No.</th>
+				<th width='20%' align='center'>No SO</th>
+				<th width='75%' align='center'>Notes Invoice</th>
+			</tr>";
+			
+			$intL	= 0;
+			foreach ($rows_Notes as $key => $vals) {
+				$intL++;
+				echo "<tr>";
+				echo "<td width='5%' align='center'>" . $intL . "</td>";
+				echo "<td width='20%' align='left'>" . $vals->no_so . "</td>";
+				echo "<td width='75%' align='left'>" . $vals->notes_invoice . "</td>";
+				echo "</tr>";
+			}
+			
+echo"
+		</table>
+	";
+}
 
 $html = ob_get_contents();
 ob_end_clean();

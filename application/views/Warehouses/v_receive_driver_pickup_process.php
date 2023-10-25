@@ -195,6 +195,7 @@ $this->load->view('include/side_menu');
 									<th class="text-center">Tool Name</th>
 									<th class="text-center">Range</th>				
 									<th class="text-center">Description</th>
+									<th class="text-center">Quotation<br>Notes</th>
 									<th class="text-center">Action</th>
 								</tr>
 							</thead>
@@ -210,9 +211,11 @@ $this->load->view('include/side_menu');
 											$Cust_Alat		= $valD->tool_name;
 											$Range_Alat		= '-';
 											$Keterangan		= $valD->descr;
+											$Notes_Quot		= '-';
 											$rows_QuotDet	= $this->db->get_where('quotation_details',array('id'=>$valD->quotation_detail_id))->row();
 											if($rows_QuotDet){
 												$Range_Alat		= $rows_QuotDet->range.' '.$rows_QuotDet->piece_id;
+												$Notes_Quot		= $rows_QuotDet->descr;
 											}
 											
 													
@@ -223,6 +226,7 @@ $this->load->view('include/side_menu');
 												<td class="text-left">'.$Cust_Alat.'</td>
 												<td class="text-center">'.$Range_Alat.'</td>
 												<td class="text-left">'.$Keterangan.'</td>
+												<td class="text-left">'.$Notes_Quot.'</td>
 												<td class="text-center"><button type="button" onClick="ReceiveTool(\''.$Code_Detail.'\',\''.$valD->code_receive.'\')" class="btn btn-sm btn-danger" title="RECEIVE TOOLS"> <i class="fa fa-long-arrow-right"></i> </button></td>
 											</tr>
 											';

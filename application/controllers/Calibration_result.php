@@ -445,6 +445,521 @@ class Calibration_result extends CI_Controller {
 		
 	}
 	
+	
+	function print_barcode_calibration_tool(){
+		$rows_Sentral		= $rows_Tool = array();		
+		if($this->input->post()){
+			$Code_Sentral	= $this->input->post('code');
+			
+			$rows_Trans		= $this->db->get_where('trans_data_details',array('id'=>$Code_Sentral))->row();
+			$rows_Sentral	= $this->db->get_where('sentral_customer_tools',array('sentral_tool_code'=>$rows_Trans->sentral_code_tool))->row();
+			$rows_Tool		= $this->db->get_where('tools',array('id'=>$rows_Sentral->tool_id))->row();
+			
+			$File_QR		= $rows_Trans->qr_code;
+			$Path_PDF		= $this->file_location.'QRCode/'.$Code_Sentral.'.pdf';
+			$Name_File		= 'QR-'.$Code_Sentral.'.jpg';
+			
+						
+			$HashKey		= '173ALIDYhG93b0qyJfIxfsdgfh2guVoUubW46hjwvniR200881173Gacad0FgaC9mi2008811M4ru5L1mChaeMo0';
+			$CodeHash		= str_replace('=','',enkripsi_url($rows_Trans->id));
+			$Link_URL		= 'https://sentral.dutastudy.com/Siscal_CRM/index.php/CertificateGenerate/CertificateAuthorized/'.$CodeHash;
+			
+			//echo $CodeHash.' '.dekripsi_url($CodeHash);exit;
+			$GenerateQRCode	= $this->GenerateQRImage($rows_Trans->id,'QRCode',$Link_URL);
+			
+			if(file_exists($Path_PDF)){
+				unset($Path_PDF);
+			}
+			
+			## GENARATE PDF ##
+			$File_PDF		= $this->GenerateQRFile($Code_Sentral);
+			if(file_exists($Path_PDF)){
+				chmod($Path_PDF, 0777);
+			}
+			
+			
+			$myurl 			= $Path_PDF.'[0]';
+			$image 			= new Imagick();
+			$image->setResolution( 300, 300 );
+			$image->readImage($myurl);
+			$image->setImageFormat( "jpeg" );
+			$image->writeImage($this->file_location.'QRCode/'.$Name_File);
+			$image->clear();
+			$image->destroy();
+			
+			
+			## HAPUS FILE PDF ##
+			if(file_exists($Path_PDF)){
+				unlink($Path_PDF);
+			}
+			
+			## HAPUS FILE QR ##
+			
+			$File_Barcode	= $this->file_location.'QRCode/'.$Code_Sentral.'.png';
+			if(file_exists($File_Barcode)){
+				chmod($File_Barcode, 0777);
+				unlink($File_Barcode);
+			}
+			
+			
+			
+			$UPD_Detail		= array(
+				'qr_code'	=> $Name_File
+			);
+			
+			$Has_Upd_Detail	= $this->db->update('trans_data_details',$UPD_Detail,array('id'=>$Code_Sentral));
+			$rows_Trans		= $this->db->get_where('trans_data_details',array('id'=>$Code_Sentral))->row();
+			
+			
+			$rows_Return	= array(
+				'hasil'			=> 1,
+				'pesan'			=> 'Berhasil',
+				'path'			=> $this->file_attachement.'QRCode/'.$Name_File
+			);
+			
+			echo json_encode($rows_Return);
+			
+		}		
+	}
+	
+	function GenerateQRFile($Code=''){
+		$rows_trans		= $this->db->get_where('trans_data_details',array('id'=>$Code))->row();
+		$rows_header	= $this->db->get_where('sentral_customer_tools',array('sentral_tool_code'=>$rows_trans->sentral_code_tool))->row();
+		$rows_tool		= $this->db->get_where('tools',array('id'=>$rows_header->tool_id))->row();
+		
+		$File_Path		= $this->file_location.'QRCode/'.$Code.'.pdf';
+		
+		$sroot = $_SERVER['DOCUMENT_ROOT'];
+		include $sroot.'/Siscal_mobile/application/third_party/MPDF57/mpdf.php';
+		$mpdf=new mPDF('utf-8', array(29,50));				// Create new mPDF Document
+		$ArrBulan	=array(1=>'Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','Nopember','Desember');
+		$ArrHari	= array(
+			'Sun'	=> 'Minggu',
+			'Mon'	=> 'Senin',
+			'Tue'	=> 'Selasa',
+			'Wed'	=> 'Rabu',
+			'Thu'	=> 'Kamis',
+			'Fri'	=> 'Jumat',
+			'Sat'	=> 'Sabtu'
+			);
+		//Beginning Buffer to save PHP variables and HTML tags
+		ob_start();
+		$img_sentral	= $sroot.'/Siscal_Dashboard/assets/img/logo_flat.png';
+		$img_kan		= $sroot.'/Siscal_Dashboard/assets/img/kan.png';
+		//echo"<pre>";print_r($rows_header);exit;
+
+		$HashKey		= '173ALIDYhG93b0qyJfIxfsdgfh2guVoUubW46hjwvniR200881173Gacad0FgaC9mi2008811M4ru5L1mChaeMo0';
+		$CodeHash		= Enkripsi($rows_trans->id,$HashKey);
+		$Link_URL		= 'https://sentral.dutastudy.com/Siscal_CRM/index.php/CertificateGenerate/CertificateAuthorized/'.$CodeHash;
+
+		?>  
+
+		<style type="text/css">
+		@page {
+			margin-top: 0.1cm;
+			margin-left: 0.1cm;
+			margin-right: 0.1cm;
+			margin-bottom: 0.1cm;
+		}
+		.font{
+			font-family: verdana,arial,sans-serif;
+			font-size:14px;
+		}
+		.fontheader{
+			font-family: verdana,arial,sans-serif;
+			font-size:13px;
+			color:#333333;
+			border-width: 1px;
+			border-color: #666666;
+			border-collapse: collapse;
+		}
+
+		table.noborder2 th {
+			font-size:11px;
+			padding: 1px;
+			border-color: #666666;
+		}
+
+		table.noborder2 td {	
+			padding: 1px;
+			border-color: #666666;
+			background-color: #ffffff;
+			font-size:10px;
+			font-family: verdana,arial,sans-serif;
+		}
+		table.noborder3 td {	
+			padding: 1px;
+			border-color: #666666;
+			background-color: #ffffff;
+			font-size:12px;
+			font-family: verdana,arial,sans-serif;
+		}
+		table.noborder, .noborder2,noborder3 {
+			font-family: verdana,arial,sans-serif;
+		}
+
+		table.noborder th {
+			font-size:9px;
+			padding: 2px;
+			border-color: #666666;
+		}
+
+		table.noborder td {	
+			padding: 1px;
+			border-color: #666666;
+			background-color: #ffffff;
+			font-size:9px;
+			font-family: verdana,arial,sans-serif;
+		}
+
+		table.gridtable {
+			font-family: verdana,arial,sans-serif;
+			font-size:10px;
+			color:#333333;
+			border-width: 1px;
+			border-color: #666666;
+			border-collapse: collapse;
+		}
+
+		table.gridtable th {
+			border-width: 1px;
+			padding: 5px;
+			border-style: solid;
+			border-color: #666666;
+			background-color: #f2f2f2;
+			
+		}
+
+		table.gridtable th.head {
+			border-width: 1px;
+			padding: 8px;
+			border-style: solid;
+			border-color: #666666;
+			background-color: #7f7f7f;
+			color: #ffffff;
+		}
+		table.gridtable td {
+			border-width: 1px;
+			padding: 5px;
+			border-style: solid;
+			border-color: #666666;
+			background-color: #ffffff;
+		}
+
+		table.gridtable td zero {
+			border-width: 1px;
+			padding: 5px;
+			border-color: #666666;
+			background-color: #ffffff;
+			
+		}
+
+		table.gridtable td.cols {
+			border-width: 1px;
+			padding: 5px;
+			border-style: solid;
+			border-color: #666666;
+			background-color: #ffffff;
+		}
+
+		table.cooltabs {
+			font-size:12px;
+			font-family: verdana,arial,sans-serif;
+			border-width: 1px;
+			border-style: solid;
+		}
+
+		table.cooltabs th.reg {
+			font-family: verdana,arial,sans-serif;
+			border-radius: 5px 5px 5px 5px;
+			background: #e3e0e4;
+			padding: 5px;
+		}
+
+		table.cooltabs td.reg {
+			font-family: verdana,arial,sans-serif;
+			border-radius: 5px 5px 5px 5px;
+			padding: 5px;
+			border-width: 1px;
+		}
+
+		#cooltabs {
+			font-family: verdana,arial,sans-serif;
+			border-width: 1px;
+			border-style: solid;
+			border-radius: 5px 5px 5px 5px;
+			background: #e3e0e4;
+			padding: 5px; 
+			width: 800px;
+			height: 14px; 
+		}
+
+		#cooltabs2{
+			font-family: verdana,arial,sans-serif;
+			border-width: 1px;
+			border-style: solid;
+			border-radius: 5px 5px 5px 5px;
+			background: #e3e0e4;
+			padding: 5px; 
+			width: 180px;
+			height: 10px;
+		}
+
+		#space{
+			padding: 3px; 
+			width: 180px;
+			height: 1px;
+		}
+
+		#cooltabshead{
+			font-size:12px;
+			font-family: verdana,arial,sans-serif;
+			border-width: 1px;
+			border-style: solid;
+			border-radius: 5px 5px 0 0;
+			background: #dfdfdf;
+			padding: 5px; 
+			width: 162px;
+			height: 10px;
+			float:left;
+		}
+
+		#cooltabschild{
+			font-size:10px;
+			font-family: verdana,arial,sans-serif;
+			border-width: 1px;
+			border-style: solid;
+			border-radius: 0 0 5px 5px;
+			padding: 5px; 
+			width: 162px;
+			height: 10px;
+			float:left;
+		}
+
+		p {
+		  margin: 0 0 0 0;
+		}
+
+		p.pos_fixed {
+			font-family: verdana,arial,sans-serif;
+			position: fixed;
+			top: 50px;
+			left: 230px;
+		}
+
+		p.pos_fixed2 {
+			font-family: verdana,arial,sans-serif;
+			position: fixed;
+			top: 589px;
+			left: 230px;
+		}
+
+		p.notesmall {
+			font-size: 9px;
+		}
+
+
+		.barcode {
+			padding: 1.5mm;
+			margin: 1.5mm;
+			vertical-align: top;
+			color: #000044;
+		}
+
+		.barcodecell {
+			text-align: center;
+			vertical-align: middle;
+			position: fixed;
+			top: 14px;
+			right: 10px;
+		}
+
+		p.pt {
+			font-family: verdana,arial,sans-serif;
+			font-size:7px;
+			position: fixed;
+			top: 62px;
+			left: 5px;
+		}
+		h3.pt {
+			font-family: calibri,arial,sans-serif;
+			position: fixed;	
+			top: 175px;
+			left: 250px;
+			}
+
+		h3 {
+			font-family: calibri,arial,sans-serif;
+			position: fixed;	
+			top: 65px;
+			left: 200px;
+			}
+
+		h2 {
+			font-family: calibri,arial,sans-serif;
+			position: fixed;
+			top: 95px;
+			left: 280px;
+			}
+			
+		p.reg {
+			font-family: verdana,arial,sans-serif;
+			font-size:11px;
+		}
+
+		p.sub {
+			font-family: verdana,arial,sans-serif;
+			font-size:13px;
+			position: fixed;
+			top: 55px;
+			left: 214px;
+			color: #6b6b6b;
+		}
+
+		p.header {
+			font-family: verdana,arial,sans-serif;
+			font-size:11px;
+			color: #330000;
+		}
+
+		p.barcs {
+			font-family: verdana,arial,sans-serif;
+			font-size:11px;
+			position: fixed;
+			top: 13px;
+			right: 1px;
+		}
+
+		p.alamat {
+			font-family: verdana,arial,sans-serif;
+			font-size:7px;
+			position: fixed;
+			top: 71px;
+			left: 5px;
+		}
+
+		p.tlp {
+			font-family: verdana,arial,sans-serif;
+			font-size:7px;
+			position: fixed;
+			top: 80px;
+			left: 5px;
+		}
+
+		p.date {
+			font-family: verdana,arial,sans-serif;
+			font-size:12px;
+			text-align: right;
+		}
+
+		p.foot {
+			font-family: verdana,arial,sans-serif;
+			font-size:7px;
+			position: fixed;
+			top: 750px;
+			left: 5px;
+		}
+
+		p.footer {
+			font-family: verdana,arial,sans-serif;
+			font-size:10px;
+			position: fixed;
+			bottom: 7px;    
+		}
+
+		p.ln {
+			font-family: verdana,arial,sans-serif;
+			font-size:9px;
+			position: fixed;
+			bottom: 1px;
+			left: 2px;
+		}
+
+		#hrnew {
+			border: 0;
+			border-bottom: 1px solid #ccc;
+			background: #999;
+		}
+		.text-wrap{
+			overflow-wrap: break-word !important;
+			word-wrap: break-word !important;
+			white-space: pre-wrap !important;
+			word-break: break-word !important;
+		}
+		.text-center{
+			text-align:center !important;
+			vertical-align : middle !important;
+		}
+		.text-left{
+			text-align:left !important;
+			vertical-align : middle !important;
+		}
+		</style>
+		<?php
+		$Font_Footer	= $Font_Header = "8px";
+		$Code_Trans		= $rows_trans->id;
+		$Code_Serial	= $rows_trans->no_serial_number;
+		$Code_Identify	= $rows_trans->no_identifikasi;
+		$Text_Head		= $Code_Trans;
+		if(!empty($Code_Identify) && $Code_Identify !== '-'){
+			$Text_Head		= $Code_Identify;
+		}
+
+		if(!empty($Code_Serial) && $Code_Serial !== '-'){
+			$Text_Head		= $Code_Serial;
+		}
+
+		if(strlen($Text_Head) > 20){
+			//$Font_Header	= "6px";
+		}
+		$Text_Footer	= date('d-m-Y',strtotime($rows_trans->datet));
+		if(!empty($rows_trans->valid_until) && $rows_trans->valid_until !== '0000-00-00' && $rows_trans->valid_until !== '1970-01-01'){
+			$Text_Footer	.='<br>sd<br>'.date('d-m-Y',strtotime($rows_trans->valid_until));
+			//$Font_Footer	= "6px";
+		}
+
+		$rows_Image	= "";
+		if(strtolower($rows_tool->certification_id) == 'kan'){
+			$rows_Image	= "
+			<tr>
+				<td width='100%' class='text-center'>
+					<img src='".$img_kan."' width='30' height='25'>
+				</td>
+			</tr>
+			";
+		}
+
+
+
+		$Header	="
+		<div style='border-width: 1px;border-color: #666666;border-style: solid;'>
+			<table class='noborder' width='100%' height='100%'>
+				<tr>
+					<td width='100%' class='text-center text-wrap' style='font-size:".$Font_Header." !important;'>".$Text_Head."</td>
+				</tr>
+				<tr>
+					<td width='100%' class='text-center'>
+						<img src='".$this->file_attachement.'QRCode/'.$Code_Trans.".png' width='85' height='80'>
+					</td>
+				</tr>
+				<tr>
+					<td width='100%' class='text-center text-wrap' style='font-size:".$Font_Footer." !important;'>".$Text_Footer."</td>
+				</tr>
+			</table>	
+		</div>
+		";
+
+		echo $Header;
+			
+		$html = ob_get_contents();
+		ob_end_clean();
+		//echo $html;exit;
+		$mpdf->WriteHTML($html);
+		$mpdf->Output($File_Path ,'F');
+	}
+	
+	
+	/*
 	function print_barcode_calibration_tool(){
 		$rows_Sentral		= $rows_Tool = array();		
 		if($this->input->post()){
@@ -462,8 +977,9 @@ class Calibration_result extends CI_Controller {
 				$CodeHash		= str_replace('=','',enkripsi_url($rows_Trans->id));
 				$Link_URL		= 'https://sentral.dutastudy.com/Siscal_CRM/index.php/CertificateGenerate/CertificateAuthorized/'.$CodeHash;
 				//echo $CodeHash.' '.dekripsi_url($CodeHash);exit;
-				$GenerateQRCode	= $this->GenerateQRImage($rows_Trans->id,'QRCode',$Link_URL);
-				
+				//$GenerateQRCode	= $this->GenerateQRImage($rows_Trans->id,'QRCode',$Link_URL);
+				//echo"<br>https://sentral.dutastudy.com/T.php?q=".$rows_Trans->id;
+				//echo"<br>".$CodeHash;exit;
 				if(file_exists($Path_PDF)){
 					unset($Path_PDF);
 				}
@@ -549,7 +1065,7 @@ class Calibration_result extends CI_Controller {
 		$HashKey		= '173ALIDYhG93b0qyJfIxfsdgfh2guVoUubW46hjwvniR200881173Gacad0FgaC9mi2008811M4ru5L1mChaeMo0';
 		$CodeHash		= Enkripsi($rows_trans->id,$HashKey);
 		$Link_URL		= 'https://sentral.dutastudy.com/Siscal_CRM/index.php/CertificateGenerate/CertificateAuthorized/'.$CodeHash;
-
+		
 		?>  
 
 		<style type="text/css">
@@ -935,7 +1451,8 @@ class Calibration_result extends CI_Controller {
 				</tr>
 				<tr>
 					<td width='100%' class='text-center'>
-						<img src='".$this->file_attachement.'QRCode/'.$Code_Trans.".png' width='50' height='45'>
+						<barcode code='".$Link_URL."' type='QR' size='0.5' error='L'/>
+						
 					</td>
 				</tr>
 				<tr>
@@ -952,5 +1469,546 @@ class Calibration_result extends CI_Controller {
 		//echo $html;exit;
 		$mpdf->WriteHTML($html);
 		$mpdf->Output($File_Path ,'F');
+	}
+	
+	*/
+	
+	function print_barcode_nonQR_tool(){
+		$rows_Sentral		= $rows_Tool = array();		
+		if($this->input->post()){
+			$Code_Sentral	= $this->input->post('code');
+			$rows_Trans		= $this->db->get_where('trans_data_details',array('id'=>$Code_Sentral))->row();
+			$rows_Sentral	= $this->db->get_where('sentral_customer_tools',array('sentral_tool_code'=>$rows_Trans->sentral_code_tool))->row();
+			$rows_Tool		= $this->db->get_where('tools',array('id'=>$rows_Sentral->tool_id))->row();
+			
+			$File_QR		= $rows_Trans->qr_code;
+			$Path_PDF		= $this->file_location.'QRCode/'.$Code_Sentral.'.pdf';
+			$Name_File		= 'QR-'.$Code_Sentral.'.jpg';
+			
+					
+			$HashKey		= '173ALIDYhG93b0qyJfIxfsdgfh2guVoUubW46hjwvniR200881173Gacad0FgaC9mi2008811M4ru5L1mChaeMo0';
+			$CodeHash		= str_replace('=','',enkripsi_url($rows_Trans->id));
+			$Link_URL		= 'https://sentral.dutastudy.com/Siscal_CRM/index.php/CertificateGenerate/CertificateAuthorized/'.$CodeHash;
+			//echo $CodeHash.' '.dekripsi_url($CodeHash);exit;
+			//$GenerateQRCode	= $this->GenerateQRImage($rows_Trans->id,'QRCode',$Link_URL);
+			//echo"<br>https://sentral.dutastudy.com/T.php?q=".$rows_Trans->id;
+			//echo"<br>".$CodeHash;exit;
+			if(file_exists($Path_PDF)){
+				unset($Path_PDF);
+			}
+			
+			## GENARATE PDF ##
+			$File_PDF		= $this->GenerateNonQRFile($Code_Sentral);
+			if(file_exists($Path_PDF)){
+				chmod($Path_PDF, 0777);
+			}
+			
+			
+			$myurl 			= $Path_PDF.'[0]';
+			$image 			= new Imagick();
+			$image->setResolution( 300, 300 );
+			$image->readImage($myurl);
+			$image->setImageFormat( "jpeg" );
+			$image->writeImage($this->file_location.'QRCode/'.$Name_File);
+			$image->clear();
+			$image->destroy();
+			
+			
+			## HAPUS FILE PDF ##
+			
+			if(file_exists($Path_PDF)){
+				unlink($Path_PDF);
+			}
+			
+			## HAPUS FILE QR ##
+			
+			$File_Barcode	= $this->file_location.'QRCode/'.$Code_Sentral.'.png';
+			if(file_exists($File_Barcode)){
+				chmod($File_Barcode, 0777);
+				unlink($File_Barcode);
+			}
+			
+			
+			$UPD_Detail		= array(
+				'qr_code'	=> $Name_File
+			);
+			
+			$Has_Upd_Detail	= $this->db->update('trans_data_details',$UPD_Detail,array('id'=>$Code_Sentral));
+			$rows_Trans		= $this->db->get_where('trans_data_details',array('id'=>$Code_Sentral))->row();
+		
+			
+			$rows_Return	= array(
+				'hasil'			=> 1,
+				'pesan'			=> 'Berhasil',
+				'path'			=> $this->file_attachement.'QRCode/'.$Name_File
+			);
+			
+			echo json_encode($rows_Return);
+			
+		}		
+	}
+	function GenerateNonQRFile($Code=''){
+		$rows_trans		= $this->db->get_where('trans_data_details',array('id'=>$Code))->row();
+		$rows_header	= $this->db->get_where('sentral_customer_tools',array('sentral_tool_code'=>$rows_trans->sentral_code_tool))->row();
+		$rows_tool		= $this->db->get_where('tools',array('id'=>$rows_trans->tool_id))->row();
+		//echo"<pre>";print_r($rows_trans);
+		$File_Path		= $this->file_location.'QRCode/'.$Code.'.pdf';
+		
+		$sroot = $_SERVER['DOCUMENT_ROOT'];
+		include $sroot.'/Siscal_mobile/application/third_party/MPDF57/mpdf.php';
+		$mpdf=new mPDF('utf-8', array(53,27));				// Create new mPDF Document
+		$ArrBulan	=array(1=>'Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','Nopember','Desember');
+		$ArrHari	= array(
+			'Sun'	=> 'Minggu',
+			'Mon'	=> 'Senin',
+			'Tue'	=> 'Selasa',
+			'Wed'	=> 'Rabu',
+			'Thu'	=> 'Kamis',
+			'Fri'	=> 'Jumat',
+			'Sat'	=> 'Sabtu'
+			);
+		//Beginning Buffer to save PHP variables and HTML tags
+		ob_start();
+		$img_sentral	= $sroot.'/Siscal_Dashboard/assets/img/logo_flat.png';
+		$img_kan		= $sroot.'/Siscal_Dashboard/assets/img/kan.png';
+		//echo"<pre>";print_r($rows_header);exit;
+
+		$HashKey		= '173ALIDYhG93b0qyJfIxfsdgfh2guVoUubW46hjwvniR200881173Gacad0FgaC9mi2008811M4ru5L1mChaeMo0';
+		$CodeHash		= Enkripsi($rows_trans->id,$HashKey);
+		$Link_URL		= 'https://sentral.dutastudy.com/Siscal_CRM/index.php/CertificateGenerate/CertificateAuthorized/'.$CodeHash;
+		
+		?>  
+
+		<style type="text/css">
+		@page {
+			margin-top: 0.1cm;
+			margin-left: 0.1cm;
+			margin-right: 0.1cm;
+			margin-bottom: 0.1cm;
+		}
+		.font{
+			font-family: verdana,arial,sans-serif;
+			font-size:14px;
+		}
+		.fontheader{
+			font-family: verdana,arial,sans-serif;
+			font-size:13px;
+			color:#333333;
+			border-width: 1px;
+			border-color: #666666;
+			border-collapse: collapse;
+		}
+
+		table.noborder2 th {
+			font-size:11px;
+			padding: 1px;
+			border-color: #666666;
+		}
+
+		table.noborder2 td {	
+			padding: 1px;
+			border-color: #666666;
+			background-color: #ffffff;
+			font-size:10px;
+			font-family: verdana,arial,sans-serif;
+		}
+		table.noborder3 td {	
+			padding: 1px;
+			border-color: #666666;
+			background-color: #ffffff;
+			font-size:12px;
+			font-family: verdana,arial,sans-serif;
+		}
+		table.noborder, .noborder2,noborder3 {
+			font-family: verdana,arial,sans-serif;
+		}
+
+		table.noborder th {
+			font-size:9px;
+			padding: 2px;
+			border-color: #666666;
+		}
+
+		table.noborder td {	
+			padding: 1px;
+			border-color: #666666;
+			background-color: #ffffff;
+			font-size:9px;
+			font-family: verdana,arial,sans-serif;
+		}
+
+		table.gridtable {
+			font-family: verdana,arial,sans-serif;
+			font-size:10px;
+			color:#333333;
+			border-width: 1px;
+			border-color: #666666;
+			border-collapse: collapse;
+		}
+
+		table.gridtable th {
+			border-width: 1px;
+			padding: 5px;
+			border-style: solid;
+			border-color: #666666;
+			background-color: #f2f2f2;
+			
+		}
+
+		table.gridtable th.head {
+			border-width: 1px;
+			padding: 8px;
+			border-style: solid;
+			border-color: #666666;
+			background-color: #7f7f7f;
+			color: #ffffff;
+		}
+		table.gridtable td {
+			border-width: 1px;
+			padding: 5px;
+			border-style: solid;
+			border-color: #666666;
+			background-color: #ffffff;
+		}
+
+		table.gridtable td zero {
+			border-width: 1px;
+			padding: 5px;
+			border-color: #666666;
+			background-color: #ffffff;
+			
+		}
+
+		table.gridtable td.cols {
+			border-width: 1px;
+			padding: 5px;
+			border-style: solid;
+			border-color: #666666;
+			background-color: #ffffff;
+		}
+
+		table.cooltabs {
+			font-size:12px;
+			font-family: verdana,arial,sans-serif;
+			border-width: 1px;
+			border-style: solid;
+		}
+
+		table.cooltabs th.reg {
+			font-family: verdana,arial,sans-serif;
+			border-radius: 5px 5px 5px 5px;
+			background: #e3e0e4;
+			padding: 5px;
+		}
+
+		table.cooltabs td.reg {
+			font-family: verdana,arial,sans-serif;
+			border-radius: 5px 5px 5px 5px;
+			padding: 5px;
+			border-width: 1px;
+		}
+
+		#cooltabs {
+			font-family: verdana,arial,sans-serif;
+			border-width: 1px;
+			border-style: solid;
+			border-radius: 5px 5px 5px 5px;
+			background: #e3e0e4;
+			padding: 5px; 
+			width: 800px;
+			height: 14px; 
+		}
+
+		#cooltabs2{
+			font-family: verdana,arial,sans-serif;
+			border-width: 1px;
+			border-style: solid;
+			border-radius: 5px 5px 5px 5px;
+			background: #e3e0e4;
+			padding: 5px; 
+			width: 180px;
+			height: 10px;
+		}
+
+		#space{
+			padding: 3px; 
+			width: 180px;
+			height: 1px;
+		}
+
+		#cooltabshead{
+			font-size:12px;
+			font-family: verdana,arial,sans-serif;
+			border-width: 1px;
+			border-style: solid;
+			border-radius: 5px 5px 0 0;
+			background: #dfdfdf;
+			padding: 5px; 
+			width: 162px;
+			height: 10px;
+			float:left;
+		}
+
+		#cooltabschild{
+			font-size:10px;
+			font-family: verdana,arial,sans-serif;
+			border-width: 1px;
+			border-style: solid;
+			border-radius: 0 0 5px 5px;
+			padding: 5px; 
+			width: 162px;
+			height: 10px;
+			float:left;
+		}
+
+		p {
+		  margin: 0 0 0 0;
+		}
+
+		p.pos_fixed {
+			font-family: verdana,arial,sans-serif;
+			position: fixed;
+			top: 50px;
+			left: 230px;
+		}
+
+		p.pos_fixed2 {
+			font-family: verdana,arial,sans-serif;
+			position: fixed;
+			top: 589px;
+			left: 230px;
+		}
+
+		p.notesmall {
+			font-size: 9px;
+		}
+
+
+		.barcode {
+			padding: 1.5mm;
+			margin: 1.5mm;
+			vertical-align: top;
+			color: #000044;
+		}
+
+		.barcodecell {
+			text-align: center;
+			vertical-align: middle;
+			position: fixed;
+			top: 14px;
+			right: 10px;
+		}
+
+		p.pt {
+			font-family: verdana,arial,sans-serif;
+			font-size:7px;
+			position: fixed;
+			top: 62px;
+			left: 5px;
+		}
+		h3.pt {
+			font-family: calibri,arial,sans-serif;
+			position: fixed;	
+			top: 175px;
+			left: 250px;
+			}
+
+		h3 {
+			font-family: calibri,arial,sans-serif;
+			position: fixed;	
+			top: 65px;
+			left: 200px;
+			}
+
+		h2 {
+			font-family: calibri,arial,sans-serif;
+			position: fixed;
+			top: 95px;
+			left: 280px;
+			}
+			
+		p.reg {
+			font-family: verdana,arial,sans-serif;
+			font-size:11px;
+		}
+
+		p.sub {
+			font-family: verdana,arial,sans-serif;
+			font-size:13px;
+			position: fixed;
+			top: 55px;
+			left: 214px;
+			color: #6b6b6b;
+		}
+
+		p.header {
+			font-family: verdana,arial,sans-serif;
+			font-size:11px;
+			color: #330000;
+		}
+
+		p.barcs {
+			font-family: verdana,arial,sans-serif;
+			font-size:11px;
+			position: fixed;
+			top: 13px;
+			right: 1px;
+		}
+
+		p.alamat {
+			font-family: verdana,arial,sans-serif;
+			font-size:7px;
+			position: fixed;
+			top: 71px;
+			left: 5px;
+		}
+
+		p.tlp {
+			font-family: verdana,arial,sans-serif;
+			font-size:7px;
+			position: fixed;
+			top: 80px;
+			left: 5px;
+		}
+
+		p.date {
+			font-family: verdana,arial,sans-serif;
+			font-size:12px;
+			text-align: right;
+		}
+
+		p.foot {
+			font-family: verdana,arial,sans-serif;
+			font-size:7px;
+			position: fixed;
+			top: 750px;
+			left: 5px;
+		}
+
+		p.footer {
+			font-family: verdana,arial,sans-serif;
+			font-size:10px;
+			position: fixed;
+			bottom: 7px;    
+		}
+
+		p.ln {
+			font-family: verdana,arial,sans-serif;
+			font-size:9px;
+			position: fixed;
+			bottom: 1px;
+			left: 2px;
+		}
+
+		#hrnew {
+			border: 0;
+			border-bottom: 1px solid #ccc;
+			background: #999;
+		}
+		.text-wrap{
+			overflow-wrap: break-word !important;
+			word-wrap: break-word !important;
+			white-space: pre-wrap !important;
+			word-break: break-word !important;
+		}
+		.text-center{
+			text-align:center !important;
+			vertical-align : middle !important;
+		}
+		.text-left{
+			text-align:left !important;
+			vertical-align : middle !important;
+		}
+		</style>
+		<?php
+		
+		$Code_Trans		= trim($rows_trans->id);
+		$Code_Serial	= trim($rows_trans->no_serial_number);
+		$Code_Identify	= trim($rows_trans->no_identifikasi);
+		$Text_Head		= $Code_Trans;
+		$Text_Label		= 'S/N';
+		if(!empty($Code_Identify) && $Code_Identify != '-'){
+			$Text_Head		= $Code_Identify;
+			$Text_Label		= 'ID';
+		}
+
+		if(!empty($Code_Serial) && $Code_Serial != '-'){
+			$Text_Head		= $Code_Serial;
+			$Text_Label		= 'ID';
+		}
+
+		$Font_Size		= "10px";
+		$Cals_Date		= date('d-m-Y',strtotime($rows_trans->datet));
+		$Extra_Text		= "<tr>
+								<td colspan='3' height='1'>&nbsp;</td>
+							</tr>";
+		if(!empty($rows_trans->valid_until) && $rows_trans->valid_until != '0000-00-00' && $rows_trans->valid_until != '1970-01-01'){
+			$Font_Size	= "9px";
+			$Extra_Text	= "<tr>
+							<td width='25%' class='text-center text-wrap' style='font-size:".$Font_Size." !important;'><b>Exp Date<br><p>&nbsp;</p></b></td>
+							<td width='5%' class='text-center' style='font-size:".$Font_Size." !important;'>:<br><p>&nbsp;</p></td>
+							<td class='text-left text-wrap' style='font-size:".$Font_Size." !important;'><b>".date('d-m-Y',strtotime($rows_trans->valid_until))."<br><p>&nbsp;</p></b></td>
+						</tr>
+						";
+			
+			
+		}
+
+		$rows_Image	= "";
+		
+		if(strtolower($rows_tool->certification_id) == 'kan'){
+			$rows_Image	= "
+				<td width='70%' class='text-center'>
+					<img src='".$img_sentral."' width='100' height='25'>
+				</td>
+				<td width='30%' class='text-center'>
+					<img src='".$img_kan."' width='30' height='25'>
+				</td>
+			";
+		}else{
+			$rows_Image	= "
+				<td width='100%' class='text-center' colspan='2'>
+					<img src='".$img_sentral."' width='33' height='14'>
+				</td>		
+			";
+		}
+		
+
+		
+$Header	="
+		<div style='border-width: 1px;border-color: #666666;border-style: solid;'>
+			<table class='noborder' width='100%' height='100%' style='border-collapse: collapse !important;'>
+				<tr>
+					".$rows_Image."
+				</tr>
+			</table>
+			
+			<table width='100%' height='100%' style='border-collapse: collapse !important;font-family: verdana,arial,sans-serif;' class='noborder'>
+				<tr>
+					<td width='25%' class='text-center text-wrap' style='font-size:".$Font_Size." !important;'><b>".$Text_Label."</b></td>
+					<td width='5%' class='text-center' style='font-size:".$Font_Size." !important;'>:</td>
+					<td class='text-left text-wrap' style='font-size:".$Font_Size." !important;'><b>".((strlen($Text_Head) > 43)?substr($Text_Head,0,43):$Text_Head)."</b></td>
+				</tr>
+				<tr>
+					<td width='25%' class='text-center text-wrap' style='font-size:".$Font_Size." !important;'><b>Cal Date</b></td>
+					<td width='5%' class='text-center' style='font-size:".$Font_Size." !important;'>:</td>
+					<td class='text-left text-wrap' style='font-size:".$Font_Size." !important;'><b>".$Cals_Date."</b></td>
+				</tr>
+				".$Extra_Text."
+				
+			</table>
+			
+		</div>
+		";
+		
+
+		echo $Header;
+			
+		$html = ob_get_contents();
+		ob_end_clean();
+		//echo $html;exit;
+		$mpdf->WriteHTML($html);
+		$mpdf->Output($File_Path ,'F');
+		
 	}
 }

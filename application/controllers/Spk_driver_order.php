@@ -397,16 +397,24 @@ class Spk_driver_order extends CI_Controller {
 						}
 					}
 					
-					##  MODIFIED BY ALI ~ 2022-12-12  ##
+					##  MODIFIED BY ALI ~ 2023-01-28  ##
 					if($Flag_Process === 'Y'){
-						$Field_Upd_Bast	= "spk_driver_id = NULL, receive_by = NULL, sending_by = NULL";
-						
-						
-						$Upd_Bast_Head		= "UPDATE bast_headers SET ".$Field_Upd_Bast." WHERE spk_driver_id = '".$Code_Order."' AND status <> 'CNC'";
-						$Has_Upd_Bast_Head 	= $this->db->query($Upd_Bast_Head);
-						if($Has_Upd_Bast_Head !== TRUE){
-							$Pesan_Error	= 'Error Update Bast Header Header';
+						if($Type_Trans == 'REC'){
+							$Field_Upd_Bast	= "spk_driver_id = NULL, status = 'OPN'";					
+							$Upd_Bast_Head		= "UPDATE insitu_letters SET ".$Field_Upd_Bast." WHERE spk_driver_id = '".$Code_Order."'";
+							$Has_Upd_Bast_Head 	= $this->db->query($Upd_Bast_Head);
+							if($Has_Upd_Bast_Head !== TRUE){
+								$Pesan_Error	= 'Error Update Bast Insitu Header';
+							}
+						}else{
+							$Field_Upd_Bast	= "spk_driver_id = NULL, receive_by = NULL, sending_by = NULL";					
+							$Upd_Bast_Head		= "UPDATE bast_headers SET ".$Field_Upd_Bast." WHERE spk_driver_id = '".$Code_Order."' AND status <> 'CNC'";
+							$Has_Upd_Bast_Head 	= $this->db->query($Upd_Bast_Head);
+							if($Has_Upd_Bast_Head !== TRUE){
+								$Pesan_Error	= 'Error Update Bast Header Header';
+							}
 						}
+						
 					}
 					
 					$Qry_Upd_Order	= "UPDATE trans_driver_orders SET sts_order ='OPN', driver_id = NULL, driver_name = NULL, spk_driver_code = NULL, modified_by = '".$Created_By."', modified_date = '".$Created_Date."' WHERE spk_driver_code = '".$Code_Order."'";

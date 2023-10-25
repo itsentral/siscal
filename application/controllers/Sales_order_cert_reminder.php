@@ -141,7 +141,19 @@ class Sales_order_cert_reminder extends CI_Controller {
 				
 			}
 			
-			
+			$Ket_Status	= "<span class='badge bg-red-active'>INACTIVE</span>";
+			$Query_User	=  "SELECT
+								*
+							FROM
+								crm_users
+							WHERE
+								flag_active = '1'
+							AND category = 'EXT'
+							AND FIND_IN_SET('".$row['customer_id']."', custid) > 0";
+			$rows_User	= $this->db->query($Query_User)->row();
+			if($rows_User){
+				$Ket_Status	= "<span class='badge bg-green-active'>ACTIVE</span>";
+			}
 			
 			
 			
@@ -152,6 +164,7 @@ class Sales_order_cert_reminder extends CI_Controller {
 			$nestedData[]	= $No_Quot;
 			$nestedData[]	= $No_PO;
 			$nestedData[]	= $Name_Sales;
+			$nestedData[]	= $Ket_Status;
 			$nestedData[]	= $Template;
 			
 			$data[] = $nestedData;
@@ -271,7 +284,15 @@ class Sales_order_cert_reminder extends CI_Controller {
 		if($this->input->get()){
 			$Code_Order	= urldecode($this->input->get('code_order'));
 			$rows_Order	= $this->db->get_where('letter_orders',array('id'=>$Code_Order))->row();
-			$rows_User	= $this->db->get_where('crm_users',array('custid'=>$rows_Order->customer_id,'flag_active'=>'1','category'=>'EXT'))->row();
+			$Query_User	=  "SELECT
+								*
+							FROM
+								crm_users
+							WHERE
+								flag_active = '1'
+							AND category = 'EXT'
+							AND FIND_IN_SET('".$rows_Order->customer_id."', custid) > 0";
+			$rows_User	= $this->db->query($Query_User)->row();
 			$rows_Quot	= $this->db->get_where('quotations',array('id'=>$rows_Order->quotation_id))->row();
 			
 			
@@ -462,7 +483,7 @@ class Sales_order_cert_reminder extends CI_Controller {
 					
 					$Link_Approval		= 'https://sentral.dutastudy.com/Siscal_CRM';
 				
-					$Pesan_Whatsapp		= "# *Sentral Kalibrasi Sistem* # \n\nDear *".strtoupper($User_Full)."*\n\nSertifikat alat atas _*".$Customer_Name."*_ dengan nomor PO *".$Nomor_PO."* dan nomor SO *".$Nomor_Order."* telah dapat didonwload melalui sistem *".$Link_Approval."*\n\nUntuk akses ke sistem tersebut, Bapak/Ibu dapat login menggunakan akun _*".$User_Name."*_  atau Nomor HP *".$Nomor_WA."*.";
+					$Pesan_Whatsapp		= "# *Sentral Sistem Calibration* # \n\nDear *".strtoupper($User_Full)."*\n\nSertifikat alat atas _*".$Customer_Name."*_ dengan nomor PO *".$Nomor_PO."* dan nomor SO *".$Nomor_Order."* telah dapat didonwload melalui sistem *".$Link_Approval."*\n\nUntuk akses ke sistem tersebut, Bapak/Ibu dapat login menggunakan akun _*".$User_Name."*_  atau Nomor HP *".$Nomor_WA."*.";
 					$Pesan_Whatsapp	   .= '\n\nTerima kasih.\n _This WA message automatically generated from System '.base_url().'_';
 					
 					$Arr_Balik			= Kirim_Whatsapp($Nomor_WA,$Pesan_Whatsapp);

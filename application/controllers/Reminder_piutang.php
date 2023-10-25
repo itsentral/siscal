@@ -6,11 +6,11 @@ class Reminder_piutang extends CI_Controller {
 		parent::__construct();
 		$this->load->model('master_model');
 		// Your own constructor code
-		/*
+		
 		if(!$this->session->userdata('isSISCALlogin')){
 			redirect('login');
 		}
-		*/
+		
 		$controller			= ucfirst(strtolower($this->uri->segment(1)));
 		/*
 		$this->Arr_Akses			= getAcccesmenu($controller);		
@@ -44,64 +44,144 @@ class Reminder_piutang extends CI_Controller {
 	}
 	
 	function get_data_display(){
-		include "ssp.class.php";
-		$WHERE		="";
-		$table 		= 'ar_reminders';
-		$primaryKey = 'id';
-		$columns 	= array(
-			array( 'db' => 'id', 'dt' => 'id'),
-			 array(
-				'db' => 'id',
-				'dt' => 'DT_RowId'
-			),
-			array( 'db' => 'nomor_surat', 'dt' => 'nomor_surat'),
-			array( 'db' => 'customer_id', 'dt' => 'customer_id'),
-			array( 'db' => 'customer_name', 'dt' => 'customer_name'),
-			array( 'db' => 'sts_letter', 'dt' => 'sts_letter'),
-			array( 'db' => 'pic_name', 'dt' => 'pic_name'),
-			array( 'db' => 'pic_email', 'dt' => 'pic_email'),
-			array( 'db' => 'cancel_by', 'dt' => 'cancel_by'),
-			array( 'db' => 'cancel_reason', 'dt' => 'cancel_reason'),
-			array( 'db' => 'flag_email', 'dt' => 'flag_email'),
-			array(
-				'db' => 'datet',
-				'dt'=> 'datet',
-				'formatter' => function($d,$row){
-					return date('d F Y',strtotime($d));
-				}
-			),
-			array(
-				'db' => 'cancel_date',
-				'dt'=> 'cancel_date',
-				'formatter' => function($d,$row){
-					return date('d F Y',strtotime($d));
-				}
-			),
-			
-			array(
-				'db' => 'id',
-				'dt'=> 'action',
-				'formatter' => function($d,$row){
-					return '';
-				}
-			)
-
-		);
-
-
-		$sql_details = array(
-			'user' => $this->db->username,
-			'pass' => $this->db->password,
-			'db'   => $this->db->database,
-			'host' => $this->db->hostname
+		$Arr_Akses		= $this->Arr_Akses;
+		
+		$WHERE			= "1=1";
+		
+		$requestData	= $_REQUEST;
+		
+		$like_value     = $requestData['search']['value'];
+        $column_order   = $requestData['order'][0]['column'];
+        $column_dir     = $requestData['order'][0]['dir'];
+        $limit_start    = $requestData['start'];
+        $limit_length   = $requestData['length'];
+		
+		$columns_order_by = array(
+			0 => 'nomor_surat',
+			1 => 'datet',
+			2 => 'customer_name',
+			3 => 'pic_name',
+			4 => 'pic_email'
 		);
 		
+		
+		
+		if($like_value){
+			if(!empty($WHERE))$WHERE	.=" AND ";
+			$WHERE	.="(
+						  nomor_surat LIKE '%".$this->db->escape_like_str($like_value)."%'
+						  OR DATE_FORMAT(datet, '%d %b %Y') LIKE '%".$this->db->escape_like_str($like_value)."%'
+						  OR customer_name LIKE '%".$this->db->escape_like_str($like_value)."%'
+						  OR pic_name LIKE '%".$this->db->escape_like_str($like_value)."%'
+						  OR pic_email LIKE '%".$this->db->escape_like_str($like_value)."%'
+						)";
+		}
+		
+		
+		$sql = "SELECT
+					*,
+					(@row:=@row+1) AS urut
+				FROM
+					ar_reminders,
+				(SELECT @row:=0) r 
+				WHERE ".$WHERE;
+		//print_r($sql);exit();
+		$fetch['totalData'] 	= $this->db->query($sql)->num_rows();
+		$fetch['totalFiltered']	= $this->db->query($sql)->num_rows();
 
+		
 
-		echo json_encode(
-			SSP::complex ($_POST, $sql_details, $table, $primaryKey, $columns,null, $WHERE)
+		$sql .= " ORDER BY ".$columns_order_by[$column_order]." ".$column_dir." ";
+		$sql .= " LIMIT ".$limit_start." ,".$limit_length." ";
+
+		$fetch['query'] = $this->db->query($sql);
+		
+		$totalData		= $fetch['totalData'];
+		$totalFiltered	= $fetch['totalFiltered'];
+		$query			= $fetch['query'];
+		
+		$data		= array();
+        $urut1  	= 1;
+        $urut2  	= 0;
+		$Periode_Now= date('Y-m');
+		$Tahun_Now	= date('Y');
+		foreach($query->result_array() as $row)
+		{
+			$total_data     = $totalData;
+            $start_dari     = $requestData['start'];
+            $asc_desc       = $requestData['order'][0]['dir'];
+            if($asc_desc == 'asc')
+            {
+                $nomor = $urut1 + $start_dari;
+            }
+            if($asc_desc == 'desc')
+            {
+                $nomor = ($total_data - $start_dari) - $urut2;
+            }
+			
+			$Code_Letter	= $row['id'];
+			$Nomor_Letter	= $row['nomor_surat'];
+			$Date_Letter	= date('d-m-Y',strtotime($row['datet']));
+			$Custid			= $row['customer_id'];
+			$Customer		= $row['customer_name'];
+			$Status_Letter	= $row['sts_letter'];
+			$PIC_Name		= $row['pic_name'];
+			$PIC_Email		= $row['pic_email'];
+			
+			
+			$Lable_Status	= 'OPEN';
+			$Color_Status	= 'bg-green-active';
+			if($Status_Letter === 'CNC'){
+				$Lable_Status	= 'CANCELED';
+				$Color_Status	= 'bg-orange-active';
+			}else if($Status_Letter === 'CLS'){
+				$Lable_Status	= 'CLOSE';
+				$Color_Status	= 'bg-navy-active';
+			}
+			$Ket_Status		= '<span class="badge '.$Color_Status.'">'.$Lable_Status.'</span>';
+			
+			$Template		= '<a href="'.site_url().'/Reminder_piutang/view_letter/'.urlencode($Code_Letter).'" class="btn btn-sm btn-primary" title="VIEW DETAIL"> <i class="fa fa-search"></i> </a>';
+				
+			if($Status_Letter === 'OPN'){
+				if($Arr_Akses['create'] == '1' || $Arr_Akses['update'] == '1'){
+					$Template		.= '&nbsp;&nbsp;<a href="'.site_url().'/Reminder_piutang/cancel_letter/'.urlencode($Code_Letter).'" class="btn btn-sm btn-danger"  title="CANCEL LETTER"> <i class="fa fa-trash-o"></i> </a>';
+					$Template		.= '&nbsp;&nbsp;<a href="'.site_url().'/Reminder_piutang/email_letter/'.urlencode($Code_Letter).'" class="btn btn-sm btn-success" title="EMAIL LETTER"> <i class="fa fa-envelope"></i> </a>';
+				}
+				if($Arr_Akses['download'] == '1'){
+					$Template		.= '&nbsp;&nbsp;<button type="button" class="btn btn-sm btn-warning" onClick = "previewPDF(\''.$Code_Letter.'\');" title="PRINT SPK DRIVER ORDER" target = "_blank"> <i class="fa fa-print"></i> </button>';
+				
+					
+				}
+			}
+			
+			
+			
+			
+			$nestedData		= array();
+			$nestedData[]	= $Nomor_Letter;
+			$nestedData[]	= $Date_Letter;
+			$nestedData[]	= $Customer;
+			$nestedData[]	= $PIC_Name;
+			$nestedData[]	= $PIC_Email;
+			$nestedData[]	= $Ket_Status;
+			$nestedData[]	= $Template;
+			$data[] = $nestedData;
+            $urut1++;
+            $urut2++;
+		}
+
+		$json_data = array(
+			"draw"            => intval( $requestData['draw'] ),  
+			"recordsTotal"    => intval( $totalData ),  
+			"recordsFiltered" => intval( $totalFiltered ), 
+			"data"            => $data
 		);
+
+		echo json_encode($json_data);
+		
 	}
+	
+	
 	
 	function create_letter(){
 		set_time_limit(0);
@@ -116,6 +196,8 @@ class Reminder_piutang extends CI_Controller {
 		$Pros_Del		= $this->db->query($Query_Del);
 		
 		## INSERT PROSES ##
+		/*
+		## QUERY ORIGINAL ##
 		$Query_Temp1	= "INSERT INTO temp_piutang_payment (
 								id,
 								invoice_no,
@@ -186,8 +268,150 @@ class Reminder_piutang extends CI_Controller {
 								)
 								)
 							) >= 60";
+		*/					
+		$Query_Temp1	= "INSERT INTO temp_piutang_payment (
+								id,
+								invoice_no,
+								datet,
+								customer_id,
+								customer_name,
+								address,
+								dpp,
+								ppn,
+								pph23,
+								grand_tot,
+								total_payment,
+								send_date,
+								receive_date,
+								plan_payment,
+								leadtime,
+								ver_data,
+								receive_by
+							) SELECT
+									x_detail.id,
+									x_detail.invoice_no,
+									x_detail.datet,
+									x_detail.customer_id,
+									x_detail.customer_name,
+									x_detail.address,
+									x_detail.dpp,
+									x_detail.ppn,
+
+								IF (
+									x_detail.pph23 IS NULL
+									OR x_detail.pph23 = 0
+									OR x_detail.pph23 = '',
+									ROUND(x_detail.dpp * 0.02),
+									x_detail.pph23
+								) AS pph23,
+								 x_detail.grand_tot,
+								 x_detail.total_payment,
+								 x_detail.send_date,
+								 x_detail.receive_date,
+								 x_detail.plan_payment,
+								 DATEDIFF(
+									CURDATE(),
+
+								IF (
+									x_detail.receive_date IS NULL
+									OR x_detail.receive_date = ''
+									OR x_detail.receive_date = '-',
+									x_detail.datet,
+									x_detail.receive_date
+								)
+								) AS leadtime,
+								 2 AS ver_data,
+								 x_detail.receive_by
+								FROM
+									(
+										SELECT
+											head_inv.`id`,
+											head_inv.`invoice_no`,
+											head_inv.`nomor`,
+											head_inv.`datet`,
+											head_inv.`customer_id`,
+											head_inv.`customer_name`,
+											head_inv.`address`,
+											head_inv.`dpp`,
+											head_inv.`diskon`,
+											head_inv.`total_dpp`,
+											head_inv.`ppn`,
+											head_inv.`pph23`,
+											head_inv.`grand_tot`,
+											head_inv.`npwp`,
+											head_inv.`tipe_faktur`,
+											head_inv.`no_faktur`,
+											head_inv.`due_date`,
+											head_inv.`send_date`,
+											head_inv.`receive_date`,
+											head_inv.`receive_by`,
+											head_inv.`flag_proses`,
+											date_format(
+												head_inv.`created_date`,
+												'%Y-%m-%d'
+											) AS `date_create`,
+
+										IF (
+											x_payment.total_bayar > 0,
+											x_payment.total_bayar,
+											0
+										) AS total_payment,
+										(
+											SELECT
+												`follow_up_invoices`.`plan_paid`
+											FROM
+												`follow_up_invoices`
+											WHERE
+												(
+													`follow_up_invoices`.`invoice_id` = head_inv.`id`
+												)
+											ORDER BY
+												`follow_up_invoices`.`follow_up_date` DESC
+											LIMIT 1
+										) AS `plan_payment`
+									FROM
+										invoices head_inv
+									LEFT JOIN (
+										SELECT
+											invoice_no,
+											SUM(
+
+												IF (kredit > 0, kredit, 0) -
+												IF (debet > 0, debet, 0)
+											) AS total_bayar
+										FROM
+											trans_ar_jurnals
+										WHERE
+											`flag_batal` <> 'Y'
+										AND NOT (
+											invoice_no IS NULL
+											OR invoice_no = ''
+											OR invoice_no = '-'
+										)
+										GROUP BY
+											invoice_no
+									) x_payment ON head_inv.invoice_no = x_payment.invoice_no
+									WHERE
+										head_inv.grand_tot > 0
+									)x_detail
+								WHERE
+									(x_detail.grand_tot - x_detail.total_payment) > 0
+								AND (
+									DATEDIFF(
+										CURDATE(),
+
+									IF (
+										x_detail.receive_date IS NULL
+										OR x_detail.receive_date = ''
+										OR x_detail.receive_date = '-',
+										x_detail.datet,
+										x_detail.receive_date
+									)
+									)
+								) >= 60";
 		$Proses_Temp	= $this->db->query($Query_Temp1);
-							
+		
+		/*
 		$Query_Temp2	= "INSERT INTO temp_piutang_payment (
 								id,
 								invoice_no,
@@ -259,6 +483,7 @@ class Reminder_piutang extends CI_Controller {
 								)
 							) >= 60";
 		$Proses_Temp2	= $this->db->query($Query_Temp2);
+		*/
 		
 		## PROSES SELECT ##		
 		$Query_Data	= "SELECT

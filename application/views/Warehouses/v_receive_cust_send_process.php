@@ -151,7 +151,7 @@ $this->load->view('include/side_menu');
 									<th class="text-center">Tool Code</th>
 									<th class="text-center">Tool Name</th>
 									<th class="text-center">Range</th>				
-									<th class="text-center">Description</th>
+									<th class="text-center">Quotation<br>Notes</th>
 									<th class="text-center">Action</th>
 								</tr>
 							</thead>
@@ -214,6 +214,7 @@ $this->load->view('include/side_menu');
 										<th class="text-center">Description</th>
 										<th class="text-center">Serial<br>Number</th>
 										<th class="text-center">Sentral<br>Tool Code</th>
+										<th class="text-center">Quotation<br>Notes</th>
 										<th class="text-center">Action</th>
 									</tr>
 								</thead>
@@ -228,9 +229,11 @@ $this->load->view('include/side_menu');
 								if($rows_Sentral){
 									$Nomor_Seri	= $rows_Sentral->no_serial_number;
 								}
+								$Notes_Quot		= '-';
 								$rows_QuotDet	= $this->db->get_where('quotation_details',array('id'=>$valRec->quotation_detail_id))->row();
 								if($rows_QuotDet){
 									$Range_Receive		= $rows_QuotDet->range.' '.$rows_QuotDet->piece_id;
+									$Notes_Quot			= $rows_QuotDet->descr;
 								}
 								
 								echo'
@@ -242,6 +245,7 @@ $this->load->view('include/side_menu');
 									<td class="text-left">'.$valRec->descr.'</td>
 									<td class="text-center">'.$Nomor_Seri.'</td>
 									<td class="text-center">'.$valRec->sentral_code_tool.'</td>
+									<td class="text-left text-wrap">'.$Notes_Quot.'</td>
 									<td class="text-center">
 										<button type="button" onClick="ViewReceiveTool(\''.$valRec->id.'\')" class="btn btn-sm btn-danger" title="VIEW RECEIVE TOOLS"> <i class="fa fa-search"></i> </button>
 										&nbsp;&nbsp;<button type="button" onClick="PrintBarcode(\''.$valRec->sentral_code_tool.'\')" class="btn btn-sm btn-warning" title="PRINT TOOL BARCODE"> <i class="fa fa-print"></i> </button>
@@ -411,11 +415,34 @@ $this->load->view('include/side_menu');
 		let ImageRight	= $('#pic_webcam_kanan').val();
 		let ImageLeft	= $('#pic_webcam_kiri').val();
 		
+		let OK_File		= 0;
+		let UploadFront = $('#files_depan');
+		if((ImageFront != '' && ImageFront != null) || (ImageBack != '' && ImageBack != null) || (ImageRight != '' && ImageRight != null) || (ImageLeft != '' && ImageLeft != null) || parseInt(UploadFront.get(0).files.length) > 0){
+			OK_File		= 1;
+		}
+		if(parseInt(UploadFront.get(0).files.length) > 4){
+			ValueCheck['max_upload']	= {'nilai':'','error':'Maximum 4 image uploaded..'};
+		}
+		/*
 		let UploadFront = $('#files_depan').val();
 		let UploadBack 	= $('#files_back').val();
 		let UploadRight	= $('#files_kanan').val();
 		let UploadLeft	= $('#files_kiri').val();
 		
+		
+		
+		if((ImageFront != '' && ImageFront != null) || (UploadFront != '' && UploadFront == null) || (ImageBack != '' && ImageBack != null) || (UploadBack != '' && UploadBack != null) || (ImageRight != '' && ImageRight != null) || (UploadRight != '' && UploadRight != null) || (ImageLeft != '' && ImageLeft != null) || (UploadLeft != '' && UploadLeft != null)){
+			OK_File		= 1;
+		}
+		
+		*/
+		
+		if(OK_File == 0){
+			let GambarAlat = '';
+			ValueCheck['gambar_alat']	= {'nilai':GambarAlat,'error':'Empty Picture. Please Tak Picture or Upload Image at least one picture..'};
+		}
+		
+		/*
 		if((ImageFront == '' || ImageFront == null) && (UploadFront == '' || UploadFront == null)){
 			let GambarDepan = '';
 			ValueCheck['gambar_depan']	= {'nilai':GambarDepan,'error':'Empty Front Picture. Please Tak Picture or Upload Image first..'};
@@ -435,7 +462,7 @@ $this->load->view('include/side_menu');
 			let GambarKiri = '';
 			ValueCheck['gambar_kiri']	= {'nilai':GambarKiri,'error':'Empty Left Side Picture. Please Tak Picture or Upload Image first..'};
 		}
-		
+		*/
 		
 		
 		try{			

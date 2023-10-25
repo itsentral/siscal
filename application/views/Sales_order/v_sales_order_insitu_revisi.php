@@ -1,7 +1,7 @@
 <?php
 $this->load->view('include/side_menu');
 ?> 
-<form action="#" method="POST" id="form_proses_order" enctype="multipart/form-data">
+<form action="#" method="POST" id="form_proses_order" enctype="multipart/form-data" accept-charset="UTF-8">
 	<div class="box box-warning">
 		
 		<div class="box-body">
@@ -76,6 +76,27 @@ $this->load->view('include/side_menu');
 				<div class='row'>
 					<div class="col-sm-6">
 						<div class="form-group">
+							<label class="control-label">PO No</label>
+							<?php
+								echo form_input(array('id'=>'pono','name'=>'pono','class'=>'form-control input-sm','readOnly'=>true),$rows_quot->pono);	
+								
+							?>
+						</div>
+					</div>	
+					<div class="col-sm-6">
+						&nbsp;
+					</div>
+								
+				</div>
+				<div class="row">
+					<div class="col-sm-12 col-xs-12 text-center sub-heading" style="color:white;">
+						<h5>DETAIL CUSTOMER</h5>
+					</div>
+					
+				</div>
+				<div class='row'>
+					<div class="col-sm-6">
+						<div class="form-group">
 							<label class="control-label">Customer</label>
 							<?php
 								echo form_input(array('id'=>'customer_name','name'=>'customer_name','class'=>'form-control input-sm','readOnly'=>true),$rows_quot->customer_name);
@@ -85,13 +106,22 @@ $this->load->view('include/side_menu');
 					</div>
 					<div class="col-sm-6">
 						<div class="form-group">
-							<label class="control-label">PO No</label>
+							<label class="control-label">Plant</label>
+							<select name="comp_plant" id="comp_plant" class="form-control input-sm chosen-select">
+								<option value=""> - </option>
 							<?php
-								echo form_input(array('id'=>'pono','name'=>'pono','class'=>'form-control input-sm','readOnly'=>true),$rows_quot->pono);	
+								if($rows_plant){
+									foreach($rows_plant as $keyPlant=>$valPlant){
+										echo'<option value="'.$valPlant->id.'">'.$valPlant->branch.'</option>';
+									}
+								}
+								
 								
 							?>
+							</select>
 						</div>
-					</div>				
+					</div>
+					
 				</div>
 				<div class='row'>
 					<div class="col-sm-6">
@@ -496,6 +526,14 @@ $this->load->view('include/side_menu');
 	var active_controller	= '<?php echo($this->uri->segment(1)); ?>';
 	var rows_supplier		= <?php echo json_encode($rows_supplier); ?>;
 	var rows_delivery		= <?php echo json_encode($rows_delivery); ?>;
+	
+	var _Address_Delv		= $('#address_send').val();
+	var _Address_Inv		= $('#address_inv').val();
+	var _Address_Cert		= $('#address_sertifikat').val();
+	var _Address_Cust		= $('#address').val();
+	var _PIC_Cust			= $('#pic_name').val();
+	var _PIC_Phone			= $('#pic_phone').val();
+	
 	$(document).ready(function(){
 		$('#loader_proses_save').hide();
 		$('#list_detail').find('tr').each(function(){
@@ -516,7 +554,7 @@ $this->load->view('include/side_menu');
 			minDate		:'+0d'
 		});
 		
-		$('#pic_phone').mask('?999 999 999 999 999');
+		//$('#pic_phone').mask('?999 999 999 999 999');
 		$('.chosen-select').chosen();
 		
 	});
@@ -748,6 +786,29 @@ $this->load->view('include/side_menu');
     	return true;
 	}
 	
-	
+	$(document).on('change','#comp_plant',()=>{
+		
+		let ChosenPlant			= $('#comp_plant').val();
+		if(ChosenPlant == '' || ChosenPlant == null){
+			$('#address_send').val(_Address_Delv);
+			$('#address_inv').val(_Address_Inv);
+			$('#address_sertifikat').val(_Address_Cert);
+			$('#address').val(_Address_Cust);
+			$('#pic_name').val(_PIC_Cust);
+			$('#pic_phone').val(_PIC_Phone);
+		}else{
+			let ChosenCust	= $('#customer_id').val();
+			$('#loader_proses_save').show();
+			$.post(base_url+'/'+active_controller+'/get_detail_comp_plant',{'plant':ChosenPlant,'nocust':ChosenCust},function(response){
+				$('#loader_proses_save').hide();
+				const datas	= $.parseJSON(response);
+				$('#address').val(datas.alamat);
+				$('#address_send').val(datas.alamat);
+				$('#address_sertifikat').val(datas.alamat);
+				$('#pic_name').val(datas.nama);
+				$('#pic_phone').val(datas.phone);
+			});
+		}
+	});
 	
 </script>

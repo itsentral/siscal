@@ -200,7 +200,10 @@ $this->load->view('include/side_menu');
 											}
 											if(!empty($valK->sentral_code_tool) && $valK->sentral_code_tool !== '-'){
 												if(!empty($Template))$Template	.='&nbsp;&nbsp;';
-												$Template  .= '<button type="button" onClick="PrintBarcode(\''.$ID_Alat.'\')" class="btn btn-sm btn-warning" title="PRINT CALIBRATIONS BARCODE"> <i class="fa fa-print"></i> </button>';
+												$Template  .= '<button type="button" onClick="PrintBarcode(\''.$ID_Alat.'\',\'Y\')" class="btn btn-sm btn-warning" title="PRINT CALIBRATIONS BARCODE QR"> <i class="fa fa-print"></i> </button>';
+												
+												if(!empty($Template))$Template	.='&nbsp;&nbsp;';
+												$Template  .= '<button type="button" onClick="PrintBarcode(\''.$ID_Alat.'\',\'N\')" class="btn btn-sm bg-orange-active" title="PRINT CALIBRATIONS BARCODE NON QR"> <i class="fa fa-print"></i> </button>';
 											}
 										}else if($Cal_Result === 'N'){
 											if($Cal_Reschedule === 'Y'){
@@ -383,9 +386,14 @@ $this->load->view('include/side_menu');
     	return true;
 	}
 	
-	const PrintBarcode = (Code_Print)=>{
+	const PrintBarcode = (Code_Print, Flag_QR)=>{
+		
 		loading_spinner_new();
-		 $.post(base_url +'/'+ active_controller+'/print_barcode_calibration_tool',{'code':Code_Print}, function(response) {
+		let Barcode_Action	= 'print_barcode_nonQR_tool';
+		if(Flag_QR == 'Y'){
+			Barcode_Action	= 'print_barcode_calibration_tool';
+		}
+		 $.post(base_url +'/'+ active_controller+'/'+Barcode_Action,{'code':Code_Print}, function(response) {
 			close_spinner_new();
             //console.log(response);
 			const datas	= $.parseJSON(response);

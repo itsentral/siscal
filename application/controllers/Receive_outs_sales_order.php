@@ -149,6 +149,11 @@ class Receive_outs_sales_order extends CI_Controller {
 				
 			}
 			
+			if($Arr_Akses['download'] == '1'){
+				$Template		.= '&nbsp;&nbsp;<button type="button" class="btn btn-sm btn-danger" onClick = "printReceive(\''.$Code_Receive.'\');" title="PRINT RECEIVE"> <i class="fa fa-print"></i> </button>';
+				
+			}
+			
 			
 			
 			
@@ -334,6 +339,7 @@ class Receive_outs_sales_order extends CI_Controller {
 					
 					
 					$Qty_Rec_Driver		= '';
+					 
 					if(strtolower($Cat_Receive) == 'driver'){
 						$Qry_Quot_Detail	= "UPDATE quotation_details SET qty_so = qty_so - ".$Qty_Cancel.", qty_driver = qty_driver + ".$Qty_Cancel." WHERE id='".$Quot_Detail."'";
 						$Qty_Rec_Driver		= "UPDATE quotation_driver_detail_receives SET flag_warehouse = 'N', sentral_code_tool = NULL, code_rec_warehouse = NULL WHERE code_rec_warehouse='".$Code_Detail."'";
@@ -586,5 +592,31 @@ class Receive_outs_sales_order extends CI_Controller {
 		
 	}
 	
+	function print_warehouse_receive($Code_Process = ''){
+		$OK_Proses	= 0;
+		$rows_Header	= $rows_Detail = $rows_Quot =  array();
+		
+		if($this->input->get()){
+			$Code_Process	= urldecode($this->input->get('code'));
+		}
+		$rows_Header	= $this->db->get_where('quotation_header_receives',array('id'=>$Code_Process))->row();
+		$rows_Quot		= $this->db->get_where('quotations',array('id'=>$rows_Header->quotation_id))->row();
+		$rows_Detail	= $this->db->get_where('quotation_detail_receives',array('quotation_header_receive_id'=>$Code_Process))->result();
+		
+		
+		$data = array(
+			'title'			=> 'WAREHOUSE RECEIVE PREVIEW',
+			'action'		=> 'preview_warehouse_receive',
+			'akses_menu'	=> $this->Arr_Akses,
+			'rows_header'	=> $rows_Header,
+			'rows_detail'	=> $rows_Detail,
+			'rows_quot'		=> $rows_Quot,
+			'printby'		=> $this->session->userdata('siscal_username'),
+			'today' 		=> date("Y-m-d H:i:s"),
+		);
+		
+		$this->load->view($this->folder.'/v_outs_sales_order_print',$data);
+		
+	}
 	
 }

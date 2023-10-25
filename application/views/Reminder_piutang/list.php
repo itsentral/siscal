@@ -40,13 +40,13 @@ $this->load->view('include/side_menu');
 <?php $this->load->view('include/footer'); ?>
 <!-- page script -->
 <script type="text/javascript">
-	var base_url			= '<?php echo base_url(); ?>';
+	var base_url			= '<?php echo site_url(); ?>';
 	var active_controller	= '<?php echo($this->uri->segment(1)); ?>';
 	var arr_akses			= <?php echo json_encode($akses_menu);?>;
     $(function() {		
 		 $('#btn-create').click(function(){
 			 loading_spinner();
-			 window.location.href =  base_url+active_controller+'/create_letter';
+			 window.location.href =  base_url+'/'+active_controller+'/create_letter';
 		 });
 		data_display();
 		
@@ -54,65 +54,54 @@ $this->load->view('include/side_menu');
 	
 
 	function data_display(){
-		var cabang		= $('#kdcab').val();
-		var table_data = $('#my-grid').dataTable( {
-			"paging"	: true,
-			"processing": true,
+		let table_data 		= $('#my-grid').DataTable({
 			"serverSide": true,
-			'destroy'	: true,
-			"ajax": {
-				"url"	:  base_url + active_controller+'/get_data_display',
-				"type"	: "POST"
-				/*
-				"data"	:{'cabang':cabang}
-				*/
-							
-			},		 
-			"columns": [
-				{"data":"nomor_surat","sClass":"text-center"},
-				{"data":"datet","sClass":"text-center"},
-				{"data":"customer_name","sClass":"text-left"},
-				{"data":"pic_name","sClass":"text-center"},
-				{"data":"pic_email","sClass":"text-left"},
-				{"data":"sts_letter","sClass":"text-center","searchable":false},
-				{"data":"action","sClass":"text-center","searchable":false}
-			],
-			"rowCallback": function(row,data,index,iDisplayIndexFull){
-				//console.log(data.tool_id);
-				var flag_batal	= data.sts_letter;
-				var OK_Edit		= 1;
-				if(flag_batal=='CNC'){
-					var Template2	='<span class="badge bg-red">CANCELED</span>';
-					OK_Edit			= 0;
-				}else if(flag_batal=='OPN') {
-					var Template2	='<span class="badge bg-green">OPEN</span>';					
-				}else if(flag_batal=='CLS') {
-					var Template2	='<span class="badge bg-maroon">CLOSE</span>';
-					OK_Edit			= 0;
+			"destroy"	: true,
+			"stateSave" : false,
+			"bAutoWidth": false,
+			"oLanguage": {
+				"sSearch": "<b>Live Search : </b>",
+				"sLengthMenu": "_MENU_ &nbsp;&nbsp;<b>Records Per Page</b>&nbsp;&nbsp;",
+				"sInfo": "Showing _START_ to _END_ of _TOTAL_ entries",
+				"sInfoFiltered": "(filtered from _MAX_ total entries)", 
+				"sZeroRecords": "No matching records found", 
+				"sEmptyTable": "No data available in table", 
+				"sLoadingRecords": "Please wait - loading...", 
+				"oPaginate": {
+					"sPrevious": "Prev",
+					"sNext": "Next"
 				}
-				
-				var Template		='<a href="'+base_url + active_controller+'/view_letter/'+data.id+'" class="btn btn-sm btn-default" title="View Detail"><span class="glyphicon glyphicon-search"></span></a>';
-				if(OK_Edit ==1){
-					if(arr_akses['download']==1){
-						Template		+='&nbsp;&nbsp;&nbsp;<a href="#" class="btn btn-sm btn-primary" onClick="previewPDF('+'\''+data.id+'\''+');"><span class="glyphicon glyphicon-print"></span></a>';
-					}
-					if(arr_akses['delete']==1){
-						Template		+='&nbsp;&nbsp;&nbsp;<a href="'+base_url + active_controller+'/cancel_letter/'+data.id+'" class="btn btn-sm btn-danger" title="Cancel Letter"><span class="glyphicon glyphicon-trash"></span></a>';
-					}
-					if(arr_akses['update']==1){
-						Template		+='&nbsp;&nbsp;&nbsp;<a href="'+base_url + active_controller+'/email_letter/'+data.id+'" class="btn btn-sm btn-info" title="Send Email"><i class="fa fa-envelope"></i></a>';
-					}
-				}	
-				
-				$('td:eq(5)',row).html(Template2);
-				$('td:eq(6)',row).html(Template);
 			},
-			"order": [[1,"desc"]]
+			"aaSorting": [[ 1, "desc" ]],			
+			"columnDefs": [
+				{"targets":0,"sClass":"text-center"},
+				{"targets":1,"sClass":"text-center"},
+				{"targets":2,"sClass":"text-left text-wrap"},
+				{"targets":3,"sClass":"text-center"},
+				{"targets":4,"sClass":"text-center"},
+				{"targets":5,"sClass":"text-center","searchable":false,"orderable": false},
+				{"targets":6,"sClass":"text-center","searchable":false,"orderable": false}
+			],
+			"sPaginationType": "simple_numbers", 
+			"iDisplayLength": 10,
+			"aLengthMenu": [[5, 10, 20, 50, 100, 150], [5, 10, 20, 50, 100, 150]],
+			"ajax":{
+				url 	: base_url +'/'+ active_controller+'/get_data_display',
+				type	: "post",
+				cache	: false,
+				data	: {},
+				error	: function(){ 
+					$(".my-grid-error").html("");
+					$("#my-grid").append('<tbody class="my-grid-error"><tr><th colspan="7">No data found in the server</th></tr></tbody>');
+					$("#my-grid_processing").css("display","none");
+				}
+			}
 		});
+		
 		
 	}
 	function previewPDF(kode_letter){
-		var Links		= base_url+active_controller+'/print_letter/'+kode_letter+'/D';
+		var Links		= base_url+'/'+active_controller+'/print_letter/'+kode_letter+'/D';
 		window.open(Links,'_blank');
 	}
 

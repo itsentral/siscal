@@ -447,7 +447,8 @@ class Cust_survey extends CI_Controller {
 			
 			$rows_Cust		= $this->db->get_where('customers',array('id'=>$rows_Answer->customer_id))->row();
 			$rows_Header	= $this->db->get_where('crm_surveys',array('code_survey'=>$rows_Answer->code_survey))->row();
-			$rows_Detail	= $this->db->get_where('crm_survey_questions',array('code_survey'=>$rows_Answer->code_survey))->result();
+			$Query_Question	= "SELECT * FROM crm_survey_questions WHERE code_survey = '".$rows_Answer->code_survey."' ORDER BY question_no ASC";
+			$rows_Detail	= $this->db->query($Query_Question)->result();
 			
 			
 		}

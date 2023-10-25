@@ -182,22 +182,34 @@
 				</div>
 				<div class='row'>
 					<div class="col-sm-6">
+						<label>
+							<strong>Take Picture Of Tool</strong>
+						</label>
+						<div>
+							<button type="button" class="btn btn-sm bg-green-active"  id="btn_ambil_kamera" name="btn_ambil_kamera">
+								<i class="fa fa-camera"></i> Take Picture
+							</button>
+						</div>
+					</div>
+					<div class="col-sm-6">
+						<label>
+							<strong>Upload Picture Of Tool</strong>
+						</label>
+					   <input class="form-control" type="file" name="files_depan[]" id="files_depan" onChange="ValidateSingleInput(this);" multiple>
+					</div>
+				</div>
+				<div class='row'>
+					<div class="col-sm-6" id="div_picture_depan" style="display: none;">
 						<div class="form-group">
 							<label>
-								<strong>The Front Of Tool</strong>
+								<strong>Preview Picture 1</strong>
 							</label>
 							<div>
-								<button type="button" class="btn btn-sm bg-green-active" onclick="ambil_kamera('depan')">
-									<i class="fa fa-camera"></i> Take Picture
-								</button>
-								<button type="button" class="btn btn-sm btn-danger btn-hapus-foto_depan" style="display: none;" onclick="hapus_foto('depan')">
+								<button type="button" class="btn btn-sm btn-danger btn-hapus-foto_depan"  onclick="hapus_foto('depan')">
 									<i class="fa fa-trash"></i> Delete Picture
 								</button>
 							</div>					
-							 <input type="hidden" name="pic_webcam_depan" id="pic_webcam_depan" value="">
-							 <input type="hidden" name="pic_webcam_back" id="pic_webcam_back" value="">
-							 <input type="hidden" name="pic_webcam_kanan" id="pic_webcam_kanan" value="">
-							 <input type="hidden" name="pic_webcam_kiri" id="pic_webcam_kiri" value="">
+							 <input type="hidden" name="pic_webcam_depan" id="pic_webcam_depan" value="">							
 						</div>
 						<div class="form-group">
 							<p class="text-center">
@@ -205,35 +217,19 @@
 								<img src="" id="pic_upload_preview_depan" style="display: none;max-width: 100%;">
 							</p>
 						</div>
-						<div class="form-group">
-							<label>
-								<strong>Upload Front Image</strong>
-							</label>
-						   <input class="form-control" type="file" name="files_depan" id="files_depan" onChange="ValidateSingleInput(this);">					   
-						</div>
-						<div class="form-group">
-							<label>
-								<strong>Notes Front Image </strong>
-							</label>
-							<textarea cols="75" rows="1" id="notes_depan" name="notes_depan" class="form-control"></textarea>				   
-						</div>		
-						<hr></hr>
+						
 					</div>
-					
-					<div class="col-sm-6">
+					<div class="col-sm-6" id="div_picture_back" style="display: none;">
 						<div class="form-group">
 							<label>
-								<strong>The Back Of Tool</strong>
+								<strong>Preview Picture 2</strong>
 							</label>
 							<div>
-								<button type="button" class="btn btn-sm bg-blue-active" onclick="ambil_kamera('back')">
-									<i class="fa fa-camera"></i> Take Picture
-								</button>
-								<button type="button" class="btn btn-sm btn-danger btn-hapus-foto_back" style="display: none;" onclick="hapus_foto('back')">
+								<button type="button" class="btn btn-sm btn-danger btn-hapus-foto_back"  onclick="hapus_foto('back')">
 									<i class="fa fa-trash"></i> Delete Picture
 								</button>
-							</div>
-							
+							</div>					
+							 <input type="hidden" name="pic_webcam_back" id="pic_webcam_back" value="">							
 						</div>
 						<div class="form-group">
 							<p class="text-center">
@@ -241,34 +237,20 @@
 								<img src="" id="pic_upload_preview_back" style="display: none;max-width: 100%;">
 							</p>
 						</div>
-						<div class="form-group">
-							<label>
-								<strong>Upload Back Image</strong>
-							</label>
-						   <input class="form-control" type="file" name="files_back" id="files_back" onChange="ValidateSingleInput(this);">					   
-						</div>
-						<div class="form-group">
-							<label>
-								<strong>Notes Back Image </strong>
-							</label>
-							<textarea cols="75" rows="1" id="notes_back" name="notes_back" class="form-control"></textarea>				   
-						</div>	
-						<hr></hr>
 					</div>
-					<div class="col-sm-6">
+				</div>
+				<div class='row'>
+					<div class="col-sm-6" id="div_picture_kanan" style="display: none;">
 						<div class="form-group">
 							<label>
-								<strong>The Right Side Of Tool</strong>
+								<strong>Preview Picture 3</strong>
 							</label>
 							<div>
-								<button type="button" class="btn btn-sm bg-maroon-active" onclick="ambil_kamera('kanan')">
-									<i class="fa fa-camera"></i> Take Picture
-								</button>
-								<button type="button" class="btn btn-sm btn-danger btn-hapus-foto_kanan" style="display: none;" onclick="hapus_foto('kanan')">
+								<button type="button" class="btn btn-sm btn-danger btn-hapus-foto_kanan"  onclick="hapus_foto('kanan')">
 									<i class="fa fa-trash"></i> Delete Picture
 								</button>
-							</div>
-							
+							</div>					
+							 <input type="hidden" name="pic_webcam_kanan" id="pic_webcam_kanan" value="">							
 						</div>
 						<div class="form-group">
 							<p class="text-center">
@@ -276,35 +258,19 @@
 								<img src="" id="pic_upload_preview_kanan" style="display: none;max-width: 100%;">
 							</p>
 						</div>
-						<div class="form-group">
-							<label>
-								<strong>Upload Right Side Image</strong>
-							</label>
-						   <input class="form-control" type="file" name="files_kanan" id="files_kanan" onChange="ValidateSingleInput(this);">					   
-						</div>
-						<div class="form-group">
-							<label>
-								<strong>Notes Right Side Image </strong>
-							</label>
-							<textarea cols="75" rows="1" id="notes_kanan" name="notes_kanan" class="form-control"></textarea>				   
-						</div>
-						<hr></hr>
+						
 					</div>
-					
-					<div class="col-sm-6">
+					<div class="col-sm-6" id="div_picture_kiri" style="display: none;">
 						<div class="form-group">
 							<label>
-								<strong>The Left Side Of Tool</strong>
+								<strong>Preview Picture 4</strong>
 							</label>
 							<div>
-								<button type="button" class="btn btn-sm bg-orange-active" onclick="ambil_kamera('kiri')">
-									<i class="fa fa-camera"></i> Take Picture
-								</button>
-								<button type="button" class="btn btn-sm btn-danger btn-hapus-foto_kiri" style="display: none;" onclick="hapus_foto('kiri')">
+								<button type="button" class="btn btn-sm btn-danger btn-hapus-foto_kiri"  onclick="hapus_foto('kiri')">
 									<i class="fa fa-trash"></i> Delete Picture
 								</button>
-							</div>
-							
+							</div>					
+							 <input type="hidden" name="pic_webcam_kiri" id="pic_webcam_kiri" value="">							
 						</div>
 						<div class="form-group">
 							<p class="text-center">
@@ -312,23 +278,9 @@
 								<img src="" id="pic_upload_preview_kiri" style="display: none;max-width: 100%;">
 							</p>
 						</div>
-						
-						<div class="form-group">
-							<label>
-								<strong>Upload Left Side Image</strong>
-							</label>
-						   <input class="form-control" type="file" name="files_kiri" id="files_kiri" onChange="ValidateSingleInput(this);">					   
-						</div>
-						<div class="form-group">
-							<label>
-								<strong>Notes Left Side Image </strong>
-							</label>
-							<textarea cols="75" rows="1" id="notes_kiri" name="notes_kiri" class="form-control"></textarea>				   
-						</div>
-						<hr></hr>
 					</div>
-					
 				</div>
+				
 				
 			<?php
 			}
@@ -442,15 +394,19 @@
 
             reader.onload = function(e) {
 				if(tipe == 'depan'){
+					$("#div_picture_depan").show();
 					$("#pic_upload_preview_depan").show();
 					$('#pic_upload_preview_depan').attr('src', e.target.result);
 				}else if(tipe == 'kanan'){
+					$("#div_picture_kanan").show();
 					$("#pic_upload_preview_kanan").show();
 					$('#pic_upload_preview_kanan').attr('src', e.target.result);
 				}else if(tipe == 'kiri'){
+					$("#div_picture_kiri").show();
 					$("#pic_upload_preview_kiri").show();
 					$('#pic_upload_preview_kiri').attr('src', e.target.result);
 				}else{
+					$("#div_picture_back").show();
 					$("#pic_upload_preview_back").show();
 					$('#pic_upload_preview_back').attr('src', e.target.result);
 				}
@@ -460,7 +416,31 @@
             reader.readAsDataURL(input.files[0]);
         }
     }
-
+	
+	$(document).on('click','#btn_ambil_kamera',()=>{
+		let gambar_depan	= $('#pic_webcam_depan').val();
+		let gambar_back		= $('#pic_webcam_back').val();
+		let gambar_right	= $('#pic_webcam_kanan').val();
+		let gambar_left		= $('#pic_webcam_kiri').val();
+		let ket_tipe		= '';
+		
+		if(gambar_depan == '' || gambar_depan == null){
+			ket_tipe		= 'depan';
+		}else if(gambar_back == '' || gambar_back == null){
+			ket_tipe		= 'back';
+		}else if(gambar_right == '' || gambar_right == null){
+			ket_tipe		= 'kanan';
+		}else if(gambar_left == '' || gambar_left == null){
+			ket_tipe		= 'kiri';
+		}
+		
+		if(ket_tipe !='' && ket_tipe != null){
+			ambil_kamera(ket_tipe);
+		}else{
+			GeneralShowMessageError('error','Maximum 4 picture. Please delete one picture before take picture again');
+			return false;
+		}
+	});
     function ambil_kamera(jenis){
         $("#ContactModal").modal();
         $("#contact-body").html('');
@@ -475,25 +455,25 @@
 		if(jenis =='depan'){
 			$("#result_camera_depan").html("");
 			$("#pic_webcam_depan").attr('value', '');
-			$(".btn-hapus-foto_depan").hide();
+			$("#div_picture_depan").hide();
 			$("#pic_upload_preview_depan").hide();
 			$('#pic_upload_preview_depan').attr('src', '');
 		}else if(jenis =='kanan'){
 			$("#result_camera_kanan").html("");
 			$("#pic_webcam_kanan").attr('value', '');
-			$(".btn-hapus-foto_kanan").hide();
+			$("#div_picture_kanan").hide();
 			$("#pic_upload_preview_kanan").hide();
 			$('#pic_upload_preview_kanan').attr('src', '');
 		}else if(jenis =='kiri'){
 			$("#result_camera_kiri").html("");
 			$("#pic_webcam_kiri").attr('value', '');
-			$(".btn-hapus-foto_kiri").hide();
+			$("#div_picture_kiri").hide();
 			$("#pic_upload_preview_kiri").hide();
 			$('#pic_upload_preview_kiri').attr('src', '');
 		}else{
 			$("#result_camera_back").html("");
 			$("#pic_webcam_back").attr('value', '');
-			$(".btn-hapus-foto_back").hide();
+			$("#div_picture_back").hide();
 			$("#pic_upload_preview_back").hide();
 			$('#pic_upload_preview_back').attr('src', '');
 		}
