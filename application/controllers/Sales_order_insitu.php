@@ -79,13 +79,43 @@ class Sales_order_insitu extends CI_Controller {
 			if(!empty($WHERE))$WHERE .=" AND ";
 			$WHERE	.="YEAR(head_so.tgl_so) = '".$Year_Find."'";
 		}
-		if($Status_Find){
-			if(!empty($WHERE))$WHERE .=" AND ";
-			
-			$WHERE	.="head_so.sts_so = '".$Status_Find."'";
+		if ($Status_Find) {
+			if (!empty($WHERE)){
+				$WHERE .= " AND ";
+				if($Status_Find == "PSCH"){
+					$WHERE	.= "head_so.sts_so = 'SCH' AND";
+					$WHERE	.= "(dt.qty - dt.qty_schedule) > 0";
+				}else if($Status_Find == "SCH"){
+					$WHERE	.= "head_so.sts_so = 'SCH' AND";
+					$WHERE	.= "(dt.qty - dt.qty_schedule) = 0";
+				}else{
+					$WHERE	.= "head_so.sts_so = '" . $Status_Find . "'";
+				}
+				
+				
+			} 
 		}
 		
-		$sql = "SELECT
+		if($Status_Find == "PSCH" ||  $Status_Find == "SCH"){
+			$sql = "SELECT
+					head_so.*,
+					head_quot.nomor AS quotation_nomor,
+					head_quot.datet AS quotation_date,
+					head_quot.pono,
+					head_quot.podate,
+					head_quot.member_id,
+					head_quot.member_name,
+					(@row:=@row+1) AS urut
+				FROM
+					letter_orders head_so
+				INNER JOIN quotations head_quot ON head_so.quotation_id = head_quot.id
+				JOIN letter_order_details dt ON head_so.id = dt.letter_order_id,
+				(SELECT @row:=0) r 
+				WHERE " . $WHERE;
+
+			$sql .= " GROUP BY head_so.no_so" . " ";
+		}else{
+			$sql = "SELECT
 					head_so.*,
 					head_quot.nomor AS quotation_nomor,
 					head_quot.datet AS quotation_date,
@@ -98,7 +128,9 @@ class Sales_order_insitu extends CI_Controller {
 					letter_orders head_so
 				INNER JOIN quotations head_quot ON head_so.quotation_id = head_quot.id,
 				(SELECT @row:=0) r 
-				WHERE ".$WHERE;
+				WHERE " . $WHERE;
+		}
+		
 		//print_r($sql);exit();
 		$fetch['totalData'] 	= $this->db->query($sql)->num_rows();
 		$fetch['totalFiltered']	= $this->db->query($sql)->num_rows();

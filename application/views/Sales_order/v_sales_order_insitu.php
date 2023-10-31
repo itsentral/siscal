@@ -69,7 +69,7 @@ $this->load->view('include/side_menu');
 								<option value="">- Choose Status -</option>
 								<?php
 								$array_Status = array(
-									'OPN'    => 'OPEN', 'CNC'   => 'CANCELED', 'REV'   => 'REVISION', 'SCH'   => 'SCHEDULED'
+									'OPN'    => 'OPEN', 'CNC'   => 'CANCELED', 'REV'   => 'REVISION', 'SCH'   => 'SCHEDULED', 'PSCH' => 'PARTIAL SCHEDULED'
 								);
 
 								foreach ($array_Status as $key => $value) {
