@@ -24,7 +24,7 @@ class Approval_invoice extends CI_Controller {
 			$this->session->set_flashdata("alert_data", "<div class=\"alert alert-warning\" id=\"flash-message\">You Don't Have Right To Access This Page, Please Contact Your Administrator....</div>");
 			redirect(site_url('dashboard'));
 		}
-		
+// TEST
 		$data = array(
 			'title'			=> 'INVOICE APPROVAL',
 			'action'		=> 'index',
