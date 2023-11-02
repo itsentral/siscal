@@ -57,7 +57,7 @@
 						</span>
 						
 						<div class="text">
-							<strong>Informasi</strong>
+							<strong>Informasi Login</strong>
 							<p>Hubungi admin untuk informasi password anda.</p>
 						</div>
 						
