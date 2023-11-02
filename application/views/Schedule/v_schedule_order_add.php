@@ -228,7 +228,32 @@ $this->load->view('include/side_menu');
 													}
 												echo'
 												</td>
-												<td class="text-center" id="proses_'.$intL.'"></td>
+												<td class="text-center" id="proses_'.$intL.'">';
+												
+												if(!empty($jdwl_teknisi)){
+													foreach($jdwl_teknisi as $teknisi=>$tek){
+														if($tek->quotation_detail_id == $Code_DetQuot){
+
+															echo form_input(array('id'=>'process_date_'.$intL,'name'=>'detDetail['.$intL.'][process_date]','type'=>'hidden'),$tek->plan_date_start);
+															echo form_input(array('id'=>'member_id_'.$intL,'name'=>'detDetail['.$intL.'][member_id]','type'=>'hidden'),$tek->member_id);
+															echo form_input(array('id'=>'member_name_'.$intL,'name'=>'detDetail['.$intL.'][member_name]','type'=>'hidden'),$tek->nama);
+															echo form_input(array('id'=>'jam_awal_'.$intL,'name'=>'detDetail['.$intL.'][jam_awal]','type'=>'hidden'),$tek->plan_time_start);
+															echo form_input(array('id'=>'jam_akhir_'.$intL,'name'=>'detDetail['.$intL.'][jam_akhir]','type'=>'hidden'),$tek->plan_time_end);
+
+
+															echo 	$tek->plan_date_start.' '.
+																	date('h:i', strtotime($tek->plan_time_start)).' - '.
+																	date('h:i', strtotime($tek->plan_time_end)).' ('.
+																	$tek->nama.') '.
+																	'<a class="btn btn-xs btn-danger" href="javascript:(0)" title="Hapus Teknisi" onclick="DeleteTeknisi(' . "'" . $Code_DetQuot . "'," . "'" . $tek->kode_proses . "'" . ')"><i class="fa fa-trash-o"></i></a><br/>';
+															
+														}
+													}
+												}
+												
+
+												echo'
+												</td>
 												<td class="text-center">';
 													if($labs=='Y' || $subcon=='Y'){
 														$Plan_Pickup	= date('Y-m-d');
@@ -657,6 +682,53 @@ $this->load->view('include/side_menu');
 		$("#MyModalView").modal('show');	
 		
 	}
+
+	function DeleteTeknisi(id, kode){
+		swal(
+			{
+				title: "Anda Yakin?",
+				text: "Ingin menghapus data teknisi tersebut!",
+				type: "warning",
+				showCancelButton: true,
+				confirmButtonClass: "btn-danger",
+				confirmButtonText: "Hapus",
+				cancelButtonText: "Batal",
+				closeOnConfirm: false,
+				closeOnCancel: false
+			},
+			function(isConfirm) 
+			{
+				if (isConfirm) {
+					$.ajax({
+						url: "<?php echo site_url('schedule_order/delete_teknisi') ?>/" + id + "/" + kode,
+						type: "POST",
+						dataType: "JSON",
+						success: function(data) {
+							if(data.status == '1'){
+								swal("Terhapus!", data.pesan, "success");
+								setTimeout(function(){
+									window.location.reload();
+								}, 2000);
+							}else{
+								swal("Gagal!", data.pesan, "error");
+								setTimeout(function(){
+									window.location.reload();
+								}, 2000);
+							}
+						},
+						error: function(jqXHR, textStatus, errorThrown) {
+							alert('Error deleting data');
+						}
+					});
+					
+				} else {
+					swal("Dibatalkan", "Hapus data telah dibatalkan  ", "error");
+				}
+				
+			}
+		);
+		
+	}
 	
 	function splitData(UrutJadwal){
 				
@@ -887,7 +959,7 @@ $this->load->view('include/side_menu');
 			formData.append('kode_proses',NewKodeProses);
 			formData.append('sts_split',FlagSplit);
 			const ParamProcess	= {
-				'action'		: 'save_insert_schedule_tools',
+				'action'		: 'save_insert_schedule_tools/add',
 				'parameter'		: formData,
 				'loader'		: 'loader_proses_save_calibration'
 			};			
@@ -897,17 +969,20 @@ $this->load->view('include/side_menu');
 				GeneralShowMessageError('success',Hasil_Bro.pesan);
 				
 				let TeknisiNama		= Hasil_Bro.member_name;
-				let KetKalibrasi	= TglKalibrasi+' '+JamAwalKalibrasi+' - '+JamAkhirKalibrasi+' ('+TeknisiNama+')';
-				let TemplateHasil	= '<input type="hidden" name="detDetail['+UrutKalibrasi+'][process_date]" id="process_date_'+UrutKalibrasi+'" value="'+TglKalibrasi+'">'+
-									  '<input type="hidden" name="detDetail['+UrutKalibrasi+'][member_id]" id="member_id_'+UrutKalibrasi+'" value="'+TeknisiKalibrasi+'">'+
-									  '<input type="hidden" name="detDetail['+UrutKalibrasi+'][member_name]" id="member_name_'+UrutKalibrasi+'" value="'+TeknisiNama+'">'+
-									  '<input type="hidden" name="detDetail['+UrutKalibrasi+'][jam_awal]" id="jam_awal_'+UrutKalibrasi+'" value="'+JamAwalKalibrasi+'">'+
-									  '<input type="hidden" name="detDetail['+UrutKalibrasi+'][jam_akhir]" id="jam_akhir_'+UrutKalibrasi+'" value="'+JamAkhirKalibrasi+'">'+KetKalibrasi;
-				$('#proses_'+UrutKalibrasi).html(TemplateHasil);
+				// let KetKalibrasi	= TglKalibrasi+' '+JamAwalKalibrasi+' - '+JamAkhirKalibrasi+' ('+TeknisiNama+')';
+				// let TemplateHasil	= '<input type="text" name="detDetail['+UrutKalibrasi+'][process_date]" id="process_date_'+UrutKalibrasi+'" value="'+TglKalibrasi+'">'+
+				// 					  '<input type="text" name="detDetail['+UrutKalibrasi+'][member_id]" id="member_id_'+UrutKalibrasi+'" value="'+TeknisiKalibrasi+'">'+
+				// 					  '<input type="text" name="detDetail['+UrutKalibrasi+'][member_name]" id="member_name_'+UrutKalibrasi+'" value="'+TeknisiNama+'">'+
+				// 					  '<input type="text" name="detDetail['+UrutKalibrasi+'][jam_awal]" id="jam_awal_'+UrutKalibrasi+'" value="'+JamAwalKalibrasi+'">'+
+				// 					  '<input type="text" name="detDetail['+UrutKalibrasi+'][jam_akhir]" id="jam_akhir_'+UrutKalibrasi+'" value="'+JamAkhirKalibrasi+'">'+KetKalibrasi;
+				// $('#proses_'+UrutKalibrasi).html(TemplateHasil);
 				$('#waktu_tempuh_'+UrutKalibrasi).val(TempuhKalibrasi);
 				$("#MyModalDetail").html('');
 				$("#MyModalView").modal('hide');
 				$('#btn-modal-close').prop('disabled',false);
+				setTimeout(function(){
+					window.location.reload();
+				}, 2000);
 			}else{
 				GeneralShowMessageError('error',Hasil_Bro.pesan);
 				$('#btn-modal-close, #btn_simpan_schedule').prop('disabled',false);

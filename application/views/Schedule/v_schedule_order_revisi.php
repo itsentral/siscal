@@ -923,7 +923,7 @@ $this->load->view('include/side_menu');
 			formData.append('kode_proses',NewKodeProses);
 			formData.append('sts_split',FlagSplit);
 			const ParamProcess	= {
-				'action'		: 'save_insert_schedule_tools',
+				'action'		: 'save_insert_schedule_tools/revisi',
 				'parameter'		: formData,
 				'loader'		: 'loader_proses_save_calibration'
 			};			

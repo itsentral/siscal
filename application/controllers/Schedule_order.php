@@ -426,6 +426,18 @@ class Schedule_order extends CI_Controller
 			$rows_Customer	= $this->db->get_where('customers', array('id' => $rows_Header->customer_id))->row();
 			$rows_Quot		= $this->db->get_where('quotations', array('id' => $rows_Header->quotation_id))->row();
 			$rows_Detail	= $this->db->get_where('letter_order_details', array('letter_order_id' => $Code_Sales, '(qty - qty_schedule) >' => 0))->result();
+			$getTeknisi		= $this->db->select('temp_allocations.quotation_detail_id, 
+												 temp_allocations.member_id,
+												 members.nama, 
+												 temp_allocations.plan_date_start,
+												 temp_allocations.plan_time_start,
+												 temp_allocations.plan_time_end,
+												 temp_allocations.kode_proses')
+								->from('temp_allocations')
+								->join('members', 'temp_allocations.member_id = members.id')
+								->where("temp_allocations.status", "RES")
+								->like("temp_allocations.quotation_detail_id", $rows_Header->quotation_id)
+								->get()->result();
 		}
 		if ($rows_Detail) {
 			$data = array(
@@ -436,7 +448,8 @@ class Schedule_order extends CI_Controller
 				'rows_detail'	=> $rows_Detail,
 				'rows_cust'		=> $rows_Customer,
 				'rows_quot'		=> $rows_Quot,
-				'kode_proses'	=> $Kode_Proses
+				'kode_proses'	=> $Kode_Proses,
+				'jdwl_teknisi'	=> $getTeknisi
 			);
 
 			## UPDATE LETTER ORDER JADI RESERVED ##
@@ -759,7 +772,7 @@ class Schedule_order extends CI_Controller
 		echo json_encode($arrData);
 	}
 
-	function save_insert_schedule_tools()
+	function save_insert_schedule_tools($aksi)
 	{
 		$rows_Return	= array(
 			'status'		=> 2,
@@ -778,11 +791,26 @@ class Schedule_order extends CI_Controller
 			$Code_Process		= $this->input->post('kode_proses');
 			$Flag_Split			= $this->input->post('sts_split');
 
-			$Name_Teknisi		= '-';
-			$rows_Member		= $this->db->get_where('members', array('id' => $Code_Teknisi))->row();
-			if ($rows_Member) {
-				$Name_Teknisi	= strtoupper($rows_Member->nama);
+			$cekTeknisi			= $this->db->get_where('temp_allocations', array('quotation_detail_id' => $Code_QuotDet))->row();
+
+			if($aksi == "revisi"){
+				$cekDel	= $this->db->get_where('temp_allocations', array('quotation_detail_id'=>$Code_QuotDet,'member_id'=>$Code_Teknisi,'status'=>'RES'))->row();
+				if($cekDel){
+					$this->db->delete('temp_allocations',array('quotation_detail_id'=>$Code_QuotDet,'member_id'=>$Code_Teknisi,'status'=>'RES'));
+				}
 			}
+
+			if($cekTeknisi && $aksi != "revisi"){
+				$rows_Return	= array(
+					'status'		=> 2,
+					'pesan'			=> 'Teknisi sudah tersedia. untuk update teknisi, Mohon hapus teknisi yang sudah ada terlebih dahulu!'
+				);
+			}else{
+				$Name_Teknisi		= '-';
+				$rows_Member		= $this->db->get_where('members', array('id' => $Code_Teknisi))->row();
+				if ($rows_Member) {
+					$Name_Teknisi	= strtoupper($rows_Member->nama);
+				}
 
 			if ($Trip_Time > 0) {
 				$jam_bagi1	= explode(':', $Start_Time_Cal);
@@ -860,32 +888,57 @@ class Schedule_order extends CI_Controller
 					}
 				}
 
-				$Has_Ins_Alocate	= $this->db->insert('temp_allocations', $dataIns);
-				if ($Has_Ins_Alocate !== true) {
-					$Pesan_Error	= 'Error Insert Temp Alocate - New Data';
-				}
+					//$Has_Ins_Alocate	= $this->db->insert('temp_allocations', $dataIns);
+					$Has_Ins_Alocate	= $this->db->insert('temp_allocations', $dataIns);
+					if ($Has_Ins_Alocate !== true) {
+						$Pesan_Error	= 'Error Insert Temp Alocate - New Data';
+					}
 
-				if ($this->db->trans_status() != TRUE || !empty($Pesan_Error)) {
-					$this->db->trans_rollback();
-					$rows_Return		= array(
-						'status'		=> 2,
-						'pesan'			=> 'Create Sales Order Process  Failed, ' . $Pesan_Error,
-						'member_name'	=> $Name_Teknisi
-					);
-					history('Insert Tool Schedule Date ' . $Code_QuotDet . ' - ' . $Code_Process . ' - ' . $Pesan_Error);
-				} else {
-					$this->db->trans_commit();
-					$rows_Return		= array(
-						'status'		=> 1,
-						'pesan'			=> 'Create Sales Order success. Thank you & have a nice day......',
-						'member_name'	=> $Name_Teknisi
-					);
-					history('Insert Tool Schedule Date ' . $Code_QuotDet . ' - ' . $Code_Process . ' - Success');
+					if ($this->db->trans_status() != TRUE || !empty($Pesan_Error)) {
+						$this->db->trans_rollback();
+						$rows_Return		= array(
+							'status'		=> 2,
+							'pesan'			=> 'Create Sales Order Process  Failed, ' . $Pesan_Error,
+							'member_name'	=> $Name_Teknisi
+						);
+						history('Insert Tool Schedule Date ' . $Code_QuotDet . ' - ' . $Code_Process . ' - ' . $Pesan_Error);
+					} else {
+						$this->db->trans_commit();
+						$rows_Return		= array(
+							'status'		=> 1,
+							'pesan'			=> 'Create Sales Order success. Thank you & have a nice day......',
+							'member_name'	=> $Name_Teknisi
+						);
+						history('Insert Tool Schedule Date ' . $Code_QuotDet . ' - ' . $Code_Process . ' - Success');
+					}
 				}
 			}
 		}
 		echo json_encode($rows_Return);
 	}
+
+	function delete_teknisi($id, $kode){
+		$rows_Return	= array(
+			'status'		=> 2,
+			'pesan'			=> 'No record was found...'
+		);
+
+		$delete = $this->db->delete('temp_allocations',array('quotation_detail_id'=>$id,'kode_proses'=>$kode));
+
+		if($delete){
+			$rows_Return	= array(
+				'status'		=> 1,
+				'pesan'			=> 'Data teknisi berhasil dihapus '.$kode
+			);
+		}else{
+			$rows_Return	= array(
+				'status'		=> 2,
+				'pesan'			=> 'Data teknisi gagal dihapus'
+			);
+		}
+
+        echo json_encode($rows_Return);
+    }
 
 	function save_create_schedule_order()
 	{
