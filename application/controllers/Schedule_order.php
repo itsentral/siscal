@@ -772,7 +772,7 @@ class Schedule_order extends CI_Controller
 		echo json_encode($arrData);
 	}
 
-	function save_insert_schedule_tools($aksi)
+	function save_insert_schedule_tools($aksi = null)
 	{
 		$rows_Return	= array(
 			'status'		=> 2,
@@ -793,14 +793,14 @@ class Schedule_order extends CI_Controller
 
 			$cekTeknisi			= $this->db->get_where('temp_allocations', array('quotation_detail_id' => $Code_QuotDet))->row();
 
-			if($aksi == "revisi"){
+			if($aksi == "revisi" && $aksi == "recycle"){
 				$cekDel	= $this->db->get_where('temp_allocations', array('quotation_detail_id'=>$Code_QuotDet,'member_id'=>$Code_Teknisi,'status'=>'RES'))->row();
 				if($cekDel){
 					$this->db->delete('temp_allocations',array('quotation_detail_id'=>$Code_QuotDet,'member_id'=>$Code_Teknisi,'status'=>'RES'));
 				}
 			}
 
-			if($cekTeknisi && $aksi != "revisi"){
+			if($cekTeknisi && $aksi != "revisi" && $aksi != "recycle"){
 				$rows_Return	= array(
 					'status'		=> 2,
 					'pesan'			=> 'Teknisi sudah tersedia. untuk update teknisi, Mohon hapus teknisi yang sudah ada terlebih dahulu!'
