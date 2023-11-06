@@ -460,6 +460,7 @@ $this->load->view('include/side_menu');
 	}
 </style>
 <script>
+	var ActionClick 		= false;
 	var base_url			= '<?php echo site_url(); ?>';
 	var active_controller	= '<?php echo($this->uri->segment(1)); ?>';
 	$(document).ready(function(){
@@ -627,6 +628,7 @@ $this->load->view('include/side_menu');
 			
 			if(Hasil_Bro.status == '1'){
 				GeneralShowMessageError('success',Hasil_Bro.pesan);
+				ActionClick = true;
 				window.location.href	= base_url+'/'+active_controller;
 			}else{
 				GeneralShowMessageError('error',Hasil_Bro.pesan);
@@ -727,7 +729,7 @@ $this->load->view('include/side_menu');
 				
 			}
 		);
-		
+		ActionClick = true;
 	}
 	
 	function splitData(UrutJadwal){
@@ -969,20 +971,20 @@ $this->load->view('include/side_menu');
 				GeneralShowMessageError('success',Hasil_Bro.pesan);
 				
 				let TeknisiNama		= Hasil_Bro.member_name;
-				// let KetKalibrasi	= TglKalibrasi+' '+JamAwalKalibrasi+' - '+JamAkhirKalibrasi+' ('+TeknisiNama+')';
-				// let TemplateHasil	= '<input type="text" name="detDetail['+UrutKalibrasi+'][process_date]" id="process_date_'+UrutKalibrasi+'" value="'+TglKalibrasi+'">'+
-				// 					  '<input type="text" name="detDetail['+UrutKalibrasi+'][member_id]" id="member_id_'+UrutKalibrasi+'" value="'+TeknisiKalibrasi+'">'+
-				// 					  '<input type="text" name="detDetail['+UrutKalibrasi+'][member_name]" id="member_name_'+UrutKalibrasi+'" value="'+TeknisiNama+'">'+
-				// 					  '<input type="text" name="detDetail['+UrutKalibrasi+'][jam_awal]" id="jam_awal_'+UrutKalibrasi+'" value="'+JamAwalKalibrasi+'">'+
-				// 					  '<input type="text" name="detDetail['+UrutKalibrasi+'][jam_akhir]" id="jam_akhir_'+UrutKalibrasi+'" value="'+JamAkhirKalibrasi+'">'+KetKalibrasi;
-				// $('#proses_'+UrutKalibrasi).html(TemplateHasil);
+				let KetKalibrasi	= TglKalibrasi+' '+JamAwalKalibrasi+' - '+JamAkhirKalibrasi+' ('+TeknisiNama+')';
+				let TemplateHasil	= '<input type="hidden" name="detDetail['+UrutKalibrasi+'][process_date]" id="process_date_'+UrutKalibrasi+'" value="'+TglKalibrasi+'">'+
+									  '<input type="hidden" name="detDetail['+UrutKalibrasi+'][member_id]" id="member_id_'+UrutKalibrasi+'" value="'+TeknisiKalibrasi+'">'+
+									  '<input type="hidden" name="detDetail['+UrutKalibrasi+'][member_name]" id="member_name_'+UrutKalibrasi+'" value="'+TeknisiNama+'">'+
+									  '<input type="hidden" name="detDetail['+UrutKalibrasi+'][jam_awal]" id="jam_awal_'+UrutKalibrasi+'" value="'+JamAwalKalibrasi+'">'+
+									  '<input type="hidden" name="detDetail['+UrutKalibrasi+'][jam_akhir]" id="jam_akhir_'+UrutKalibrasi+'" value="'+JamAkhirKalibrasi+'">'+KetKalibrasi;
+				$('#proses_'+UrutKalibrasi).html(TemplateHasil);
 				$('#waktu_tempuh_'+UrutKalibrasi).val(TempuhKalibrasi);
 				$("#MyModalDetail").html('');
 				$("#MyModalView").modal('hide');
 				$('#btn-modal-close').prop('disabled',false);
-				setTimeout(function(){
-					window.location.reload();
-				}, 2000);
+				// setTimeout(function(){
+				// 	window.location.reload();
+				// }, 2000);
 			}else{
 				GeneralShowMessageError('error',Hasil_Bro.pesan);
 				$('#btn-modal-close, #btn_simpan_schedule').prop('disabled',false);
@@ -994,5 +996,12 @@ $this->load->view('include/side_menu');
             return false;
 		}
 	});
+
+	window.onbeforeunload = function(evt) {
+		var message = "";
+		if(evt && !ActionClick) {
+			evt.returnValue = message;
+		}  
+	};
 	
 </script>
