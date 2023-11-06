@@ -791,12 +791,12 @@ class Schedule_order extends CI_Controller
 			$Code_Process		= $this->input->post('kode_proses');
 			$Flag_Split			= $this->input->post('sts_split');
 
-			$cekTeknisi			= $this->db->get_where('temp_allocations', array('quotation_detail_id' => $Code_QuotDet))->row();
+			$cekTeknisi			= $this->db->get_where('temp_allocations', array('quotation_detail_id' => $Code_QuotDet, 'kode_proses' => $Code_Process))->row();
 
 			if($aksi == "revisi" && $aksi == "recycle"){
-				$cekDel	= $this->db->get_where('temp_allocations', array('quotation_detail_id'=>$Code_QuotDet,'member_id'=>$Code_Teknisi,'status'=>'RES'))->row();
+				$cekDel	= $this->db->get_where('temp_allocations', array('quotation_detail_id'=>$Code_QuotDet, 'kode_proses' => $Code_Process, 'member_id'=>$Code_Teknisi, 'status'=>'RES'))->row();
 				if($cekDel){
-					$this->db->delete('temp_allocations',array('quotation_detail_id'=>$Code_QuotDet,'member_id'=>$Code_Teknisi,'status'=>'RES'));
+					$this->db->delete('temp_allocations',array('quotation_detail_id'=>$Code_QuotDet, 'kode_proses' => $Code_Process, 'member_id'=>$Code_Teknisi, 'status'=>'RES'));
 				}
 			}
 
