@@ -26,6 +26,7 @@ class M_invoice_subcon extends CI_Model
 							subcon_cpr_headers.payment_reff ');
 		$this->db->from($this->table);
 		$this->db->join('subcon_cpr_headers', 'subcon_cpr_details.subcon_cpr_header_id = subcon_cpr_headers.id');
+		$this->db->where('YEAR(subcon_cpr_headers.datet) >', "2021");
 
 		if ($this->input->post('noInvoice') != "") {
             $this->db->where('subcon_cpr_details.cust_invoice_no =', $this->input->post('noInvoice'));
