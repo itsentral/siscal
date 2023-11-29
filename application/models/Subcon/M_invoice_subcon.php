@@ -4,8 +4,8 @@ class M_invoice_subcon extends CI_Model
 {
 
 	var $table 			= 'subcon_cpr_details';
-	var $column_order 	= array('subcon_cpr_headers.supplier_name', 'subcon_cpr_details.total', 'subcon_cpr_headers.descr', 'subcon_cpr_headers.payment_date', 'subcon_cpr_headers.payment_reff', null); 
-	var $column_search 	= array('subcon_cpr_headers.supplier_name', 'subcon_cpr_details.total', 'subcon_cpr_headers.descr', 'subcon_cpr_headers.payment_date', 'subcon_cpr_headers.payment_reff'); 
+	var $column_order 	= array('subcon_cpr_headers.supplier_name', 'subcon_cpr_details.cust_invoice_no', 'subcon_cpr_details.subcon_cpr_header_id', 'subcon_cpr_headers.descr', 'subcon_cpr_headers.payment_date', 'subcon_cpr_headers.payment_reff', null, 'subcon_cpr_details.total'); 
+	var $column_search 	= array('subcon_cpr_headers.supplier_name', 'subcon_cpr_details.cust_invoice_no', 'subcon_cpr_details.subcon_cpr_header_id', 'subcon_cpr_headers.descr', 'subcon_cpr_headers.payment_date', 'subcon_cpr_headers.payment_reff', 'subcon_cpr_details.total'); 
 	var $order 			= array('subcon_cpr_details.subcon_cpr_header_id' => 'desc');
 
 	public function __construct()

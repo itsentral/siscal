@@ -14,12 +14,15 @@ $this->load->view('include/side_menu');
 	<form>
 		<div class='form-group row'>			
 			<div class='col-sm-3'>
+				<label>No Invoice</label>
 				<input type="text" class="form-control" name="noInvoice" id="noInvoice" placeholder="Cari No Invoice...">							
 			</div>
 			<div class='col-sm-3'>
+				<label>No PCR</label>
 				<input type="text" class="form-control" name="noPCR" id="noPCR" placeholder="Cari No PCR...">							
 			</div>
 			<div class='col-sm-2'>
+				<label>Status</label>
 				<select class="form-control chosen-large" name="noRef" id="noRef">
 					<option value="">== Pilih Status ==</option>
 					<option value="P">PAID</option>
@@ -27,38 +30,32 @@ $this->load->view('include/side_menu');
 				</select>							
 			</div>
 			<div class='col-sm-4'>
-            	<button type="button" class="btn btn-primary" onClick="reload_table()"><i class="glyphicon glyphicon-search"></i> Search</button>			
-				<button type="button" class="btn btn-warning" onClick="reload_table()"><i class="glyphicon glyphicon-refresh"></i> Reload Table</button>				
+            	<button type="button" class="btn btn-primary" onClick="reload_table()" style="margin-top:25px;"><i class="glyphicon glyphicon-search"></i> Search</button>			
+				<button type="button" class="btn btn-warning" onClick="reload_table()" style="margin-top:25px;"><i class="glyphicon glyphicon-refresh"></i> Reload Table</button>				
 			</div>
 		</div>
 	</form>
 	<br/>
 
-	<div class="shw_tbl">
+	<div class="table-responsive">
 		<table id="table-invoice" class="table table-bordered table-striped" cellspacing="0" width="100%">
 			<thead style="background-color:#102850;color:white;">
                 <tr >
                     <th class="text-center" width="25%">Vendor</th>
                     <th class="text-center" width="10%">No Invoice</th>
-                    <th class="text-center" width="10%">No CPR</th>
-                    <th class="text-center" width="15%">Total After PPN</th>
+                    <th class="text-center" width="15%">No CPR</th>
                     <th class="text-center" width="15%">Desc/Plan Bayar</th>
                     <th class="text-center" width="10%">Tgl Pembayaran</th>
                     <th class="text-center" width="10%">No REFF</th>
                     <th class="text-center" width="5%">Status</th>
+                    <th class="text-center" width="10%">Total After PPN</th>
                 </tr>
             </thead>
             <tbody>
             </tbody>
 			<tfoot>
 				<tr>
-					<th></th>
-					<th></th>
-					<th style="text-align:right">Total:</th>
-					<th colspan=""></th>
-					<th></th>
-					<th></th>
-					<th></th>
+					<th colspan="7" style="text-align:right">Total:</th>
 					<th></th>
 				</tr>
 			</tfoot>
@@ -105,9 +102,9 @@ var table;
 $(document).ready(function() {
 	var numberRenderer = $.fn.dataTable.render.number( ',').display;
 	table = $('#table-invoice').DataTable({
-		scrollY			: 377,
-		scrollX			: true,
-		scrollCollapse	: true,   
+		//scrollY			: 377,
+		//scrollX			: true,
+		//scrollCollapse	: true,   
 		processing		: true,
 		serverSide		: true, 
 		order			: [],
@@ -166,15 +163,15 @@ $(document).ready(function() {
 						],
 		columnDefs		: [
 							{
-								"targets": [ 2, 5, 6, 7 ],
+								"targets": [ 2, 4, 5, 6],
 								"className": 'text-center',
 							},  
 							{
-								"targets": [ 3 ],
+								"targets": [ 7 ],
 								"className": 'text-right',
 							},  
 							{
-								"targets": [ 7 ],
+								"targets": [ 6 ],
 								"orderable": false,
 							},  
 						],
@@ -201,7 +198,7 @@ $(document).ready(function() {
 	
 			// Total over all pages
 			total = api
-				.column(3)
+				.column(7)
 				.data()
 				.reduce(function (a, b) {
 					return intVal(a) + intVal(b);
@@ -209,14 +206,14 @@ $(document).ready(function() {
 	
 			// Total over this page
 			pageTotal = api
-				.column(3, { page: 'current' })
+				.column(7, { page: 'current' })
 				.data()
 				.reduce(function (a, b) {
 					return intVal(a) + intVal(b);
 				}, 0);
 	
 			// Update footer
-			$(api.column(3).footer()).html(
+			$(api.column(7).footer()).html(
 				'Rp' + numberRenderer(pageTotal)
 			);
 		}
