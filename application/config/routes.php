@@ -52,3 +52,5 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 $route['default_controller'] = 'dashboard_invoice';
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
+
+$route['Getqrtest/(:any)'] = 'Getqr/getQRcalresult/$1';
