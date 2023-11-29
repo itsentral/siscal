@@ -53,11 +53,11 @@ class List_invoice_subcon extends CI_Controller {
 				$row[] = $item->supplier_name;
 				$row[] = $item->cust_invoice_no;
 				$row[] = $item->subcon_cpr_header_id;
-				$row[] = number_format($item->total);
 				$row[] = $item->descr;
 				$row[] = ($item->payment_date != null) ? date("Y/m/d", $tglPayment) : "";
 				$row[] = $item->payment_reff;
 				$row[] = $status;
+				$row[] = number_format($item->total);
 				
 				$data[] = $row;
 			}
