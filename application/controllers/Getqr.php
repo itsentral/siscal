@@ -14,8 +14,8 @@ class Getqr extends CI_Controller {
 		parent::__construct();
 
 		$this->load->model('master_model');
-		//$this->file_attachement	= $this->config->item('link_file');
-		//$this->file_location	= $this->config->item('location_file');
+		$this->file_attachement	= $this->config->item('link_file');
+		$this->file_location	= $this->config->item('location_file');
 		
 	}
 
