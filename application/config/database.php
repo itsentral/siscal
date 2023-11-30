@@ -75,7 +75,7 @@ $query_builder = TRUE;
 
 $db['default'] = array(
 	'dsn'	=> '',
-	'hostname' => '103.228.117.98',
+	'hostname' => 'localhost',
 	'username' => 'root',
 	'password' => 'sentral2022**',
 	'database' => 'calibrationsnew_db',
@@ -94,4 +94,27 @@ $db['default'] = array(
 	'failover' => array(),
 	'save_queries' => TRUE
 );
+
+//OLD-OFF ON 30 November 2023
+// $db['default'] = array(
+// 	'dsn'	=> '',
+// 	'hostname' => '103.228.117.98',
+// 	'username' => 'root',
+// 	'password' => 'sentral2022**',
+// 	'database' => 'calibrationsnew_db',
+// 	'dbdriver' => 'mysqli',
+// 	'dbprefix' => '',
+// 	'pconnect' => FALSE,
+// 	'db_debug' => (ENVIRONMENT !== 'production'),
+// 	'cache_on' => FALSE,
+// 	'cachedir' => '',
+// 	'char_set' => 'utf8',
+// 	'dbcollat' => 'utf8_general_ci',
+// 	'swap_pre' => '',
+// 	'encrypt' => FALSE,
+// 	'compress' => FALSE,
+// 	'stricton' => FALSE,
+// 	'failover' => array(),
+// 	'save_queries' => TRUE
+// );
 
