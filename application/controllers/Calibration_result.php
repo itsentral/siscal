@@ -464,9 +464,9 @@ class Calibration_result extends CI_Controller {
 			$CodeHash		= str_replace('=','',enkripsi_url($rows_Trans->id));
 			$Link_URL		= 'https://sentral.dutastudy.com/Siscal_CRM/index.php/CertificateGenerate/CertificateAuthorized/'.$CodeHash;
 			
-			//echo $CodeHash.' '.dekripsi_url($CodeHash);exit;
+			//echo $Path_PDF;exit;
 			$GenerateQRCode	= $this->GenerateQRImage($rows_Trans->id,'QRCode',$Link_URL);
-			
+			//exit;
 			if(file_exists($Path_PDF)){
 				unset($Path_PDF);
 			}
@@ -476,7 +476,7 @@ class Calibration_result extends CI_Controller {
 			if(file_exists($Path_PDF)){
 				chmod($Path_PDF, 0777);
 			}
-			
+			//exit;
 			
 			$myurl 			= $Path_PDF.'[0]';
 			$image 			= new Imagick();
@@ -491,7 +491,7 @@ class Calibration_result extends CI_Controller {
 			## HAPUS FILE PDF ##
 			if(file_exists($Path_PDF)){
 				unlink($Path_PDF);
-			}
+			} 
 			
 			## HAPUS FILE QR ##
 			
@@ -939,7 +939,7 @@ class Calibration_result extends CI_Controller {
 				</tr>
 				<tr>
 					<td width='100%' class='text-center'>
-						<img src='".$this->file_attachement.'QRCode/'.$Code_Trans.".png' width='85' height='80'>
+						<img src='".$this->file_location.'QRCode/'.$Code_Trans.".png' width='85' height='80'>
 					</td>
 				</tr>
 				<tr>

@@ -112,6 +112,7 @@ $this->load->view('include/side_menu');
 						  <th class="text-center" colspan="4">Ambil Dari Subcon</th>
 						  <th class="text-center" colspan="4">Kirim Ke Customer</th>
 						  <th class="text-center" rowspan="2">Keterangan</th>
+						  <th class="text-center" rowspan="2">Cals Notes</th>
 					</tr>
 					<tr style="background-color :#16697A !important;color : white !important;">
 						  <th class="text-center">Nomor</th>
@@ -287,7 +288,8 @@ $this->load->view('include/side_menu');
 				{"targets":30,"sClass":"text-center"},
 				{"targets":31,"sClass":"text-center"},
 				{"targets":32,"sClass":"text-center"},
-				{"targets":33,"sClass":"text-center","searchable":false,"orderable": false}
+				{"targets":33,"sClass":"text-center","searchable":false,"orderable": false},
+				{"targets":34,"sClass":"text-center","searchable":false,"orderable": false}
 			],
 			"sPaginationType": "simple_numbers", 
 			"iDisplayLength": 10,

@@ -264,7 +264,23 @@ class Monitoring_tool_close extends CI_Controller {
 			}
 			
 			
+			$Ket_Cals		= '-';
 			
+			$Query_Notest	= "SELECT
+									GROUP_CONCAT(DISTINCT(UPPER(keterangan)) SEPARATOR ', ') AS notes
+								FROM
+									trans_data_details
+								WHERE
+									trans_detail_id = '".$Code_Process."'
+								AND NOT (
+									keterangan IS NULL
+									OR keterangan = ''
+									OR keterangan = '-'
+								)";
+			$rows_Notes		= $this->db->query($Query_Notest)->row();
+			if($rows_Notes){
+				$Ket_Cals	= $rows_Notes->notes;
+			}
 			
 			
 			$nestedData		= array();
@@ -302,6 +318,7 @@ class Monitoring_tool_close extends CI_Controller {
 			$nestedData[]	= $Bast_Send_Nomor;
 			$nestedData[]	= $Qty_Kirim_Cust;
 			$nestedData[]	= $Keterangan;
+			$nestedData[]	= $Ket_Cals;
 			
 			$data[] = $nestedData;
             $urut1++;
@@ -654,6 +671,12 @@ class Monitoring_tool_close extends CI_Controller {
 		$sheet->getStyle($Cols.$NewRow.':'.$Cols.$Row_Baru)->applyFromArray($style_header);
 		$sheet->mergeCells($Cols.$NewRow.':'.$Cols.$Row_Baru);
 		
+		$Mulai_Col++;
+		$Cols		= getColsChar($Mulai_Col);
+		$sheet->setCellValue($Cols.$NewRow, 'Cals Notes');
+		$sheet->getStyle($Cols.$NewRow.':'.$Cols.$Row_Baru)->applyFromArray($style_header);
+		$sheet->mergeCells($Cols.$NewRow.':'.$Cols.$Row_Baru);
+		
 		$sql = "SELECT
 					*,
 					(@row:=@row+1) AS urut
@@ -710,6 +733,24 @@ class Monitoring_tool_close extends CI_Controller {
 					}else{
 						$Qty_Fail	= $Qty_Alat - $Qty_Proses;
 					}
+				}
+				
+				$Ket_Cals		= '-';
+			
+				$Query_Notest	= "SELECT
+										GROUP_CONCAT(DISTINCT(UPPER(keterangan)) SEPARATOR ', ') AS notes
+									FROM
+										trans_data_details
+									WHERE
+										trans_detail_id = '".$values['id']."'
+									AND NOT (
+										keterangan IS NULL
+										OR keterangan = ''
+										OR keterangan = '-'
+									)";
+				$rows_Notes		= $this->db->query($Query_Notest)->row();
+				if($rows_Notes){
+					$Ket_Cals	= $rows_Notes->notes;
 				}
 				
 				$awal_col	= 0;
@@ -888,6 +929,11 @@ class Monitoring_tool_close extends CI_Controller {
 				$awal_col++;				
 				$Cols		= getColsChar($awal_col);
 				$sheet->setCellValue($Cols.$awal_row, $Keterangan);
+				$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray2);
+				
+				$awal_col++;				
+				$Cols		= getColsChar($awal_col);
+				$sheet->setCellValue($Cols.$awal_row, $Ket_Cals);
 				$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray2);
 				
 				

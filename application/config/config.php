@@ -29,6 +29,7 @@ $config['base_url'] = $root;
 
 $config['link_file']    	= 'https://sentral.dutastudy.com/Calibrations_New/img/';
 $config['location_file']    = rtrim($_SERVER['DOCUMENT_ROOT'],'/').'/Calibrations_New/app/webroot/img/';
+//$config['location_file']    = __DIR__.'/Calibrations_New/app/webroot/img/';
 
 $config['login_key']    	= '173ALIDYhG93b0qyJfIxfsdgfh2guVoUubW46hjwvniR200881173Gacad0FgaC9mi2008811M4ru5L1mChaeMo0';
 

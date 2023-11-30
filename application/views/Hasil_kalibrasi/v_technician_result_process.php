@@ -315,7 +315,7 @@
 								<label class="control-label">Calibration Date <span class="text-red"> *</span></label>
 								
 								<?php
-									echo form_input(array('id'=>'tgl_proses','name'=>'tgl_proses','class'=>'form-control input-sm','readOnly'=>true),date('d-m-Y'));								
+									echo form_input(array('id'=>'tgl_proses','name'=>'tgl_proses','class'=>'form-control input-sm','readOnly'=>true));								
 								?>
 								
 							</div>

@@ -1460,7 +1460,7 @@ class Technician_result extends CI_Controller
 				</tr>
 				<tr>
 					<td width='100%' class='text-center'>
-						<img src='" . $this->file_attachement . 'QRCode/' . $Code_Trans . ".png' width='50' height='45'>
+						<img src='" . $this->file_location . 'QRCode/' . $Code_Trans . ".png' width='50' height='45'>
 					</td>
 				</tr>
 				<tr>

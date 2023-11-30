@@ -38,7 +38,7 @@ $this->load->view('include/side_menu');
 						
 					</div>
 				</div>
-				<div class="col-sm-3">
+				<div class="col-sm-2">
 					<div class="form-group">
 						
 						<label class="control-label">
@@ -99,7 +99,18 @@ $this->load->view('include/side_menu');
 						
 					</div>
 				</div>
-				
+				<div class="col-sm-4">
+					<div class="form-group">
+						
+						<label class="control-label">
+							&nbsp;
+						</label>
+						<div>
+							<button type='button' class='btn btn-md bg-navy-active' id='btn-download'> DOWNLOAD EXCEL <i class='fa fa-file'></i>  </button>
+						</div>
+						
+					</div>
+				</div>
 			</div>
 			
 			<div id="Loading_tes" class="overlay_load">
@@ -264,13 +275,22 @@ $this->load->view('include/side_menu');
 		});
 		
 		
-	}
+	} 
 	
-	$(document).on('click','#btn-partial',(e)=>{
+	$(document).on('click','#btn-partial',(e)=>{   
 		e.preventDefault();
 		loading_spinner();
 		window.location.href	= base_url +'/'+ active_controller+'/list_outstanding_partial_po';
 	});
+	
+	$(document).on('click','#btn-download',(e)=>{
+		let CustChosen	 	= $('#customer').val();
+		let MonthChosen		= $('#bulan').val();
+		let YearChosen		= $('#tahun').val();
+		let LinkDownload 	= base_url +'/'+ active_controller+'/download_invoice?nocust='+encodeURIComponent(CustChosen)+'&bulan='+encodeURIComponent(MonthChosen)+'&tahun='+encodeURIComponent(YearChosen);
+		window.open(LinkDownload,'_blank');
+	});
+	
 	
 
 </script>

@@ -246,6 +246,7 @@ class Technician_productivities extends CI_Controller {
 										det_trans.no_serial_number,
 										det_trans.no_sertifikat,
 										det_trans.valid_until,
+										det_trans.keterangan,
 										".$Plan_Tech." AS code_technician,
 										IF (
 											NOT (
@@ -710,6 +711,7 @@ class Technician_productivities extends CI_Controller {
 									det_trans.no_serial_number,
 									det_trans.no_sertifikat,
 									det_trans.valid_until,
+									det_trans.keterangan,
 									".$Plan_Tech." AS code_technician,
 									IF (
 										NOT (
@@ -843,7 +845,8 @@ class Technician_productivities extends CI_Controller {
 			'type_cals'			=> 'Type Process',
 			'name_technician'	=> 'Technician',
 			'date_cals'			=> 'Calibration Date',
-			'jumlah_menit'		=> 'Duration (Minutes)'			
+			'jumlah_menit'		=> 'Duration (Minutes)',
+			'keterangan'		=> 'Cals Notes'
 		);
 		
 		

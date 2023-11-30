@@ -2116,4 +2116,288 @@ class Invoice_process extends CI_Controller
 			$this->load->view($this->folder . '/v_invoice_cancel', $data);
 		}
 	}
+	
+	function download_invoice(){ 
+		set_time_limit(0);
+		$Month_Find			= $this->input->get('bulan');
+		$Year_Find			= $this->input->get('tahun');
+		$Cust_Find			= $this->input->get('nocust');
+		
+		$Judul				= '';
+		
+		$WHERE				= "grand_tot > 0";
+		$Judul_Cabang	= 'ALL CUSTOMER';
+		if(!empty($Cust_Find) && strtolower($Cust_Find) !== 'all'){
+			$rows_Customer		= $this->db->get_where('customers',array('id'=>$Cust_Find))->row();
+			$Judul_Cabang		= strtoupper($rows_Customer->name);
+			if(!empty($WHERE))$WHERE	.=" AND ";
+			$WHERE	.="customer_id = '".$Cust_Find."'";
+			
+		}
+		$Period_Find	= '';
+		if($Month_Find){
+			if(!empty($WHERE))$WHERE	.=" AND ";
+			$WHERE	.="MONTH(datet) = '".$Month_Find."'";
+			$Period_Find	.=' '.date('F',mktime(0,0,0,$Month_Find,1,date('Y')));
+		}
+		
+		if($Year_Find){
+			if(!empty($WHERE))$WHERE	.=" AND ";
+			$WHERE	.="YEAR(datet) = '".$Year_Find."'";
+			$Period_Find	.=' '.$Year_Find;
+		}
+		
+		
+		
+		
+		$this->load->library("PHPExcel");
+        $objPHPExcel = new PHPExcel();
+		        
+		// Set Creator & Title
+        $objPHPExcel->getProperties()->setCreator("SISCAL")->setTitle("SISCAL");
+ 
+		$objset = $objPHPExcel->setActiveSheetIndex(0);
+		$objget = $objPHPExcel->getActiveSheet(); 
+		$objget->setTitle('AR');
+             
+        $objget->getStyle("A5:Q5")->applyFromArray(
+            array(
+				'fill' => array(
+					'type' => PHPExcel_Style_Fill::FILL_SOLID,
+					'color' => array('rgb' => 'E1E0F7')
+				),
+				'font' => array(
+					'color' => array('rgb' => '000000'),
+					'bold' => true
+				)
+            )
+        );
+		
+		
+		
+		$objset->setCellValue("A".'1', 'SISCAL'); 
+		$objset->setCellValue("A".'2', 'INVOICE PERIODE :'.$Period_Find);
+		$objset->setCellValue("A".'3', 'CUSTOMER :  '.$Judul_Cabang);
+			
+		//table header
+		$cols = array("A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q");
+		$val = array("No","Invoice No","Inv Date","Customer","Address","Tax No","DPP","PPN","Total","PPH 23","Plan Payment Date","Paid Date","Total Paid","Bank","Withholding Tax Slip","Date Tax","Total Tax");
+		
+		for ($a=0;$a<count($cols); $a++){
+			$objset->setCellValue($cols[$a].'5', $val[$a]);
+			 
+			//Setting lebar cell
+			$objPHPExcel->getActiveSheet()->getColumnDimension('A')->setWidth(10);
+			$objPHPExcel->getActiveSheet()->getColumnDimension('B')->setWidth(15);
+			$objPHPExcel->getActiveSheet()->getColumnDimension('C')->setWidth(20);
+			$objPHPExcel->getActiveSheet()->getColumnDimension('D')->setWidth(45);
+			$objPHPExcel->getActiveSheet()->getColumnDimension('E')->setWidth(20);
+			$objPHPExcel->getActiveSheet()->getColumnDimension('F')->setWidth(20);
+			$objPHPExcel->getActiveSheet()->getColumnDimension('G')->setWidth(20);
+			$objPHPExcel->getActiveSheet()->getColumnDimension('H')->setWidth(20);
+			$objPHPExcel->getActiveSheet()->getColumnDimension('I')->setWidth(10);
+			$objPHPExcel->getActiveSheet()->getColumnDimension('J')->setWidth(20);
+			$objPHPExcel->getActiveSheet()->getColumnDimension('K')->setWidth(20);
+			$objPHPExcel->getActiveSheet()->getColumnDimension('L')->setWidth(20);
+			$objPHPExcel->getActiveSheet()->getColumnDimension('M')->setWidth(20);
+			$objPHPExcel->getActiveSheet()->getColumnDimension('N')->setWidth(20);
+			$objPHPExcel->getActiveSheet()->getColumnDimension('O')->setWidth(20);
+			$objPHPExcel->getActiveSheet()->getColumnDimension('P')->setWidth(20);
+			$objPHPExcel->getActiveSheet()->getColumnDimension('Q')->setWidth(20);
+		 
+			$style = array(
+				'alignment' => array(
+					'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+				)
+			);
+			$objPHPExcel->getActiveSheet()->getStyle($cols[$a].'0')->applyFromArray($style);
+		}
+		
+		
+		
+		$sql = "SELECT
+				*
+			FROM
+				invoices
+			WHERE ".$WHERE;
+		$rows_Detail = $this->db->query($sql)->result();
+		
+		//baris mulai
+		$baris   		= 6;
+		$Loop			= 0;
+		$tot_DPP = $tot_PPN = $tot_PPH = $tot_ALL =0;
+		if($rows_Detail){
+			foreach($rows_Detail as $key=>$vals){
+				$Loop++;
+				
+		
+				$Nil_DPP	= $vals->total_dpp;
+				$Nil_PPN	= $vals->ppn;
+				$Nil_PPH	= $vals->pph23;
+				$Code_Inv	= $vals->id;
+				
+				$Total_Inv	= $vals->grand_tot;
+				
+				$tot_DPP		+=$Nil_DPP;
+				$tot_PPN		+=$Nil_PPN;
+				$tot_PPH		+=$Nil_PPH;
+				$tot_ALL		+=$Total_Inv;
+				
+				$Plan_Bayar		= $Tgl_Bayar = $Bank = $No_Bukpot = $Tgl_Bukpot = '-';
+				$Total_Bayar	= $Total_bukpot = 0;
+				
+				## AMBIL DATA AR ##
+				$Query_AR		= "SELECT * FROM account_receivables WHERE invoice_no = '".$vals->invoice_no."' ORDER BY tahun DESC, bulan DESC LIMIT 1";
+				$rows_AR		= $this->db->query($Query_AR)->row();
+				if($rows_AR){
+					$Saldo_Akhir	= $rows_AR->saldo_akhir;
+					if($Saldo_Akhir > 0){
+						$Query_Plan	= "SELECT plan_paid FROM follow_up_invoices WHERE invoice_id = '".$Code_Inv."' AND NOT(plan_paid IS NULL OR plan_paid ='' OR plan_paid ='-') ORDER BY follow_up_date DESC LIMIT 1";
+						$rows_Plan	= $this->db->query($Query_Plan)->row();
+						if($rows_Plan){
+							$Plan_Bayar		= date('d-m-Y',strtotime($rows_Plan->plan_paid));
+						}
+					}
+				}
+				
+				## AMBIL DATA JURNAL BUM ##
+				$Query_BUM		= "SELECT
+									jur_ar.jurnalid,
+									jur_ar.tgl_jurnal,
+									jur_ar.debet,
+									jur_ar.kredit,
+									jur_head.accid,
+									head_coa.acc_name
+								FROM
+									trans_ar_jurnals jur_ar
+								INNER JOIN trans_jurnal_headers jur_head ON jur_ar.jurnalid = jur_head.jurnalid
+								LEFT JOIN coa_masters head_coa ON head_coa.accid = jur_head.accid
+								WHERE
+									jur_ar.flag_batal = 'N'
+								AND jur_ar.invoice_no = '".$vals->invoice_no."'
+								AND jur_head.tipe = 'BUM'
+								AND (
+									jur_ar.debet > 0
+									OR jur_ar.kredit > 0
+								)";
+				$rows_BUM	= $this->db->query($Query_BUM)->result();
+				if($rows_BUM){
+					$Temp_BUM = $Temp_BUM_Date = $Temp_BUM_Bank = array();
+					foreach($rows_BUM as $keyBUM=>$valBUM){
+						$Debet			= $valBUM->debet;
+						$Kredit			= $valBUM->kredit;
+						$BUM_No			= $valBUM->jurnalid;
+						$BUM_Tgl		= date('d-m-Y',strtotime($valBUM->tgl_jurnal));
+						$Nama_COA		= $valBUM->acc_name;
+						
+						$Selisih_BUM	= $Kredit - $Debet;
+						if($Selisih_BUM > 0){
+							$Total_Bayar	+=$Selisih_BUM;
+							$Temp_BUM[$BUM_No]			= $BUM_No;
+							$Temp_BUM_Date[$BUM_Tgl]	= $BUM_Tgl;
+							$Temp_BUM_Bank[$Nama_COA]	= $Nama_COA;
+						}
+						
+					}
+					
+					$Tgl_Bayar	= implode(",",$Temp_BUM_Date);
+					$Bank		= implode(",",$Temp_BUM_Bank);
+				}
+				
+				## QUERY BUK POT ##
+				$Query_BukPot		= "SELECT
+											jur_ar.jurnalid,
+											jur_ar.tgl_jurnal,
+											jur_ar.debet,
+											jur_ar.kredit,
+											jur_head.no_reff
+										FROM
+											trans_ar_jurnals jur_ar
+										INNER JOIN trans_jurnal_headers jur_head ON jur_ar.jurnalid = jur_head.jurnalid
+										WHERE
+											jur_ar.flag_batal = 'N'
+										AND jur_ar.invoice_no = '".$vals->invoice_no."'
+										AND jur_head.tipe = 'CN'
+										AND NOT(jur_head.no_reff IS NULL OR jur_head.no_reff = '' OR jur_head.no_reff = '-')
+										AND (
+											jur_ar.debet > 0
+											OR jur_ar.kredit > 0
+										)";
+				$rows_Bukpot		= $this->db->query($Query_BukPot)->result();
+				if($rows_Bukpot){
+					$Temp_CN = $Temp_CN_Date = $Temp_CN_Reff = array();
+					foreach($rows_Bukpot as $keyCN=>$valCN){
+						$Debet			= $valCN->debet;
+						$Kredit			= $valCN->kredit;
+						$CN_No			= $valCN->jurnalid;
+						$CN_Tgl			= date('d-m-Y',strtotime($valCN->tgl_jurnal));
+						$Code_Reff		= $valCN->no_reff;
+						
+						$Selisih_CN	= $Kredit - $Debet;
+						if($Selisih_CN > 0){
+							$Total_bukpot	+=$Selisih_CN;
+							$Temp_CN[$CN_No]			= $CN_No;
+							$Temp_CN_Date[$CN_Tgl]		= $CN_Tgl;
+							$Temp_CN_Reff[$Code_Reff]	= $Code_Reff;
+						}
+						
+					}
+					
+					$Tgl_Bukpot	= implode(",",$Temp_CN_Date);
+					$No_Bukpot	= implode(",",$Temp_CN_Reff);
+				}
+				
+				
+				$objset->setCellValue("A".$baris, $Loop); 
+				$objset->setCellValue("B".$baris, $vals->invoice_no);
+				$objset->setCellValue("C".$baris, date('d-m-Y', strtotime($vals->datet))); 
+				$objset->setCellValue("D".$baris, $vals->customer_name);
+				$objset->setCellValue("E".$baris, $vals->address);
+				$objset->setCellValue("F".$baris, $vals->no_faktur);
+				$objset->setCellValue("G".$baris, $Nil_DPP);
+				$objset->setCellValue("H".$baris, $Nil_PPN);
+				$objset->setCellValue("I".$baris, $Total_Inv);
+				$objset->setCellValue("J".$baris, $Nil_PPH);
+				$objset->setCellValue("K".$baris, $Plan_Bayar);
+				$objset->setCellValue("L".$baris, $Tgl_Bayar);
+				$objset->setCellValue("M".$baris, $Total_Bayar);
+				$objset->setCellValue("N".$baris, $Bank);
+				$objset->setCellValue("O".$baris, $No_Bukpot);
+				$objset->setCellValue("P".$baris, $Tgl_Bukpot);
+				$objset->setCellValue("Q".$baris, $Total_bukpot);
+				
+				$baris++;
+				
+				
+			}
+			
+		}
+		  
+		
+									
+		$objPHPExcel->getActiveSheet()->getStyle('G1:J'.$baris)->getNumberFormat()->setFormatCode('#,##0');				
+		$objPHPExcel->getActiveSheet()->getStyle('G6:J'.$baris)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_RIGHT);
+		
+		     
+		//nama sheet
+		$objPHPExcel->getActiveSheet()->setTitle($Judul_Cabang); 
+		$objPHPExcel->setActiveSheetIndex(0);  
+		
+		//nama file
+		$filename	= urlencode("REPORT_INOICE_".str_replace(' ','-',$Period_Find).".xls");
+		
+		
+		
+		// kalau ingin ganti .xls, ganti Excel2007 menjadi Excel5 
+		$objWriter	= PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5'); 
+		
+		//ob_end_clean();
+		header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
+		header("Cache-Control: no-store, no-cache, must-revalidate");
+		header("Cache-Control: post-check=0, pre-check=0", false);
+		header("Pragma: no-cache");
+		header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+		header('Content-Disposition: attachment;filename="'.$filename.'"');
+		$objWriter->save("php://output");
+	}  
 }

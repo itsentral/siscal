@@ -51,6 +51,7 @@
 					<th class="text-center">SO No</th>
 					<th class="text-center">SO Date</th>
 					<th class="text-center">Quotation No</th>
+					<th class="text-center">Cals Notes</th>
 				</tr>
 			</thead>
 			<tbody id="list_detail_tool">
@@ -81,7 +82,8 @@
 							echo"<td class='text-left'>".$valD->customer_name."</td>";
 							echo"<td class='text-center'>".$valD->no_so."</td>";
 							echo"<td class='text-center'>".$valD->tgl_so."</td>";
-							echo"<td class='text-center'>".$valD->quotation_nomor."</td>";								
+							echo"<td class='text-center'>".$valD->quotation_nomor."</td>";	
+							echo"<td class='text-left'>".$valD->keterangan."</td>";
 						echo"</tr>";
 					}
 				}
