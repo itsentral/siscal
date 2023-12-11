@@ -1,5 +1,8 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
+require APPPATH.'third_party/endroid_qrcode/autoload.php';
+use Endroid\QrCode\ErrorCorrectionLevel;
+use Endroid\QrCode\QrCode;
 use setasign\Fpdi\Fpdi;
 class Calibration_result extends CI_Controller { 
 	public function __construct(){
@@ -1975,7 +1978,7 @@ class Calibration_result extends CI_Controller {
 		
 
 		
-$Header	="
+	$Header	="
 		<div style='border-width: 1px;border-color: #666666;border-style: solid;'>
 			<table class='noborder' width='100%' height='100%' style='border-collapse: collapse !important;'>
 				<tr>
@@ -2010,5 +2013,388 @@ $Header	="
 		$mpdf->WriteHTML($html);
 		$mpdf->Output($File_Path ,'F');
 		
+	}
+
+	function print_barcode_new(){
+		$rows_Sentral		= $rows_Tool = array();		
+		if($this->input->post()){
+			$Code_Sentral	= $this->input->post('code');
+			
+			$rows_Trans		= $this->db->get_where('trans_data_details',array('id'=>$Code_Sentral))->row();
+			$rows_Sentral		= $this->db->get_where('sentral_customer_tools',array('sentral_tool_code'=>$rows_Trans->sentral_code_tool))->row();
+			$rows_Tool		= $this->db->get_where('tools',array('id'=>$rows_Sentral->tool_id))->row();
+			
+			$File_QR		= $rows_Trans->qr_code;
+			$Path_PDF		= $this->file_location.'QRCode/'.$Code_Sentral.'.pdf';
+			$Name_File		= 'QR-'.$Code_Sentral.'.jpg';
+			
+						
+			$HashKey		= '173ALIDYhG93b0qyJfIxfsdgfh2guVoUubW46hjwvniR200881173Gacad0FgaC9mi2008811M4ru5L1mChaeMo0';
+			$CodeHash		= str_replace('=','',enkripsi_url($rows_Trans->id));
+			$Link_URL		= 'https://sentral.dutastudy.com/Siscal_CRM/index.php/CertificateGenerate/CertificateAuthorized/'.$CodeHash;
+			//$Link_URL		= base_url().'Getqrtest/'.$rows_Trans->id; //QR ini harus disesuaikan urlnya
+			
+			//echo $CodeHash.' '.dekripsi_url($CodeHash);exit;
+			//$GenerateQRCode	= $this->GenerateQRImage($rows_Trans->id,'QRCode',$Link_URL);
+			$GenerateQRCode	= $this->GenerateQRNew($rows_Trans->id,'QRCode',$Link_URL);
+
+
+			
+			if(file_exists($Path_PDF)){
+				unset($Path_PDF);
+			}
+			
+			## GENARATE PDF ##
+			$File_PDF		= $this->GenerateQRFileNew($Code_Sentral);
+			if(file_exists($Path_PDF)){
+				chmod($Path_PDF, 0777);
+			}
+			
+			$image = new Imagick();
+			$image->setResolution( 300, 300 );
+			$myurl = $Path_PDF.'[0]';
+			$image->readImage($myurl);
+			//$image->scaleImage(800,0);
+			//$image->setImageResolution(300, 300);
+			$image->setImageFormat( "jpeg" );
+			$image->setImageCompression(imagick::COMPRESSION_JPEG); 
+			$image->setImageCompressionQuality(100);
+			$image= $image->flattenImages();
+			$image->writeImage($this->file_location.'QRCode/'.$Name_File);
+			$image->clear();
+			$image->destroy();
+			
+			
+			## HAPUS FILE PDF ##
+			if(file_exists($Path_PDF)){
+				unlink($Path_PDF);
+			}
+			
+			## HAPUS FILE QR ##
+			
+			$File_Barcode	= $this->file_location.'QRCode/img-'.$Code_Sentral.'.png';
+			if(file_exists($File_Barcode)){
+				chmod($File_Barcode, 0777);
+				unlink($File_Barcode);
+			}
+			
+			
+			
+			$UPD_Detail		= array(
+				'qr_code'	=> $Name_File
+			);
+			
+			$Has_Upd_Detail	= $this->db->update('trans_data_details',$UPD_Detail,array('id'=>$Code_Sentral));
+			$rows_Trans		= $this->db->get_where('trans_data_details',array('id'=>$Code_Sentral))->row();
+			
+			$sroot = $_SERVER['DOCUMENT_ROOT'];
+			$rows_Return	= array(
+				'hasil'			=> 1,
+				'pesan'			=> 'Berhasil '.$sroot,
+				'path'			=> $this->file_attachement.'QRCode/'.$Name_File
+				//'path'			=> $this->file_attachement.'QRCode/'.$Code_Sentral.'.pdf'
+			);
+			
+			echo json_encode($rows_Return);
+			
+		}		
+	}
+	
+	function GenerateQRNew($Nama_File ='',$Location='',$Link_URL=''){
+		
+		$File_Path	= $this->file_location.$Location.'/img-'.$Nama_File.'.png';
+		if(file_exists($File_Path)) {
+			unlink($File_Path);
+		}
+
+
+		$rows_Trans		= $this->db->get_where('trans_data_details',array('id'=>$Nama_File))->row();
+		$rows_Tool		= $this->db->get_where('tools',array('id'=>$rows_Trans->tool_id))->row();
+		
+		if(strtolower($rows_Tool->certification_id) == 'kan'){
+			$Logo_Path	= './assets/file/'.$Location.'/cals_kan.png';
+		}else{
+			$Logo_Path	= './assets/file/'.$Location.'/logo2.png';
+		}
+		
+		$Label_Link	= $Link_URL;
+		
+		$qrCode = new QrCode($Label_Link);
+		$qrCode->setSize(250);
+
+		// Set advanced options
+		$qrCode->setWriterByName('png');
+		$qrCode->setMargin(5);
+		$qrCode->setEncoding('UTF-8');
+		$qrCode->setErrorCorrectionLevel(ErrorCorrectionLevel::HIGH);
+		$qrCode->setForegroundColor(['r' => 0, 'g' => 0, 'b' => 0, 'a' => 0]);
+		$qrCode->setBackgroundColor(['r' => 255, 'g' => 255, 'b' => 255, 'a' => 0]);
+		//$qrCode->setLogoPath('./assets/img/sc_logo.png');
+		//$qrCode->setLogoWidth(80);
+		$qrCode->setValidateResult(false);
+
+		// Directly output the QR code
+		//header('Content-Type: '.$qrCode->getContentType());
+		//echo $qrCode->writeString();
+
+		// Save it to a file
+		//$filename = time().'.png';
+		
+		if(strtolower($rows_Tool->certification_id) == 'kan'){
+			//$qrCode->setLogoPath('assets/img/sc_logo.png');
+			//$qrCode->setLogoWidth(80);
+		}else{
+			//imagecopyresampled($out, $logo, $QR_width/2.65, $QR_height/2.65, 0, 0, $QR_width/4, $QR_height/4, $newwidth, $newheight);
+		}
+		
+		$qrCode->writeFile($File_Path);
+		return $File_Path;
+		
+		
+	}
+
+	
+	function GenerateQRFileNew($Code=''){
+		$rows_trans		= $this->db->get_where('trans_data_details',array('id'=>$Code))->row();
+		$rows_header		= $this->db->get_where('sentral_customer_tools',array('sentral_tool_code'=>$rows_trans->sentral_code_tool))->row();
+		$rows_tool		= $this->db->get_where('tools',array('id'=>$rows_header->tool_id))->row();
+		
+		$File_Path		= $this->file_location.'QRCode/'.$Code.'.pdf';
+		
+		$sroot = $_SERVER['DOCUMENT_ROOT'];
+		include $sroot.'/Siscal_mobile/application/third_party/MPDF57/mpdf.php';
+		//$mpdf=new mPDF('utf-8', array(29,50));
+		//$mpdf=new mPDF('utf-8', array(43,24));				
+		$mpdf=new mPDF('utf-8', array(300,150));
+
+		$ArrBulan	=array(1=>'Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','Nopember','Desember');
+		$ArrHari	= array(
+			'Sun'	=> 'Minggu',
+			'Mon'	=> 'Senin',
+			'Tue'	=> 'Selasa',
+			'Wed'	=> 'Rabu',
+			'Thu'	=> 'Kamis',
+			'Fri'	=> 'Jumat',
+			'Sat'	=> 'Sabtu'
+			);
+		//Beginning Buffer to save PHP variables and HTML tags
+		ob_start();
+		$img_sentral	= $sroot.'/Siscal_Dashboard/assets/img/logo_flat.png';
+		$img_kan		= $sroot.'/Siscal_Dashboard/assets/img/kan.png';
+		//echo"<pre>";print_r($rows_header);exit;
+
+		$HashKey		= '173ALIDYhG93b0qyJfIxfsdgfh2guVoUubW46hjwvniR200881173Gacad0FgaC9mi2008811M4ru5L1mChaeMo0';
+		$CodeHash		= Enkripsi($rows_trans->id,$HashKey);
+		$Link_URL		= 'https://sentral.dutastudy.com/Siscal_CRM/index.php/CertificateGenerate/CertificateAuthorized/'.$CodeHash;
+
+		?>  
+
+		<style type="text/css">
+		@page {
+			margin-top: 0.05cm;
+			margin-left: 0.05cm;
+			margin-right: 0.05cm;
+			margin-bottom: 0.05cm;
+		}		
+		</style>
+
+		<?php
+		$Font_Footer	= $Font_Header = "8px";
+		$Code_Trans		= $rows_trans->id;
+		$Code_Serial	= $rows_trans->no_serial_number;
+		$Code_Identify	= $rows_trans->no_identifikasi;
+		$Text_Head		= $Code_Trans;
+		if(!empty($Code_Identify) && $Code_Identify !== '-'){
+			$Text_Head		= 'ID: '.$Code_Identify;
+		}else{
+			$Text_Head		= '-';
+		}
+
+		if(!empty($Code_Serial) && $Code_Serial !== '-'){
+			$Text_Head		= 'SN: '.$Code_Serial;
+		}else{
+			$Text_Head		= '-';
+		}
+
+		if(strlen($Text_Head) > 20){
+			//$Font_Header	= "6px";
+		}
+
+		$Logo_Path	= "";
+		
+		if(strtolower($rows_Tool->certification_id) != 'kan'){
+			$Logo_Path	= '	<div style="position: fixed; top: 0.1px; left: 48%;">
+								<img src="./assets/img/logo-sc.jpg" style="width: 70%">
+							</div>
+							<div style="position: fixed; top: 2px; left: 73%;">
+								<img src="./assets/img/kan.png" style="width: 80%">
+							</div>';
+		}else{
+			$Logo_Path	= '	<div style="position: fixed; top: 1px; left: 48%;">
+								<!--<img src="./assets/img/logo-new.png" style="width: 32px;">-->
+								<!--<img src="./assets/img/logo-sc.jpg" style="width: 32px;">-->
+								<img src="./assets/img/logo-sc.jpg" style="width: 70%">
+							</div>';
+		}
+
+		$Text_Footer	= "";
+		if(!empty($rows_trans->valid_until) && $rows_trans->valid_until !== '0000-00-00' && $rows_trans->valid_until !== '1970-01-01'){
+			$Text_Footer	='<div style="font-size: 60px;position: fixed; top: 30%; left: 50%;font-family: verdana,arial,sans-serif;"><b>'.date('d-m-Y',strtotime($rows_trans->datet)).' Sd/</b></div>
+			<div style="font-size: 60px;position: fixed; top: 42%; left: 50%;font-family: verdana,arial,sans-serif;"><b>'.date('d-m-Y',strtotime($rows_trans->valid_until)).'</b></div>';
+		}else{
+			$Text_Footer	='<div style="font-size: 60px;position: fixed; top: 43%; left: 50%;font-family: verdana,arial,sans-serif;"><b>'.date('d-m-Y',strtotime($rows_trans->datet)).'<b></div>';
+		}
+
+		
+		$Header = '
+					<div style="position: fixed;left: 1px;">
+						<img src="'.$this->file_location.'QRCode/img-'.$Code_Trans.'.png" style="width: 94%">
+					</div>
+					
+					<div style="font-size: 38px;position: fixed; bottom: -4px; left: 1%;font-family: verdana,arial,sans-serif;"><b>www.sentralkalibrasi.co.id</b></div>
+
+					'.$Logo_Path.' '.$Text_Footer.'
+
+					<div style="font-size: 50px;position: fixed; top: 53%; left: 50%;font-family: verdana,arial,sans-serif;"><hr style="height:6px;margin: 15px; width: 97%"/><b>'.$Text_Head.'</b></div>
+
+				';
+
+		echo $Header;
+			
+		$html = ob_get_contents();
+		ob_end_clean();
+		//echo $html;exit;
+		$mpdf->WriteHTML($html);
+		$mpdf->Output($File_Path ,'F');
+	}
+	
+	function downloadQRBatch($Code_SO=''){
+
+		$Query_Data		= "SELECT
+								det_tool.*,
+								head_tool.labs,
+								head_tool.insitu,
+								head_tool.subcon,
+								head_tool.location,
+								head_tool.so_descr,
+								head_tool.range,
+								head_tool.piece_id,
+								head_tool.quotation_detail_id
+						FROM
+							trans_data_details det_tool
+							INNER JOIN trans_details head_tool ON head_tool.id = det_tool.trans_detail_id
+						WHERE det_tool.flag_proses = 'Y' AND head_tool.letter_order_id = '".$Code_SO."'";
+		$rows_Trans	= $this->db->query($Query_Data)->result();
+		
+		$OK_Proses = 0;
+		if($rows_Trans){
+			$OK_Proses = 1;
+		}
+
+		$this->load->library("PHPExcel");
+		$excel	= new PHPExcel();
+
+		$excel->getProperties()->setCreator('SISCAL')
+		->setLastModifiedBy('SISCAL')
+		->setTitle("Data Kalibrasi")
+		->setSubject("SISCAL")
+		->setDescription("List Data Kalibrasi")
+		->setKeywords("Data Kalibrasi");
+
+		$style_col = array(
+		'font' => array('bold' => true),
+		'alignment' => array(
+		'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+		'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER
+		),
+		'borders' => array(
+		'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),
+		'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),
+		'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),
+		'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN)
+		)
+		);
+		
+		$style_row = array(
+		'alignment' => array(
+		'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER
+		),
+		
+		'borders' => array(
+		'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),
+		'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),
+		'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),
+		'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN)
+		)
+		);
+
+		$excel->setActiveSheetIndex(0)->setCellValue('A1', "Tool Name");
+		$excel->setActiveSheetIndex(0)->setCellValue('B1', "Valid Date");
+		$excel->setActiveSheetIndex(0)->setCellValue('C1', "Id/Serial No");
+		$excel->setActiveSheetIndex(0)->setCellValue('D1', "QRCode");
+
+		$excel->getActiveSheet()->getStyle('A1')->applyFromArray($style_col);
+		$excel->getActiveSheet()->getStyle('B1')->applyFromArray($style_col);
+		$excel->getActiveSheet()->getStyle('C1')->applyFromArray($style_col);
+		$excel->getActiveSheet()->getStyle('D1')->applyFromArray($style_col);
+
+		$siswa = $rows_Trans;
+		$no = 1;
+		$numrow = 2; 
+		foreach($siswa as $ketK=>$data){
+		
+		$CodeHash	= str_replace('=','',enkripsi_url($data->id));
+		$QR			= 'https://sentral.dutastudy.com/Siscal_CRM/index.php/CertificateGenerate/CertificateAuthorized/'.$CodeHash;
+
+		if(!empty($data->valid_until) && $data->valid_until !== '0000-00-00' && $data->valid_until !== '1970-01-01'){
+			$date	= date('d-m-Y',strtotime($data->datet)).' Sd/ '.date('d-m-Y',strtotime($data->valid_until));
+		}else{
+			$date	= date('d-m-Y',strtotime($data->datet));
+		}
+
+		$codeToolsID		= "-";
+		if(!empty($data->no_identifikasi) && $data->no_identifikasi !== '-'){
+			$codeToolsID		= 'ID: '.$data->no_identifikasi;
+		}
+
+		if(!empty($data->no_serial_number) && $data->no_serial_number !== '-'){
+			$codeToolsID		= 'SN: '.$data->no_serial_number;
+		}
+
+		$excel->setActiveSheetIndex(0)->setCellValue('A'.$numrow, $data->tool_name);
+		$excel->setActiveSheetIndex(0)->setCellValue('B'.$numrow, $date);
+		$excel->setActiveSheetIndex(0)->setCellValue('C'.$numrow, $codeToolsID, PHPExcel_Cell_DataType::TYPE_STRING);
+		$excel->setActiveSheetIndex(0)->setCellValue('D'.$numrow, $QR);
+
+		$excel->getActiveSheet()->getStyle('A'.$numrow)->applyFromArray($style_row);
+		$excel->getActiveSheet()->getStyle('B'.$numrow)->applyFromArray($style_row);
+		$excel->getActiveSheet()->getStyle('C'.$numrow)->applyFromArray($style_row);
+		$excel->getActiveSheet()->getStyle('D'.$numrow)->applyFromArray($style_row);
+		
+		$no++;
+		$numrow++;
+		}
+
+		$excel->getActiveSheet()->getColumnDimension('A')->setWidth(35);
+		$excel->getActiveSheet()->getColumnDimension('B')->setWidth(25);
+		$excel->getActiveSheet()->getColumnDimension('C')->setWidth(25);
+		$excel->getActiveSheet()->getColumnDimension('D')->setWidth(155);
+
+		$excel->getActiveSheet()->getDefaultRowDimension()->setRowHeight(-1);
+		$excel->getActiveSheet()->getPageSetup()->setOrientation(PHPExcel_Worksheet_PageSetup::ORIENTATION_LANDSCAPE);
+		$excel->getActiveSheet(0)->setTitle("Detail Tools");
+		$excel->setActiveSheetIndex(0);
+
+		$file_name = 'SISCAL QRcode Tools  - '.$Code_SO;   
+
+		$objWriter = PHPExcel_IOFactory::createWriter($excel, 'Excel5');
+		ob_end_clean();
+		header("Last-Modified: " . gmdate("D, d M Y") . " GMT");
+		header("Cache-Control: no-store, no-cache, must-revalidate");
+		header("Cache-Control: post-check=0, pre-check=0", false);
+		header("Pragma: no-cache");
+		header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+		header('Content-Disposition: attachment;filename="'.$file_name.'.xls"');
+		$objWriter->save("php://output");
 	}
 }

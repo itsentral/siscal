@@ -129,6 +129,9 @@ $this->load->view('include/side_menu');
 					<div class="col-sm-12 col-xs-12">&nbsp;</div>
 				</div>
 				<div class="row">
+				<div class="col-sm-12 text-right">
+					<button type="button" class="btn bg-orange" onclick="PrintBarcodeBatch('<?php echo $Code_SO;?>');"><i class="fa fa-print"></i> QRCode Batch</button>
+				</div>
 					<div class="col-sm-12" style="overflow-x:scroll !important;">
 						<table class="table table-striped table-bordered" id="my-grid">
 							<thead>
@@ -263,6 +266,40 @@ $this->load->view('include/side_menu');
 		</div>
 	</div>
 </div>
+
+<div class="modal fade" id="FormModalQR">
+	<div class="modal-dialog modal-sm" style="margin-top:250px;">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+				<span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title">Printer Tools</h4>
+			</div>
+			<form action="#" method="POST" id="form" enctype="multipart/form-data">
+			<div class="modal-body">
+				<input type="hidden" name="qr_code" readonly>
+				<input type="hidden" name="qr_flag" readonly>
+
+				<div class="row">
+					<div class="form-group col-sm-12">
+						<label class="control-label">Pilih Template </label>
+						<select name="flaq_print" class="form-control" style="width:100%">
+							<option value="Y">Landscape</option>
+							<option value="N">Potrait</option>
+						</select>						
+					</div>
+				</div>
+
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-danger" data-dismiss="modal"><i class="glyphicon glyphicon-remove"></i> Batal</button>
+				<button type="button" class="btn btn-primary" id="btnSave"><i class="glyphicon glyphicon-print"></i> Print</button>
+			</div>	
+		</form>
+		</div>
+	</div>
+</div>
+
 <?php $this->load->view('include/footer'); ?>
 <style>
 	.sub-heading{
@@ -388,20 +425,68 @@ $this->load->view('include/side_menu');
 	
 	const PrintBarcode = (Code_Print, Flag_QR)=>{
 		
-		loading_spinner_new();
+		
 		let Barcode_Action	= 'print_barcode_nonQR_tool';
 		if(Flag_QR == 'Y'){
 			Barcode_Action	= 'print_barcode_calibration_tool';
+			$('[name="qr_code"]').val(Code_Print);
+			$('[name="qr_flag"]').val(Flag_QR);
+			//$('[name="qr_action"]').val(Barcode_Action);
+			$('#FormModalQR').modal('show');
+		}else{
+			loading_spinner_new();
+			$.post(base_url +'/'+ active_controller+'/'+Barcode_Action,{'code':Code_Print}, function(response) {
+				close_spinner_new();
+				const datas	= $.parseJSON(response);
+				window.open(datas.path,'_blank');
+        		});
+			
 		}
-		 $.post(base_url +'/'+ active_controller+'/'+Barcode_Action,{'code':Code_Print}, function(response) {
-			close_spinner_new();
-            //console.log(response);
-			const datas	= $.parseJSON(response);
-			window.open(datas.path,'_blank');
-        });
+
 		
-		//let Link_Print	= base_url+'/'+active_controller+'/print_barcode_calibration_tool?code_tool='+encodeURIComponent(Code_Print);
-		//window.open(Link_Print,'_blank');
+
 	};
+
+	$('#btnSave').on('click',function(e) {
+		e.preventDefault();
+		//loading_spinner_new();
+
+		$('#btnSave').html('<i class="glyphicon glyphicon-ok"></i> Proses...');
+		$('#btnSave').attr('disabled', true);
+		
+		var flagPrint = $('[name="flaq_print"]').val();
+		var Code_Print= $('[name="qr_code"]').val();
+
+		//alert(flagPrint);
+		
+		let url	= 'print_barcode_calibration_tool';
+
+		if(flagPrint == 'Y'){
+			url	= 'print_barcode_new';
+		}
+		
+		//pakek ajax aja ntar gais ya
+
+		$.post(base_url +'/'+ active_controller+'/'+url,{'code':Code_Print}, function(response) {
+			//close_spinner_new();
+			
+           		//console.log(response);
+			const datas	= $.parseJSON(response);
+			
+			if(datas.hasil == 1){
+				$('#FormModalQR').modal('hide');
+				window.open(datas.path,'_blank');
+				$('#btnSave').html('<i class="glyphicon glyphicon-print"></i> Print');
+				$('#btnSave').attr('disabled', false);
+			}else{
+				alert("Maaf Print Data QRCode tidak dapat diproses!");
+				$('#btnSave').html('<i class="glyphicon glyphicon-print"></i> Print');
+				$('#btnSave').attr('disabled', false);
+
+			}
+			
+        	});
+
+	});
 	
 </script>
