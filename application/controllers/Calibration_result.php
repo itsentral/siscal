@@ -2204,7 +2204,8 @@ class Calibration_result extends CI_Controller {
 		$Code_Trans		= $rows_trans->id;
 		$Code_Serial	= $rows_trans->no_serial_number;
 		$Code_Identify	= $rows_trans->no_identifikasi;
-		$Text_Head		= $Code_Trans;
+		//$Text_Head		= $Code_Trans;
+		$Text_Head		= '-';
 		if(!empty($Code_Identify) && $Code_Identify !== '-'){
 			$Text_Head		= 'ID: '.$Code_Identify;
 		}else{
