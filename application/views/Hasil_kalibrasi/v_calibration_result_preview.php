@@ -488,5 +488,10 @@ $this->load->view('include/side_menu');
         	});
 
 	});
+
+	function PrintBarcodeBatch(Code_SO){
+		var Links = base_url + active_controller + '/downloadQRBatch/' + Code_SO;
+			window.open(Links, '_blank');
+	}
 	
 </script>
