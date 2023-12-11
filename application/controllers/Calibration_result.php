@@ -219,7 +219,8 @@ class Calibration_result extends CI_Controller {
 				'rows_quot'		=> $rows_Quot,
 				'rows_letter'	=> $rows_Letter,
 				'rows_trans'	=> $rows_Trans,
-				'rows_cust'		=> $rows_Cust
+				'rows_cust'		=> $rows_Cust,
+				'Code_SO'		=> $Code_SO
 			);
 			
 			$this->load->view($this->folder.'/v_calibration_result_preview',$data);
