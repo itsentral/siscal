@@ -135,6 +135,9 @@ $sheet->getStyle('O' . $NewRow)->applyFromArray($style_header);
 $sheet->setCellValue('P' . $NewRow, 'Keterangan');
 $sheet->getStyle('P' . $NewRow)->applyFromArray($style_header);
 
+$sheet->setCellValue('q' . $NewRow, 'Type');
+$sheet->getStyle('q' . $NewRow)->applyFromArray($style_header);
+
 if ($records) {
     $nomor = 0;
     foreach ($records as $val) {
@@ -187,6 +190,17 @@ if ($records) {
 
         $sheet->setCellValue('P' . $NewRow, $val['keterangan']);
         $sheet->getStyle('P' . $NewRow)->applyFromArray($styleArray1);
+
+		if ($val['insitu'] == 'Y' && $val['labs'] == 'N' && $val['subcon'] == 'N') {
+			$typeIn = "Insitu";
+		} else if ($val['insitu'] == 'N' && $val['labs'] == 'Y' && $val['subcon'] == 'N') {
+			$typeIn = "Labs";
+		} else {
+			$typeIn = "Subcon";
+		}
+
+        $sheet->setCellValue('q' . $NewRow, $typeIn);
+        $sheet->getStyle('q' . $NewRow)->applyFromArray($styleArray1);
     }
 }
 
