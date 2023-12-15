@@ -45,6 +45,7 @@ class Schedule_order extends CI_Controller
 		$Month_Find		= $this->input->post('bulan');
 		$Year_Find		= $this->input->post('tahun');
 		$Status_Find	= $this->input->post('status');
+		$Type_Find		= $this->input->post('type');
 		$requestData	= $_REQUEST;
 
 		$like_value     = $requestData['search']['value'];
@@ -89,6 +90,11 @@ class Schedule_order extends CI_Controller
 			$WHERE	.= "head_sched.status = '" . $Status_Find . "'";
 		}
 
+		if ($Type_Find) {
+			if (!empty($WHERE)) $WHERE .= " AND ";
+			$WHERE	.= "head_so.flag_so_insitu = '" . $Type_Find . "'";
+		}
+
 		$sql = "SELECT
 					head_sched.*,
 					head_quot.nomor AS quotation_nomor,
@@ -99,6 +105,7 @@ class Schedule_order extends CI_Controller
 					head_quot.member_name,
 					head_so.no_so,
 					head_so.tgl_so,
+					head_so.flag_so_insitu,
 					(@row:=@row+1) AS urut
 				FROM
 					schedules head_sched
@@ -153,9 +160,6 @@ class Schedule_order extends CI_Controller
 			$Quot_PO			= $row['pono'];
 			$Quot_PO_Date		= date('d-m-Y', strtotime($row['podate']));
 
-
-
-
 			$Lable_Status	= 'OPEN';
 			$Color_Status	= 'bg-green-active';
 			if ($Status_Schedule === 'CNC') {
@@ -165,7 +169,7 @@ class Schedule_order extends CI_Controller
 				$Lable_Status	= 'REVISION';
 				$Color_Status	= 'bg-navy-active';
 			} else if ($Status_Schedule === 'APV') {
-				$Lable_Status	= 'APPROVE BY CUSTOMER';
+				$Lable_Status	= 'APPROVE BY CS';
 				$Color_Status	= 'bg-maroon-active';
 			}
 			$Ket_Status		= '<span class="badge ' . $Color_Status . '">' . $Lable_Status . '</span>';
@@ -174,21 +178,27 @@ class Schedule_order extends CI_Controller
 
 			$Template		= '<button type="button" class="btn btn-sm btn-primary" onClick = "ActionPreview({code:\'' . $Code_Schedule . '\',action :\'detail_schedule_order\',title:\'VIEW SCHEDULE\'});" title="VIEW SCHEDULE"> <i class="fa fa-search"></i> </button>';
 			if (($Arr_Akses['create'] == '1' || $Arr_Akses['update'] == '1') && $Status_Schedule === 'OPN') {
-				$Template		.= '&nbsp;&nbsp;<button type="button" class="btn btn-sm btn-danger" onClick = "ActionPreview({code:\'' . $Code_Schedule . '\',action :\'cancel_schedule_order\',title:\'CANCEL SCHEDULE\'});" title="CANCEL SCHEDULE"> <i class="fa fa-trash-o"></i> </button>';
-				$Template		.= '&nbsp;&nbsp;<a href="' . site_url() . '/Schedule_order/revisi_schedule_order?nomor_order=' . urlencode($Code_Schedule) . '" class="btn btn-sm btn-success" title="REVISION SCHEDULE"> <i class="fa fa-edit"></i> </a>';
+				$Template		.= ' <button type="button" class="btn btn-sm btn-danger" onClick = "ActionPreview({code:\'' . $Code_Schedule . '\',action :\'cancel_schedule_order\',title:\'CANCEL SCHEDULE\'});" title="CANCEL SCHEDULE"> <i class="fa fa-trash-o"></i> </button>';
+				$Template		.= ' <a href="' . site_url() . '/Schedule_order/revisi_schedule_order?nomor_order=' . urlencode($Code_Schedule) . '" class="btn btn-sm btn-success" title="REVISION SCHEDULE"> <i class="fa fa-edit"></i> </a>';
 				if ($row['sts_email'] == 'N') {
-					$Template		.= '&nbsp;&nbsp;<button type="button" class="btn btn-sm bg-maroon" onClick = "ActionPreview({code:\'' . $Code_Schedule . '\',action :\'email_schedule_order\',title:\'SEND EMAIL SCHEDULE\'});" title="SEND EMAIL"> <i class="fa fa-send"></i> </button>';
+					$Template		.= ' <button type="button" class="btn btn-sm bg-maroon" onClick = "ActionPreview({code:\'' . $Code_Schedule . '\',action :\'email_schedule_order\',title:\'SEND EMAIL SCHEDULE\'});" title="SEND EMAIL"> <i class="fa fa-send"></i> </button>';
 				}
 
-				$Template		.= '&nbsp;&nbsp;<button type="button" class="btn btn-sm bg-navy-active" onClick = "ActionPreview({code:\'' . $Code_Schedule . '\',action :\'approve_schedule_order\',title:\'APPROVE SCHEDULE\'});" title="APPROVE SCHEDULE"> <i class="fa fa-check-square"></i> </button>';
+				$Template		.= ' <button type="button" class="btn btn-sm bg-navy-active" onClick = "ActionPreview({code:\'' . $Code_Schedule . '\',action :\'approve_schedule_order\',title:\'APPROVE SCHEDULE\'});" title="APPROVE SCHEDULE"> <i class="fa fa-check-square"></i> </button>';
 			}
 
 			if (($Arr_Akses['create'] == '1' || $Arr_Akses['update'] == '1') && $Status_Schedule === 'APV') {
-				$Template		.= '&nbsp;&nbsp;<a href="' . site_url() . '/Schedule_order/approve_reschedule_order?nomor_order=' . urlencode($Code_Schedule) . '" class="btn btn-sm bg-purple-active" title="APPROVE RESCHEDULE"> <i class="fa fa-recycle"></i> </a>';
+				$Template		.= ' <a href="' . site_url() . '/Schedule_order/approve_reschedule_order?nomor_order=' . urlencode($Code_Schedule) . '" class="btn btn-sm bg-purple-active" title="APPROVE RESCHEDULE"> <i class="fa fa-recycle"></i> </a>';
 			}
 
 			if ($Arr_Akses['download'] == '1'  && $Status_Schedule === 'OPN') {
-				$Template		.= '&nbsp;&nbsp;<a href="' . site_url() . '/Schedule_order/print_schedule?nomor_order=' . urlencode($Code_Schedule) . '" class="btn btn-sm btn-warning" target = "_blank" title="PRINT SCHEDULE"> <i class="fa fa-print"></i> </a>';
+				$Template		.= ' <a href="' . site_url() . '/Schedule_order/print_schedule?nomor_order=' . urlencode($Code_Schedule) . '" class="btn btn-sm btn-warning" target = "_blank" title="PRINT SCHEDULE"> <i class="fa fa-print"></i> </a>';
+			}
+
+			if ($row['flag_so_insitu'] == 'Y') {
+				$flag_so = "<td class='text-center'><span class='badge bg-green'>Insitu</span></td>";
+			} else {
+				$flag_so = "<td class='text-center'><span class='badge bg-maroon'>Labs</span></td>";
 			}
 
 
@@ -196,6 +206,7 @@ class Schedule_order extends CI_Controller
 			$nestedData[]	= $Nomor_Schedule;
 			$nestedData[]	= $Date_Schedule;
 			$nestedData[]	= $Customer;
+			$nestedData[]	= $flag_so;
 			$nestedData[]	= $Quot_Nomor;
 			$nestedData[]	= $Nomor_SO;
 			$nestedData[]	= $Ket_Status;
@@ -812,81 +823,81 @@ class Schedule_order extends CI_Controller
 					$Name_Teknisi	= strtoupper($rows_Member->nama);
 				}
 
-			if ($Trip_Time > 0) {
-				$jam_bagi1	= explode(':', $Start_Time_Cal);
-				$jam_bagi2	= explode(':', $End_Time_Cal);
-				$Start_Time_Cal	= date('H:i', mktime(intval($jam_bagi1[0]), intval($jam_bagi1[1]) - $Trip_Time, 0, date('m'), date('d'), date('Y')));
-				$End_Time_Cal	= date('H:i', mktime(intval($jam_bagi2[0]), intval($jam_bagi2[1]) + $Trip_Time, 0, date('m'), date('d'), date('Y')));
-			}
-			$Start_Time_Cal	= $Start_Time_Cal . ':00';
-			$End_Time_Cal	= $End_Time_Cal . ':00';
-
-
-			$dataIns		= array(
-				'quotation_detail_id'	=> $Code_QuotDet,
-				'member_id'				=> $Code_Teknisi,
-				'plan_date_start'		=> $Date_Calibration,
-				'plan_time_start'		=> $Start_Time_Cal,
-				'plan_date_end'			=> $Date_Calibration,
-				'plan_time_end'			=> $End_Time_Cal,
-				'status'				=> 'RES',
-				'kode_proses'			=> $Code_Process,
-				'sts_split'				=> $Flag_Split
-			);
-
-			$Query_Find	= "SELECT
-								*
-							FROM
-								temp_allocations
-							WHERE
-								plan_date_start = '" . $Date_Calibration . "'
-							AND member_id = '" . $Code_Teknisi . "'
-							AND (
-								(
-									plan_time_start > '" . $Start_Time_Cal . "'
-									AND plan_time_start < '" . $End_Time_Cal . "'
-								)
-								OR (
-									plan_time_end > '" . $Start_Time_Cal . "'
-									AND plan_time_end < '" . $End_Time_Cal . "'
-								)
-								OR (
-									plan_time_start <= '" . $Start_Time_Cal . "'
-									AND plan_time_end >= '" . $End_Time_Cal . "'
-								)
-							)
-							AND quotation_detail_id <> '" . $Code_QuotDet . "'
-							AND kode_proses <> '" . $Code_Process . "'";
-			$rows_Find	= $this->db->query($Query_Find)->num_rows();
-			if ($rows_Find > 0) {
-				$rows_Return	= array(
-					'status'		=> 2,
-					'pesan'			=> 'Schedule already exist in list...',
-					'member_name'	=> $Name_Teknisi
-				);
-			} else {
-				$Pesan_Error	= '';
-				$this->db->trans_begin();
-				$Query_Same	= "SELECT
-								*
-							FROM
-								temp_allocations
-							WHERE
-								quotation_detail_id = '" . $Code_QuotDet . "'
-							AND kode_proses = '" . $Code_Process . "'";
-				$rows_Same	= $this->db->query($Query_Same)->num_rows();
-
-				if ($rows_Same > 0) {
-					$Delete_Same	= "DELETE FROM
-											temp_allocations
-										WHERE
-											quotation_detail_id = '" . $Code_QuotDet . "'
-										AND kode_proses = '" . $Code_Process . "'";
-					$Has_Del_Same	= $this->db->query($Delete_Same);
-					if ($Has_Del_Same !== true) {
-						$Pesan_Error	= 'Error Delete Temp Alocate - Same Data';
-					}
+				if ($Trip_Time > 0) {
+					$jam_bagi1	= explode(':', $Start_Time_Cal);
+					$jam_bagi2	= explode(':', $End_Time_Cal);
+					$Start_Time_Cal	= date('H:i', mktime(intval($jam_bagi1[0]), intval($jam_bagi1[1]) - $Trip_Time, 0, date('m'), date('d'), date('Y')));
+					$End_Time_Cal	= date('H:i', mktime(intval($jam_bagi2[0]), intval($jam_bagi2[1]) + $Trip_Time, 0, date('m'), date('d'), date('Y')));
 				}
+				$Start_Time_Cal	= $Start_Time_Cal . ':00';
+				$End_Time_Cal	= $End_Time_Cal . ':00';
+
+
+				$dataIns		= array(
+					'quotation_detail_id'	=> $Code_QuotDet,
+					'member_id'				=> $Code_Teknisi,
+					'plan_date_start'		=> $Date_Calibration,
+					'plan_time_start'		=> $Start_Time_Cal,
+					'plan_date_end'			=> $Date_Calibration,
+					'plan_time_end'			=> $End_Time_Cal,
+					'status'				=> 'RES',
+					'kode_proses'			=> $Code_Process,
+					'sts_split'				=> $Flag_Split
+				);
+
+				$Query_Find	= "SELECT
+									*
+								FROM
+									temp_allocations
+								WHERE
+									plan_date_start = '" . $Date_Calibration . "'
+								AND member_id = '" . $Code_Teknisi . "'
+								AND (
+									(
+										plan_time_start > '" . $Start_Time_Cal . "'
+										AND plan_time_start < '" . $End_Time_Cal . "'
+									)
+									OR (
+										plan_time_end > '" . $Start_Time_Cal . "'
+										AND plan_time_end < '" . $End_Time_Cal . "'
+									)
+									OR (
+										plan_time_start <= '" . $Start_Time_Cal . "'
+										AND plan_time_end >= '" . $End_Time_Cal . "'
+									)
+								)
+								AND quotation_detail_id <> '" . $Code_QuotDet . "'
+								AND kode_proses <> '" . $Code_Process . "'";
+				$rows_Find	= $this->db->query($Query_Find)->num_rows();
+				if ($rows_Find > 0) {
+					$rows_Return	= array(
+						'status'		=> 2,
+						'pesan'			=> 'Schedule already exist in list...',
+						'member_name'	=> $Name_Teknisi
+					);
+				} else {
+					$Pesan_Error	= '';
+					$this->db->trans_begin();
+					$Query_Same	= "SELECT
+									*
+								FROM
+									temp_allocations
+								WHERE
+									quotation_detail_id = '" . $Code_QuotDet . "'
+								AND kode_proses = '" . $Code_Process . "'";
+					$rows_Same	= $this->db->query($Query_Same)->num_rows();
+
+					if ($rows_Same > 0) {
+						$Delete_Same	= "DELETE FROM
+												temp_allocations
+											WHERE
+												quotation_detail_id = '" . $Code_QuotDet . "'
+											AND kode_proses = '" . $Code_Process . "'";
+						$Has_Del_Same	= $this->db->query($Delete_Same);
+						if ($Has_Del_Same !== true) {
+							$Pesan_Error	= 'Error Delete Temp Alocate - Same Data';
+						}
+					}
 
 					//$Has_Ins_Alocate	= $this->db->insert('temp_allocations', $dataIns);
 					$Has_Ins_Alocate	= $this->db->insert('temp_allocations', $dataIns);

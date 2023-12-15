@@ -9,7 +9,7 @@ $this->load->view('include/side_menu');
 		</div>
 		<!-- /.box-header -->
 		<div class="box-body">
-			<div class="row">
+			<div class="row col-sm-12" style="padding-bottom: 10px;">
 				<div class="col-sm-2">
 					<div class="form-group">
 						<label class="control-label">
@@ -59,14 +59,31 @@ $this->load->view('include/side_menu');
 
 					</div>
 				</div>
-				<div class="col-sm-3">
+
+				<div class="col-sm-2">
+					<div class="form-group">
+						<label class="control-label">
+							<strong>Type</strong>
+						</label>
+						<div>
+							<select name="type" id="type" class="form-control select2" style="width:100%;">
+								<option value="">- All Type -</option>
+								<option value="Y">Insitu</option>
+								<option value="N">Labs</option>
+							</select>
+						</div>
+
+					</div>
+				</div>
+
+				<div class="col-sm-2">
 					<div class="form-group">
 						<label class="control-label">
 							<strong>Status</strong>
 						</label>
 						<div>
 							<select name="status" id="status" class="form-control select2" style="width:100%;">
-								<option value="">- Choose Status -</option>
+								<option value="">- All Status -</option>
 								<option value="OPN">OPEN</option>
 								<option value="APV">APPROVE BY CUSTOMER</option>
 								<option value="REV">REVISION</option>
@@ -75,6 +92,7 @@ $this->load->view('include/side_menu');
 
 					</div>
 				</div>
+
 				<?php
 				if ($akses_menu['create'] == '1') {
 				?>
@@ -92,27 +110,30 @@ $this->load->view('include/side_menu');
 				}
 				?>
 			</div>
-			<div id="Loading_tes" class="overlay_load">
-				<center>Please Wait . . . &nbsp;<img src="<?php echo base_url('assets/img/loading_small.gif') ?>"></center>
+			<div class="col-sm-12 table-responsive" style="overflow: auto;">
+				<div id="Loading_tes" class="overlay_load">
+					<center>Please Wait . . . &nbsp;<img src="<?php echo base_url('assets/img/loading_small.gif') ?>"></center>
+				</div>
+				<table id="my-grid" class="table table-bordered table-striped" width="100%">
+					<thead>
+						<tr style="background-color :#16697A !important;color : white !important;">
+							<th class="text-center">Schedule<br>Nomor</th>
+							<th class="text-center">Schedule<br>Date</th>
+							<th class="text-center" style="text-align: center !important">Customer</th>
+							<th class="text-center" style="padding-left: 20px">Type</th>
+							<th class="text-center">Quotation</th>
+							<th class="text-center">Sales Order</th>
+							<th class="text-center">Status</th>
+							<th class="text-center">Option</th>
+						</tr>
+					</thead>
+
+					<tbody id="list_detail">
+
+					</tbody>
+
+				</table>
 			</div>
-			<table id="my-grid" class="table table-bordered table-striped">
-				<thead>
-					<tr style="background-color :#16697A !important;color : white !important;">
-						<th class="text-center">Schedule<br>Nomor</th>
-						<th class="text-center">Schedule<br>Date</th>
-						<th class="text-center">Customer</th>
-						<th class="text-center">Quotation</th>
-						<th class="text-center">Sales Order</th>
-						<th class="text-center">Status</th>
-						<th class="text-center">Option</th>
-					</tr>
-				</thead>
-
-				<tbody id="list_detail">
-
-				</tbody>
-
-			</table>
 		</div>
 
 		<!-- /.box-body -->
@@ -172,6 +193,11 @@ $this->load->view('include/side_menu');
 			border-left-width: thin !important;
 			border-top-width: 0;
 		}
+
+		.chosen-container-single .chosen-single{
+			height: 31px;
+			line-height: 31px;
+		}
 	</style>
 	<script type="text/javascript">
 		var base_url = '<?php echo site_url(); ?>';
@@ -184,6 +210,7 @@ $this->load->view('include/side_menu');
 		$(document).on('change', '#bulan', data_display);
 		$(document).on('change', '#tahun', data_display);
 		$(document).on('change', '#status', data_display);
+		$(document).on('change', '#type', data_display);
 
 
 
@@ -211,9 +238,11 @@ $this->load->view('include/side_menu');
 
 
 		function data_display() {
-			let MonthChosen = $('#bulan').val();
-			let YearChosen = $('#tahun').val();
-			let statusChosen = $('#status').val();
+			let MonthChosen 	= $('#bulan').val();
+			let YearChosen 		= $('#tahun').val();
+			let statusChosen 	= $('#status').val();
+			let typeChosen 		= $('#type').val();
+
 			let table_data = $('#my-grid').DataTable({
 				"serverSide": true,
 				"destroy": true,
@@ -236,11 +265,7 @@ $this->load->view('include/side_menu');
 					[1, "desc"]
 				],
 				"columnDefs": [{
-						"targets": 0,
-						"sClass": "text-center"
-					},
-					{
-						"targets": 1,
+						"targets": [0,1,3,4,5,6,7],
 						"sClass": "text-center"
 					},
 					{
@@ -248,24 +273,9 @@ $this->load->view('include/side_menu');
 						"sClass": "text-left text-wrap"
 					},
 					{
-						"targets": 3,
-						"sClass": "text-center"
-					},
-					{
-						"targets": 4,
-						"sClass": "text-center"
-					},
-					{
-						"targets": 5,
-						"sClass": "text-center",
+						"targets": [3,6,7],
 						"searchable": false,
-						"orderable": false
-					},
-					{
-						"targets": 6,
-						"sClass": "text-center",
-						"searchable": false,
-						"orderable": false
+						"orderable": false,
 					}
 				],
 				"sPaginationType": "simple_numbers",
@@ -279,13 +289,14 @@ $this->load->view('include/side_menu');
 					type: "post",
 					cache: false,
 					data: {
-						'bulan': MonthChosen,
-						'tahun': YearChosen,
-						'status': statusChosen
+						'bulan'	: MonthChosen,
+						'tahun'	: YearChosen,
+						'status': statusChosen,
+						'type'	: typeChosen
 					},
 					error: function() {
 						$(".my-grid-error").html("");
-						$("#my-grid").append('<tbody class="my-grid-error"><tr><th colspan="7">No data found in the server</th></tr></tbody>');
+						$("#my-grid").append('<tbody class="my-grid-error"><tr><th colspan="8">No data found in the server</th></tr></tbody>');
 						$("#my-grid_processing").css("display", "none");
 					}
 				}
