@@ -119,7 +119,7 @@
 				
 				<div class="row">
 					<div class="col-sm-12" style="overflow-x:scroll !important;">
-						<table class="table table-striped table-bordered" id="my-grid">
+						<table class="table table-striped table-bordered" id="my-grid-view">
 							<thead>
 								<tr class="bg-navy-active">
 									<th class="text-center">Customer</th>
@@ -222,6 +222,34 @@
 		});
 	});
 	
-	
+	$(document).ready(function(){
+		var noCPR = $('#nomor_cpr').val();
+		$('#my-grid-view').dataTable({
+			order			: [],
+			lengthMenu		: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+			iDisplayLength	: 10,
+			dom				: 'Bfrtip', 
+			buttons			: [
+							{
+								extend: 'pageLength',
+								text:      '<i class="fa fa-list-ol"></i> <b>Show</b>',
+								className: "Btntable"
+							},
+							
+							{
+								extend: 'excelHtml5',
+								text:      '<i class="fa fa-file-excel-o"></i> <b>Download Excel</b>',
+								titleAttr: 'Excel',
+								className: "Btntable",
+								title: 'SALESMAN INCENTIVE - '+noCPR,
+								messageTop: 'SISCAL DASHBOARD',
+								exportOptions: {
+								columns: [0,1,2,3,4,5,6]
+								}
+							},
+
+						]
+		});
+	});
 	
 </script>
