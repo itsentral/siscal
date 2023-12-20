@@ -50,7 +50,7 @@ $config['login_key']    	= '173ALIDYhG93b0qyJfIxfsdgfh2guVoUubW46hjwvniR20088117
 
 
 */
-$config['index_page'] = 'index.php';
+$config['index_page'] = '';
 
 /*
 |--------------------------------------------------------------------------
