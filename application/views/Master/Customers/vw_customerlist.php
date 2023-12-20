@@ -54,18 +54,37 @@ $this->load->view('include/side_menu');
 		text-align: center;
 		vertical-align: middle;
 	}
+	.Btntable {
+		padding: 8px !important;
+		background-color: #34A388 !important;
+		color: white !important;
+		margin: 0px !important;
+		border-radius: 10px !important;
+	}
 </style>
 
 
 <?php $this->load->view('include/footer'); ?>
 
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
 <link rel="stylesheet" href="<?php echo base_url('adminlte/plugins/datatables/extensions/FixedColumns/css/dataTables.fixedColumns.min.css'); ?>">
 <script src="<?php echo base_url('adminlte/plugins/datatables/extensions/FixedColumns/js/dataTables.fixedColumns.min.js'); ?>"></script>
-
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
 <script>
 var table;
 
 $(document).ready(function() {
+	const today = new Date();
+	const yyyy = today.getFullYear();
+	let mm = today.getMonth() + 1; // Months start at 0!
+	//let dd = today.getDate();
+	//if (dd < 10) dd = '0' + dd;
+	if (mm < 10) mm = '0' + mm;
+	const formattedToday = mm + '-' + yyyy;
 
 	table = $('#table-cs').DataTable({
 		// scrollY			: 350,
@@ -83,6 +102,51 @@ $(document).ready(function() {
 							"url"	: "<?php echo site_url('master_cs/list_func_customer') ?>",
 							"type"	: "POST",
 						},
+		dom				: 'Bfrtip', 
+		buttons			: [
+							{
+								extend: 'pageLength',
+								text:      '<i class="fa fa-list-ol"></i> <b>Show</b>',
+								className: "Btntable"
+							},
+							
+							{
+								extend: 'copy',
+								text:      '<i class="fa fa-copy"></i> <b>Copy</b>',
+								titleAttr: 'Copy',
+								className: "Btntable",
+								exportOptions: {
+								columns: [0,1,2,3,4,5]
+								}
+							},
+							
+							{
+								extend: 'excelHtml5',
+								text:      '<i class="fa fa-file-excel-o"></i> <b>Excel</b>',
+								titleAttr: 'Excel',
+								className: "Btntable",
+								title: 'Master Customers - Data Bulan '+formattedToday,
+								messageTop: 'SISCAL DASHBOARD',
+								exportOptions: {
+										columns: [0,1,2,3,4,5]
+								}
+							},
+							
+							{
+								extend: 'pdfHtml5',
+								text:      '<i class="fa fa-file-pdf-o"></i> <b>PDF</b>',
+								titleAttr: 'PDF',
+								className: "Btntable",
+								title: 'Master Customers - Data Bulan '+formattedToday,
+								messageTop: 'SISCAL DASHBOARD',
+								orientation: 'landscape',
+								pageSize: 'LEGAL',
+								exportOptions: {
+								columns: [0,1,2,3,4,5]
+								}
+							},
+
+						],
 
 		columnDefs	: [ 
 							{

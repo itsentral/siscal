@@ -41,21 +41,26 @@ $this->load->view('include/side_menu');
                 <tr class="text-center">
                   <td>
 					<?php
-					if($statusActivity->status_activity == "New Data"){
-						echo '<text style="font-size:16px;font-weight:bold;color:#ff851b;">NEW DATA</text>';
-					}elseif($statusActivity->status_activity == "No Program"){
-						echo '<text style="font-size:16px;font-weight:bold;color:#001a35;">No Program</text>';
-					}elseif($statusActivity->status_activity == "Potensial"){
-						echo '<text style="font-size:16px;font-weight:bold;color:#605ca8;">POTENSIAL</text>';
-					}elseif($statusActivity->status_activity == "Hot"){
-						echo '<text style="font-size:16px;font-weight:bold;color:#d81b60;">HOT</text>';
-					}elseif($statusActivity->status_activity == "Deal"){
-						echo '<text style="font-size:16px;font-weight:bold;color:#3d9970;">DEAL</text>';
-					}elseif($statusActivity->status_activity == "Lose"){
-						echo '<text style="font-size:16px;font-weight:bold;color:#777;">LOSE</text>';
+					if(!empty($statusActivity->status_activity)){
+						if($statusActivity->status_activity == "New Data"){
+							echo '<text style="font-size:16px;font-weight:bold;color:#ff851b;">NEW DATA</text>';
+						}elseif($statusActivity->status_activity == "No Program"){
+							echo '<text style="font-size:16px;font-weight:bold;color:#001a35;">No Program</text>';
+						}elseif($statusActivity->status_activity == "Potensial"){
+							echo '<text style="font-size:16px;font-weight:bold;color:#605ca8;">POTENSIAL</text>';
+						}elseif($statusActivity->status_activity == "Hot"){
+							echo '<text style="font-size:16px;font-weight:bold;color:#d81b60;">HOT</text>';
+						}elseif($statusActivity->status_activity == "Deal"){
+							echo '<text style="font-size:16px;font-weight:bold;color:#3d9970;">DEAL</text>';
+						}elseif($statusActivity->status_activity == "Lose"){
+							echo '<text style="font-size:16px;font-weight:bold;color:#777;">LOSE</text>';
+						}else{
+							echo '<text style="font-size:16px;font-weight:bold;color:#777;">No Status</text>';
+						}
 					}else{
 						echo '<text style="font-size:16px;font-weight:bold;color:#777;">No Status</text>';
 					}
+					
 					?>
 				  </td>
                   <td>
