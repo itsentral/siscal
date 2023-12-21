@@ -130,7 +130,7 @@ $this->load->view('include/side_menu');
 				</div>
 				<div class="row">
 				<div class="col-sm-12 text-right">
-					<button type="button" class="btn bg-orange" onclick="PrintBarcodeBatch('<?php echo $Code_SO;?>');"><i class="fa fa-print"></i> QRCode Batch</button>
+					<button type="button" class="btn bg-orange" onclick="PrintBarcodeBatch();"><i class="fa fa-print"></i> QRCode Batch</button>
 				</div>
 					<div class="col-sm-12" style="overflow-x:scroll !important;">
 						<table class="table table-striped table-bordered" id="my-grid">
@@ -282,6 +282,15 @@ $this->load->view('include/side_menu');
 
 				<div class="row">
 					<div class="form-group col-sm-12">
+						<label class="control-label">Pengenal Alat</label>
+						<select name="flaq_pengenal" class="form-control" style="width:100%">
+							<option value="">By Sistem</option>
+							<option value="I">Identify No</option>
+							<option value="S">Serial Number</option>
+						</select>						
+					</div>
+
+					<div class="form-group col-sm-12">
 						<label class="control-label">Pilih Template </label>
 						<select name="flaq_print" class="form-control" style="width:100%">
 							<option value="Y">Landscape</option>
@@ -294,6 +303,39 @@ $this->load->view('include/side_menu');
 			<div class="modal-footer">
 				<button type="button" class="btn btn-danger" data-dismiss="modal"><i class="glyphicon glyphicon-remove"></i> Batal</button>
 				<button type="button" class="btn btn-primary" id="btnSave"><i class="glyphicon glyphicon-print"></i> Print</button>
+			</div>	
+		</form>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="FormModalQRBatch">
+	<div class="modal-dialog modal-sm" style="margin-top:250px;">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+				<span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title">Download Data QRCode Batch</h4>
+			</div>
+			<form action="#" method="POST" id="form2" enctype="multipart/form-data">
+			<div class="modal-body">
+				<input type="hidden" name="codeso" value="<?php echo $Code_SO;?>" readonly>
+
+				<div class="row">
+					<div class="form-group col-sm-12">
+						<label class="control-label">Pengenal Alat</label>
+						<select name="flaq_pengenal_batch" class="form-control" style="width:100%">
+							<option value="">By Sistem</option>
+							<option value="I">Identify No</option>
+							<option value="S">Serial Number</option>
+						</select>						
+					</div>
+				</div>
+
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-danger" data-dismiss="modal"><i class="glyphicon glyphicon-remove"></i> Batal</button>
+				<button type="button" class="btn btn-primary" id="btnSaveBatch"><i class="glyphicon glyphicon-print"></i> Download</button>
 			</div>	
 		</form>
 		</div>
@@ -454,8 +496,9 @@ $this->load->view('include/side_menu');
 		$('#btnSave').html('<i class="glyphicon glyphicon-ok"></i> Proses...');
 		$('#btnSave').attr('disabled', true);
 		
-		var flagPrint = $('[name="flaq_print"]').val();
-		var Code_Print= $('[name="qr_code"]').val();
+		var flagPrint 		= $('[name="flaq_print"]').val();
+		var flagPengenal 	= $('[name="flaq_pengenal"]').val();
+		var Code_Print		= $('[name="qr_code"]').val();
 
 		//alert(flagPrint);
 		
@@ -467,7 +510,7 @@ $this->load->view('include/side_menu');
 		
 		//pakek ajax aja ntar gais ya
 
-		$.post(base_url +'/'+ active_controller+'/'+url,{'code':Code_Print}, function(response) {
+		$.post(base_url +'/'+ active_controller+'/'+url,{'code':Code_Print,'pengenal':flagPengenal}, function(response) {
 			//close_spinner_new();
 			
            		//console.log(response);
@@ -489,9 +532,25 @@ $this->load->view('include/side_menu');
 
 	});
 
-	function PrintBarcodeBatch(Code_SO){
-		var Links = base_url +'/'+ active_controller + '/downloadQRBatch/' + Code_SO;
-			window.open(Links, '_blank');
+	function PrintBarcodeBatch(){
+		$('#FormModalQRBatch').modal('show');
 	}
+
+	$('#btnSaveBatch').on('click',function(e) {
+		e.preventDefault();
+		//loading_spinner_new();
+
+		$('#btnSaveBatch').html('<i class="glyphicon glyphicon-ok"></i> Proses...');
+		$('#btnSaveBatch').attr('disabled', true);
+		
+		var Code_SO	 		  = $('[name="codeso"]').val();
+		var flagPengenalBatch = $('[name="flaq_pengenal_batch"]').val();
+
+		var Links = base_url + active_controller + '/downloadQRBatch/' + Code_SO + '/' + flagPengenalBatch;
+			window.open(Links, '_blank');
+			$('#FormModalQRBatch').modal('hide');
+			$('#btnSaveBatch').html('<i class="glyphicon glyphicon-print"></i> Download');
+			$('#btnSaveBatch').attr('disabled', false);
+	});
 	
 </script>

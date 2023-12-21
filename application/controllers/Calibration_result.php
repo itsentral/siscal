@@ -2020,6 +2020,7 @@ class Calibration_result extends CI_Controller {
 		$rows_Sentral		= $rows_Tool = array();		
 		if($this->input->post()){
 			$Code_Sentral	= $this->input->post('code');
+			$Code_Pengenal	= $this->input->post('pengenal');
 			
 			$rows_Trans		= $this->db->get_where('trans_data_details',array('id'=>$Code_Sentral))->row();
 			$rows_Sentral		= $this->db->get_where('sentral_customer_tools',array('sentral_tool_code'=>$rows_Trans->sentral_code_tool))->row();
@@ -2046,7 +2047,7 @@ class Calibration_result extends CI_Controller {
 			}
 			
 			## GENARATE PDF ##
-			$File_PDF		= $this->GenerateQRFileNew($Code_Sentral);
+			$File_PDF		= $this->GenerateQRFileNew($Code_Sentral, $Code_Pengenal);
 			if(file_exists($Path_PDF)){
 				chmod($Path_PDF, 0777);
 			}
@@ -2155,7 +2156,7 @@ class Calibration_result extends CI_Controller {
 	}
 
 	
-	function GenerateQRFileNew($Code=''){
+	function GenerateQRFileNew($Code='', $Code_Pengenal=''){
 		$rows_trans		= $this->db->get_where('trans_data_details',array('id'=>$Code))->row();
 		$rows_header		= $this->db->get_where('sentral_customer_tools',array('sentral_tool_code'=>$rows_trans->sentral_code_tool))->row();
 		$rows_tool		= $this->db->get_where('tools',array('id'=>$rows_header->tool_id))->row();
@@ -2205,17 +2206,28 @@ class Calibration_result extends CI_Controller {
 		$Code_Serial	= $rows_trans->no_serial_number;
 		$Code_Identify	= $rows_trans->no_identifikasi;
 		//$Text_Head		= $Code_Trans;
-		$Text_Head		= '-';
-		if(!empty($Code_Identify) && $Code_Identify !== '-'){
-			$Text_Head		= 'ID: '.$Code_Identify;
-		}else{
-			$Text_Head		= '-';
-		}
+		$Text_Head		= '';
 
-		if(!empty($Code_Serial) && $Code_Serial !== '-'){
-			$Text_Head		= 'SN: '.$Code_Serial;
+		if($Code_Pengenal == "I"){
+			if(!empty($Code_Identify) && $Code_Identify !== '-'){
+				$Text_Head		= 'ID: '.$Code_Identify;
+			}else{
+				$Text_Head		= '-';
+			}
+		}elseif($Code_Pengenal == "S"){
+			if(!empty($Code_Serial) && $Code_Serial !== '-'){
+				$Text_Head		= 'SN: '.$Code_Serial;
+			}else{
+				$Text_Head		= '-';
+			}
 		}else{
-			$Text_Head		= '-';
+			if(!empty($Code_Identify) && $Code_Identify !== '-'){
+				$Text_Head		= 'ID: '.$Code_Identify;
+			}elseif(!empty($Code_Serial) && $Code_Serial !== '-'){
+				$Text_Head		= 'SN: '.$Code_Serial;
+			}else{
+				$Text_Head		= '-';
+			}
 		}
 
 		if(strlen($Text_Head) > 20){
@@ -2270,7 +2282,7 @@ class Calibration_result extends CI_Controller {
 		$mpdf->Output($File_Path ,'F');
 	}
 	
-	function downloadQRBatch($Code_SO=''){
+	function downloadQRBatch($Code_SO='', $flagPengenalBatch=''){
 
 		$Query_Data		= "SELECT
 								det_tool.*,
@@ -2354,13 +2366,28 @@ class Calibration_result extends CI_Controller {
 			$date	= date('d-m-Y',strtotime($data->datet));
 		}
 
-		$codeToolsID		= "-";
-		if(!empty($data->no_identifikasi) && $data->no_identifikasi !== '-'){
-			$codeToolsID		= 'ID: '.$data->no_identifikasi;
-		}
+		$codeToolsID		= "";
 
-		if(!empty($data->no_serial_number) && $data->no_serial_number !== '-'){
-			$codeToolsID		= 'SN: '.$data->no_serial_number;
+		if($flagPengenalBatch == "I"){
+			if(!empty($data->no_identifikasi) && $data->no_identifikasi !== '-'){
+				$codeToolsID		= 'ID: '.$data->no_identifikasi;
+			}else{
+				$codeToolsID		= "-";
+			}
+		}elseif($flagPengenalBatch == "S"){
+			if(!empty($data->no_serial_number) && $data->no_serial_number !== '-'){
+				$codeToolsID		= 'SN: '.$data->no_serial_number;
+			}else{
+				$codeToolsID		= "-";
+			}
+		}else{
+			if(!empty($data->no_identifikasi) && $data->no_identifikasi !== '-'){
+				$codeToolsID		= 'ID: '.$data->no_identifikasi;
+			}elseif(!empty($data->no_serial_number) && $data->no_serial_number !== '-'){
+				$codeToolsID		= 'SN: '.$data->no_serial_number;
+			}else{
+				$codeToolsID		= "-";
+			}
 		}
 
 		$excel->setActiveSheetIndex(0)->setCellValue('A'.$numrow, $data->tool_name);
