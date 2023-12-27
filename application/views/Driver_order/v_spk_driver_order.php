@@ -1,7 +1,7 @@
 <?php
 $this->load->view('include/side_menu'); 
 ?> 
-<form action="#" method="POST" id="form-proses" enctype="multipart/form-data">
+
 	<div class="box box-warning">
 		<div class="box-header">
 			<h4 class="box-title"><i class="fa fa-check-square"></i> <?php echo $title;?></h4>
@@ -9,22 +9,35 @@ $this->load->view('include/side_menu');
 		</div>
 		<!-- /.box-header -->
 		<div class="box-body">
-			<div class='row'>
+			<div class='col-sm-12 row'>
+			<form>
 				<div class="col-sm-3">
 					<div class="form-group">
+						<label>SPK Date</label>
+						<div class="input-group date">
+						<div class="input-group-addon">
+							<i class="fa fa-calendar"></i>
+						</div>
+							<input type="text" class="form-control input-sm pull-right" name="spk_date" id="spk_date" placeholder="yyyy-mm-dd" readonly>
+						</div>
+						<!-- /.input group -->
+					</div>
+
+					<!-- <div class="form-group">
 						<label class="control-label">SPK Date</label>
 						<div>
 						<?php
 							echo form_input(array('id'=>'spk_date','name'=>'spk_date','class'=>'form-control input-sm','readOnly'=>true),date('Y-m-d'));
 						?>
 						</div>
-					</div>
+					</div> -->
+
 				</div>
 				<div class="col-sm-3">
 					<div class="form-group">
 						<label class="control-label">Driver</label>
 						<div>
-							<select name="driver_id" id="driver_id" class="form-control chosen-select">
+							<select name="driver_id" id="driver_id" class="form-control chosen-select" onchange="filterSPK();">
 								<option value=""> - SELECT AN OPTION - </option>
 								<?php
 								if($rows_driver){
@@ -39,11 +52,34 @@ $this->load->view('include/side_menu');
 						</div>
 					</div>
 				</div>
-					
+
+				<div class="col-sm-3">
+					<div class="form-group">
+						<label class="control-label">Status</label>
+						<div>
+							<select name="status_spk" id="status_spk" class="form-control chosen-select" onchange="filterSPK();">
+								<option value="" selected="selected"> - SELECT AN OPTION - </option>
+								<option value="OPN">OPEN </option>
+								<option value="CNC">CANCELED </option>
+								<option value="CLS">CLOSE </option>
+							</select>
+						</div>
+					</div>
+				</div>
+				<div class="col-sm-2">
+					<div style="padding-top:25px;margin-bottom:45px;">
+						<button type="reset" class="btn btn-danger btn-sm" value="Reset" id="risetFilter"><i class="fa fa-undo"></i> Reset</button>
+					</div>
+				</div>
+			</form>
 			</div>
+
+		<form action="#" method="POST" id="form-proses" enctype="multipart/form-data">
 			<div id="Loading_tes" class="overlay_load">
 				<center>Please Wait . . .  &nbsp;<img src="<?php echo base_url('assets/img/loading_small.gif') ?>"></center>
 			</div>
+		
+		<div class="table-responsive col-sm-12">
 			<table id="my-grid" class="table table-bordered table-striped">
 				<thead>
 					<tr style="background-color :#16697A !important;color : white !important;">
@@ -62,6 +98,7 @@ $this->load->view('include/side_menu');
 				
 			</table>
 		</div>
+	</div>
 		
 		<!-- /.box-body -->
 	</div>
@@ -111,6 +148,11 @@ $this->load->view('include/side_menu');
 	.text-wrap {
 		word-wrap 		: break-word !important;
 	}
+
+	.chosen-container-single .chosen-single{
+		height: 30px;
+  		line-height: 30px;
+	}
 </style>
 <script type="text/javascript">
 	var base_url			= '<?php echo site_url(); ?>';
@@ -128,7 +170,17 @@ $this->load->view('include/side_menu');
 		
 	});
 	
-	
+	function filterSPK(){
+		data_display();
+	}
+
+	$('#risetFilter').on('click', function() {
+		$('#spk_date').val("");
+		$('#driver_id').val("").trigger('chosen:updated');;
+		$('#status_spk').val("").trigger('chosen:updated');
+		
+		data_display();
+	});
 	
 	function ActionPreview(ObjectParam){
 		let TitleAction	= ObjectParam.title;
@@ -151,6 +203,7 @@ $this->load->view('include/side_menu');
 	function data_display(){
 		let MonthChosen		= $('#spk_date').val();
 		let DriverChosen	= $('#driver_id').val();
+		let StatusChosen	= $('#status_spk').val();
 		let table_data 		= $('#my-grid').DataTable({
 			"serverSide": true,
 			"destroy"	: true,
@@ -185,7 +238,7 @@ $this->load->view('include/side_menu');
 				url 	: base_url +'/'+ active_controller+'/get_data_display',
 				type	: "post",
 				cache	: false,
-				data	: {'tanggal':MonthChosen,'driver':DriverChosen},
+				data	: {'tanggal':MonthChosen,'driver':DriverChosen,'status':StatusChosen},
 				error	: function(){ 
 					$(".my-grid-error").html("");
 					$("#my-grid").append('<tbody class="my-grid-error"><tr><th colspan="6">No data found in the server</th></tr></tbody>');

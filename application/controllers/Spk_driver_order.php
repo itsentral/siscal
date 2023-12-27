@@ -42,6 +42,7 @@ class Spk_driver_order extends CI_Controller {
 		
 		$Datet_Find		= $this->input->post('tanggal');
 		$Driver_Find	= $this->input->post('driver');
+		$Status_Find	= $this->input->post('status');
 		$requestData	= $_REQUEST;
 		
 		$like_value     = $requestData['search']['value'];
@@ -79,6 +80,11 @@ class Spk_driver_order extends CI_Controller {
 		if($Driver_Find){
 			if(!empty($WHERE))$WHERE .=" AND ";
 			$WHERE	.="member_id = '".$Driver_Find."'";
+		}
+
+		if($Status_Find){
+			if(!empty($WHERE))$WHERE .=" AND ";
+			$WHERE	.="status = '".$Status_Find."'";
 		}
 		
 		$sql = "SELECT
@@ -479,3 +485,5 @@ class Spk_driver_order extends CI_Controller {
 		echo json_encode($rows_Return);
 	}	
 }
+
+
