@@ -2167,7 +2167,7 @@ class Calibration_result extends CI_Controller {
 		include $sroot.'/Siscal_mobile/application/third_party/MPDF57/mpdf.php';
 		//$mpdf=new mPDF('utf-8', array(29,50));
 		//$mpdf=new mPDF('utf-8', array(43,24));				
-		$mpdf=new mPDF('utf-8', array(300,150));
+		$mpdf=new mPDF('utf-8', array(500,250));
 
 		$ArrBulan	=array(1=>'Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','Nopember','Desember');
 		$ArrHari	= array(
@@ -2237,14 +2237,14 @@ class Calibration_result extends CI_Controller {
 		$Logo_Path	= "";
 		
 		if(strtolower($rows_Tool->certification_id) != 'kan'){
-			$Logo_Path	= '	<div style="position: fixed; top: 0.1px; left: 48%;">
+			$Logo_Path	= '	<div style="position: fixed; top: 0.1px; left: 45%;">
 								<img src="./assets/img/logo-sc.jpg" style="width: 70%">
 							</div>
 							<div style="position: fixed; top: 2px; left: 73%;">
 								<img src="./assets/img/kan.png" style="width: 80%">
 							</div>';
 		}else{
-			$Logo_Path	= '	<div style="position: fixed; top: 1px; left: 48%;">
+			$Logo_Path	= '	<div style="position: fixed; top: 1px; left: 45%;">
 								<!--<img src="./assets/img/logo-new.png" style="width: 32px;">-->
 								<!--<img src="./assets/img/logo-sc.jpg" style="width: 32px;">-->
 								<img src="./assets/img/logo-sc.jpg" style="width: 70%">
@@ -2253,23 +2253,23 @@ class Calibration_result extends CI_Controller {
 
 		$Text_Footer	= "";
 		if(!empty($rows_trans->valid_until) && $rows_trans->valid_until !== '0000-00-00' && $rows_trans->valid_until !== '1970-01-01'){
-			$Text_Footer	='<div style="font-size: 60px;position: fixed; top: 30%; left: 50%;font-family: verdana,arial,sans-serif;"><b>'.date('d-m-Y',strtotime($rows_trans->datet)).' Sd/</b></div>
-			<div style="font-size: 60px;position: fixed; top: 42%; left: 50%;font-family: verdana,arial,sans-serif;"><b>'.date('d-m-Y',strtotime($rows_trans->valid_until)).'</b></div>';
+			$Text_Footer	='<div style="font-size: 85px;position: fixed; top: 31%; left: 47%;font-family: verdana,arial,sans-serif;"><b>'.date('d-m-Y',strtotime($rows_trans->datet)).' Sd/</b></div>
+			<div style="font-size: 85px;position: fixed; top: 41.5%; left: 47%;font-family: verdana,arial,sans-serif;"><b>'.date('d-m-Y',strtotime($rows_trans->valid_until)).'</b></div>';
 		}else{
-			$Text_Footer	='<div style="font-size: 60px;position: fixed; top: 43%; left: 50%;font-family: verdana,arial,sans-serif;"><b>'.date('d-m-Y',strtotime($rows_trans->datet)).'<b></div>';
+			$Text_Footer	='<div style="font-size: 85px;position: fixed; top: 38%; left: 47%;font-family: verdana,arial,sans-serif;"><b>'.date('d-m-Y',strtotime($rows_trans->datet)).'<b></div>';
 		}
 
 		
 		$Header = '
 					<div style="position: fixed;left: 1px;">
-						<img src="'.$this->file_location.'QRCode/img-'.$Code_Trans.'.png" style="width: 94%">
+						<img src="'.$this->file_location.'QRCode/img-'.$Code_Trans.'.png" style="width: 90%">
 					</div>
 					
-					<div style="font-size: 38px;position: fixed; bottom: -4px; left: 1%;font-family: verdana,arial,sans-serif;"><b>www.sentralkalibrasi.co.id</b></div>
+					<div style="font-size: 77px;position: fixed; bottom: -3px; left: 1%;font-family: verdana,arial,sans-serif;"><b>sentralkalibrasi.co.id</b></div>
 
 					'.$Logo_Path.' '.$Text_Footer.'
 
-					<div style="font-size: 50px;position: fixed; top: 53%; left: 50%;font-family: verdana,arial,sans-serif;"><hr style="height:6px;margin: 15px; width: 97%"/><b>'.$Text_Head.'</b></div>
+					<div style="font-size: 60px;position: fixed; top: 54.5%; left: 47%;font-family: verdana,arial,sans-serif;"><b>'.$Text_Head.'</b></div>
 
 				';
 
