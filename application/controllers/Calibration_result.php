@@ -2237,39 +2237,39 @@ class Calibration_result extends CI_Controller {
 		$Logo_Path	= "";
 		
 		if(strtolower($rows_Tool->certification_id) != 'kan'){
-			$Logo_Path	= '	<div style="position: fixed; top: 0.1px; left: 45%;">
-								<img src="./assets/img/logo-sc.jpg" style="width: 70%">
+			$Logo_Path	= '	<div style="position: fixed; top: 0.1px; left: 50%;">
+								<img src="./assets/img/logo-sc.jpg" style="width: 78%">
 							</div>
-							<div style="position: fixed; top: 2px; left: 73%;">
-								<img src="./assets/img/kan.png" style="width: 80%">
+							<div style="position: fixed; top: 2px; left: 77%;">
+								<img src="./assets/img/kan.png" style="width: 90%">
 							</div>';
 		}else{
-			$Logo_Path	= '	<div style="position: fixed; top: 1px; left: 45%;">
+			$Logo_Path	= '	<div style="position: fixed; top: 1px; left: 50%;">
 								<!--<img src="./assets/img/logo-new.png" style="width: 32px;">-->
 								<!--<img src="./assets/img/logo-sc.jpg" style="width: 32px;">-->
-								<img src="./assets/img/logo-sc.jpg" style="width: 70%">
+								<img src="./assets/img/logo-sc.jpg" style="width: 78%">
 							</div>';
 		}
 
 		$Text_Footer	= "";
 		if(!empty($rows_trans->valid_until) && $rows_trans->valid_until !== '0000-00-00' && $rows_trans->valid_until !== '1970-01-01'){
-			$Text_Footer	='<div style="font-size: 85px;position: fixed; top: 31%; left: 47%;font-family: verdana,arial,sans-serif;"><b>'.date('d-m-Y',strtotime($rows_trans->datet)).' Sd/</b></div>
-			<div style="font-size: 85px;position: fixed; top: 41.5%; left: 47%;font-family: verdana,arial,sans-serif;"><b>'.date('d-m-Y',strtotime($rows_trans->valid_until)).'</b></div>';
+			$Text_Footer	='<div style="font-size: 110px;position: fixed; top: 31%; left: 50%;font-family: sans-serif;"><b>'.date('d-m-Y',strtotime($rows_trans->datet)).' Sd/</b></div>
+			<div style="font-size: 110px;position: fixed; top: 41.5%; left: 50%;font-family: sans-serif;"><b>'.date('d-m-Y',strtotime($rows_trans->valid_until)).'</b></div>';
 		}else{
-			$Text_Footer	='<div style="font-size: 85px;position: fixed; top: 38%; left: 47%;font-family: verdana,arial,sans-serif;"><b>'.date('d-m-Y',strtotime($rows_trans->datet)).'<b></div>';
+			$Text_Footer	='<div style="font-size: 110px;position: fixed; top: 38%; left: 50%;font-family: sans-serif;"><b>'.date('d-m-Y',strtotime($rows_trans->datet)).'<b></div>';
 		}
 
 		
 		$Header = '
 					<div style="position: fixed;left: 1px;">
-						<img src="'.$this->file_location.'QRCode/img-'.$Code_Trans.'.png" style="width: 90%">
+						<img src="'.$this->file_location.'QRCode/img-'.$Code_Trans.'.png" style="width: 93%">
 					</div>
 					
-					<div style="font-size: 77px;position: fixed; bottom: -3px; left: 1%;font-family: verdana,arial,sans-serif;"><b>sentralkalibrasi.co.id</b></div>
+					<div style="font-size: 80px;position: fixed; bottom: -25px; left: 1.8%;font-family: sans-serif;"><b>sentralkalibrasi.co.id</b></div>
 
 					'.$Logo_Path.' '.$Text_Footer.'
 
-					<div style="font-size: 60px;position: fixed; top: 54.5%; left: 47%;font-family: verdana,arial,sans-serif;"><b>'.$Text_Head.'</b></div>
+					<div style="font-size: 78px;position: fixed; top: 54.5%; left: 50%;font-family: sans-serif;"><b>'.$Text_Head.'</b></div>
 
 				';
 
