@@ -42,7 +42,8 @@ $this->load->view('include/side_menu');
 							<?php
 								echo "<option value='all'>ALL YEAR</option>";	
 								$thn_skr = date('Y');
-								for ($x = $thn_skr; $x >= '2018'; $x--) {
+								$thn_skr1 = date('Y')+1;
+								for ($x = $thn_skr1; $x >= '2018'; $x--) {
 									$selectedthn = ($x == $thn_skr ? 'selected' : '');
 									echo '<option value="'.$x.'" '.$selectedthn.'>'.$x.'</option>';
 								}
