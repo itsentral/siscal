@@ -374,7 +374,7 @@
 	function exportExcel(){
 		var CodeAnswer = $('#code_answer').val();
 		var Links = base_url + active_controller + '/exportExcelAnswer/' + CodeAnswer;
-		alert(CodeAnswer);
+		//alert(CodeAnswer);
 		window.open(Links, '_blank');
 	}
 </script> 
