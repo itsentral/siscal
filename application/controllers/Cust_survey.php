@@ -930,6 +930,30 @@ class Cust_survey extends CI_Controller {
 		
 		echo json_encode($rows_Return);
 	}
+
+	function exportExcelAnswer($CodeAnswer = ''){
+		$rows_Question	= $rows_Answer = $rows_Cust = array();
+		
+		if($CodeAnswer){
+			$Code_Process	= $CodeAnswer;
+			$rows_Answer	= $this->db->get_where('crm_survey_answers',array('code_answer'=>$Code_Process))->row();
+			
+			$rows_Cust		= $this->db->get_where('customers',array('id'=>$rows_Answer->customer_id))->row();
+			$rows_Header	= $this->db->get_where('crm_surveys',array('code_survey'=>$rows_Answer->code_survey))->row();
+			$Query_Question	= "SELECT * FROM crm_survey_questions WHERE code_survey = '".$rows_Answer->code_survey."' ORDER BY question_no ASC";
+			$rows_Detail	= $this->db->query($Query_Question)->result();
+		}
+		
+		$data = array(
+			'title'			=> 'EXPORT ANSWER DETAIL',
+			'rows_header'	=> $rows_Header,
+			'rows_detail'	=> $rows_Detail,
+			'rows_answer'	=> $rows_Answer,
+			'rows_cust'		=> $rows_Cust
+		);
+		
+		$this->load->view($this->folder.'/export_survey_answer',$data);
+	}
 	
 	
 	
