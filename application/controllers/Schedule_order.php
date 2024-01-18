@@ -1393,7 +1393,7 @@ class Schedule_order extends CI_Controller
 				$Pesan_Error	= '';
 
 				$sroot 	= $_SERVER['DOCUMENT_ROOT'];
-				include $sroot . '/Siscal_Dashboard/application/libraries/PHPMailer/PHPMailerAutoload.php';
+				include $sroot . '/application/libraries/PHPMailer/PHPMailerAutoload.php';
 
 
 				$Body = "<html xmlns=\"http://www.w3.org/1999/xhtml\">
