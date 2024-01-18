@@ -1514,8 +1514,8 @@ class Schedule_order extends CI_Controller
 
 				$mail->Body		= $Body;
 
-				$img_file	= $sroot . '/Siscal_Dashboard/assets/img/logo.jpg';
-				$directory	= $sroot . '/Siscal_Dashboard/assets/file/';
+				$img_file	= $sroot . '/assets/img/logo.jpg';
+				$directory	= $sroot . '/assets/file/';
 
 
 				$this->download_pdf($Code_Order);
@@ -1567,7 +1567,7 @@ class Schedule_order extends CI_Controller
 	function download_pdf($kode)
 	{
 		$sroot 	= $_SERVER['DOCUMENT_ROOT'];
-		include $sroot . '/Siscal_Dashboard/application/libraries/MPDF57/mpdf.php';
+		include $sroot . '/application/libraries/MPDF57/mpdf.php';
 		$mpdf	= new mPDF('utf-8', 'A4-P');
 
 		$ArrBulan	= array(1 => 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'Nopember', 'Desember');
@@ -1582,9 +1582,9 @@ class Schedule_order extends CI_Controller
 		);
 		//Beginning Buffer to save PHP variables and HTML tags
 
-		$img_file	= $sroot . '/Siscal_Dashboard/assets/img/logo.jpg';
-		$img_file2	= $sroot . '/Siscal_Dashboard/assets/img/kan.png';
-		$directory	= $sroot . '/Siscal_Dashboard/assets/file/';
+		$img_file	= $sroot . '/assets/img/logo.jpg';
+		$img_file2	= $sroot . '/assets/img/kan.png';
+		$directory	= $sroot . '/assets/file/';
 		$ArrBulan	= array(1 => 'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec');
 		//Beginning Buffer to save PHP variables and HTML tags
 		set_time_limit(0);
