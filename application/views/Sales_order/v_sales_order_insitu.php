@@ -2,14 +2,11 @@
 $this->load->view('include/side_menu');
 ?>
 <form action="#" method="POST" id="form-proses" enctype="multipart/form-data">
-	<div class="box box-warning">
-		<div class="box-header">
-			<h4 class="box-title"><i class="fa fa-check-square"></i> <?php echo $title; ?></h4>
-
-		</div>
+	<div class="box box-primary box-cs01">
+		
 		<!-- /.box-header -->
 		<div class="box-body">
-			<div class="row">
+			<div class="row col-sm-12" style="padding-bottom:27px;padding-top:8px;">
 				<div class="col-sm-2">
 					<div class="form-group">
 						<label class="control-label">
@@ -82,46 +79,34 @@ $this->load->view('include/side_menu');
 						</div>
 
 					</div>
-					<?php
-					if ($akses_menu['create'] == '1') {
-					?>
-						<div class="col-sm-3">
-							<div class="form-group">
-								<label class="control-label">
-									&nbsp;
-								</label>
-								<div>
-									<button type="button" class="btn btn-sm bg-navy-active" id="btn_add_order" title="CREATE SALES ORDER"> CREATE INSITU SALES ORDER <i class="fa fa-plus"></i> </button>
-								</div>
-							</div>
-						</div>
-					<?php
-					}
-					?>
+					
 				</div>
+			</div>
 				<div id="Loading_tes" class="overlay_load">
 					<center>Please Wait . . . &nbsp;<img src="<?php echo base_url('assets/img/loading_small.gif') ?>"></center>
 				</div>
-				<table id="my-grid" class="table table-bordered table-striped">
-					<thead>
-						<tr style="background-color :#16697A !important;color : white !important;">
-							<th class="text-center">SO No</th>
-							<th class="text-center">SO Date</th>
-							<th class="text-center">Customer</th>
-							<th class="text-center">Quotation</th>
-							<th class="text-center">PO No</th>
-							<th class="text-center">Type</th>
-							<th class="text-center">Status</th>
-							<th class="text-center">Option</th>
-						</tr>
-					</thead>
 
-					<tbody id="list_detail">
+				<div class="table-responsive col-sm-12" style="padding-bottom:65px;">
+					<table id="my-grid" class="table table-bordered table-striped" width="100%">
+						<thead style="background-color:#E9ECF9;color:#0A1A60;">
+							<tr style="font-size: 14px;height: 50px;">
+								<th class="text-center">SO No</th>
+								<th class="text-center">SO Date</th>
+								<th class="text-center">Customer</th>
+								<th class="text-center">Quotation</th>
+								<th class="text-center">PO No</th>
+								<th class="text-center">Type</th>
+								<th class="text-center">Status</th>
+								<th class="text-center">Option</th>
+							</tr>
+						</thead>
 
-					</tbody>
+						<tbody id="list_detail">
 
-				</table>
-			</div>
+						</tbody>
+
+					</table>
+				</div>
 
 			<!-- /.box-body -->
 		</div>
@@ -143,6 +128,10 @@ $this->load->view('include/side_menu');
 		<?php $this->load->view('include/footer'); ?>
 		<!-- page script -->
 		<style>
+			.box-cs01{
+				border-radius: 18px;
+				box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+			}
 			.overlay_load {
 				background: #eee;
 				display: none;
@@ -175,20 +164,51 @@ $this->load->view('include/side_menu');
 				word-wrap: break-word !important;
 			}
 
-			table.table-bordered thead th,
-			table.table-bordered thead td {
-				border-left-width: thin !important;
-				border-top-width: 0;
+			table.dataTable tbody td {
+				vertical-align: middle;
 			}
+			table.dataTable thead th {
+				text-align: center;
+				vertical-align: middle;
+			}
+			.Btntable {
+				font-size: 13.3px !important;
+				padding: 6px !important;
+				margin: 4px !important;
+				margin-bottom: 10px !important;
+				border-radius: 4px !important;
+				width: 85px;
+				border: none !important;
+				box-shadow: 0 1px 2px rgba(0,0,0,0.07), 
+						0 2px 4px rgba(0,0,0,0.07), 
+						0 4px 8px rgba(0,0,0,0.07), 
+						0 8px 16px rgba(0,0,0,0.07),
+						0 16px 32px rgba(0,0,0,0.07), 
+						0 32px 64px rgba(0,0,0,0.07);
+			}
+			.Btn1 {
+				width: 185px;
+				background-color: #2F92E4 !important;
+				color: white !important;
+			}
+			
 		</style>
+		
+		<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
+		<script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+		<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+
 		<script type="text/javascript">
 			var base_url = '<?php echo site_url(); ?>';
 			var active_controller = '<?php echo ($this->uri->segment(1)); ?>';
+			var table_data;
 			$(function() {
 				data_display();
-
-
 			});
+
 			$(document).on('change', '#bulan', data_display);
 			$(document).on('change', '#tahun', data_display);
 			$(document).on('change', '#sts_so', data_display);
@@ -210,19 +230,20 @@ $this->load->view('include/side_menu');
 				$("#MyModalView").modal('show');
 			}
 
-
-
-
 			function data_display() {
 				let MonthChosen = $('#bulan').val();
 				let YearChosen = $('#tahun').val();
 				let StatusChosen = $('#sts_so').val();
 				let table_data = $('#my-grid').DataTable({
-					"serverSide": true,
-					"destroy": true,
-					"stateSave": false,
-					"bAutoWidth": false,
-					"oLanguage": {
+					processing		: true,
+					serverSide		: true,
+					destroy			: true,
+					stateSave		: false,
+					bAutoWidth		: false,
+					paging			: true, 
+					lengthMenu		: [[5, 10, 50, 100, 250, -1], [5, 10, 50, 100, 250, "All"]],
+					iDisplayLength	: 5,
+					oLanguage: {
 						"sSearch": "<b>Live Search : </b>",
 						"sLengthMenu": "_MENU_ &nbsp;&nbsp;<b>Records Per Page</b>&nbsp;&nbsp;",
 						"sInfo": "Showing _START_ to _END_ of _TOTAL_ entries",
@@ -230,11 +251,44 @@ $this->load->view('include/side_menu');
 						"sZeroRecords": "No matching records found",
 						"sEmptyTable": "No data available in table",
 						"sLoadingRecords": "Please wait - loading...",
-						"oPaginate": {
-							"sPrevious": "Prev",
-							"sNext": "Next"
+						oPaginate: {
+							sNext: '<i class="fa fa-chevron-circle-right fa-lg"></i>',
+							sPrevious: '<i class="fa fa-chevron-circle-left fa-lg"></i>'
 						}
 					},
+					dom				: 'Bfrtip', 
+					buttons			: [
+										{
+											extend: 'pageLength',
+											text:      '<i class="fa fa-list-ol"></i> <b>Show</b>',
+											className: "Btntable Btn2"
+										},
+										
+										{
+											extend: 'excelHtml5',
+											text:      '<i class="fa fa-download fa-lg"></i> &nbsp;<b>Excel</b>',
+											titleAttr: 'Excel',
+											className: "Btntable",
+											title: 'Sales Order - Insitu Bulan '+MonthChosen+'-'+YearChosen,
+											messageTop: 'SISCAL DASHBOARD',
+											exportOptions: {
+													columns: [0,1,2,3,4,5,6]
+											}
+										},
+										<?php if ($akses_menu['create'] == '1') { ?>
+											{
+												text:      '<i class="fa fa-plus-circle fa-lg"></i> <b>Create Insitu Sales Order</b>',
+												className: "Btntable Btn1",
+												attr:{
+														title	: 'Create Insitu Sales Order',
+														id		: 'btn_add_order'
+													}
+											},
+										<?php } ?>
+
+										
+
+									],
 					"aaSorting": [
 						[1, "desc"]
 					],
@@ -277,15 +331,10 @@ $this->load->view('include/side_menu');
 							"orderable": false
 						}
 					],
-					"sPaginationType": "simple_numbers",
-					"iDisplayLength": 10,
-					"aLengthMenu": [
-						[5, 10, 20, 50, 100, 150],
-						[5, 10, 20, 50, 100, 150]
-					],
+					
 					"ajax": {
-						url: base_url + '/' + active_controller + '/get_data_display',
-						type: "post",
+						url: "<?php echo site_url('sales_order_insitu/get_data_display') ?>",
+						type: "POST",
 						cache: false,
 						data: {
 							'bulan': MonthChosen,

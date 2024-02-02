@@ -138,7 +138,9 @@ class Sales_order_insitu extends CI_Controller {
 		
 
 		$sql .= " ORDER BY head_so.id DESC,".$columns_order_by[$column_order]." ".$column_dir." ";
-		$sql .= " LIMIT ".$limit_start." ,".$limit_length." ";
+		if($limit_length != '-1'){
+			$sql .= " LIMIT ".$limit_start." ,".$limit_length." ";
+		}
 
 		$fetch['query'] = $this->db->query($sql);
 		
