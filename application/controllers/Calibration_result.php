@@ -42,7 +42,7 @@ class Calibration_result extends CI_Controller {
 		$Month_Find			= $this->input->post('bulan');
 		$Year_Find			= $this->input->post('tahun');		
 		$WHERE				= "det_trans.flag_proses = 'Y'
-							   AND det_trans.approve_certificate IN ('OPN', 'REJ')";
+							   AND det_trans.approve_certificate IN ('OPN', 'REV', 'APV')";
 		
 		if($Month_Find){
 			if(!empty($WHERE))$WHERE .=" AND ";
@@ -155,7 +155,7 @@ class Calibration_result extends CI_Controller {
 			
 			$Template		='-';
 			if($Arr_Akses['create'] == '1' || $Arr_Akses['update'] == '1'){
-				$Template		="<a href='".site_url('Calibration_result/view_detail?kode='.urlencode($Code_SO))."' class='btn btn-sm bg-navy-active' title='DETAIL SERVICE ORDER'> <i class='fa fa-search'></i> </a>";
+				$Template		="<a href='".site_url('Calibration_result/view_detail?kode='.urlencode($Code_SO))."' class='btn btn-sm bg-yellow' title='DETAIL SERVICE ORDER'> <i class='fa fa-search'></i> </a>";
 			}
 			$nestedData		= array();
 			$nestedData[]	= $Nomor_SO;

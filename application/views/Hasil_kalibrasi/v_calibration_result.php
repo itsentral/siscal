@@ -2,14 +2,14 @@
 $this->load->view('include/side_menu'); 
 ?> 
 <form action="#" method="POST" id="form-proses" enctype="multipart/form-data">
-	<div class="box box-warning">
+	<div class="box box-primary box-cs01">
 		<div class="box-header">
 			<h4 class="box-title"><i class="fa fa-check-square"></i> <?php echo $title;?></h4>
 			
 		</div>
 		<!-- /.box-header -->
 		<div class="box-body">
-			<div class="row">			
+			<div class="row col-sm-12">			
 				<div class="col-sm-3">
 					<div class="form-group">					
 						<label class="control-label">
@@ -75,9 +75,10 @@ $this->load->view('include/side_menu');
 			<div id="Loading_tes" class="overlay_load">
 				<center>Please Wait . . .  &nbsp;<img src="<?php echo base_url('assets/img/loading_small.gif') ?>"></center>
 			</div>
+			<div class="col-sm-12 table-responsive">
 			<table id="my-grid" class="table table-bordered table-striped">
-				<thead>
-					<tr style="background-color :#16697A !important;color : white !important;">
+				<thead style="background-color:#E9ECF9;color:#0A1A60;">
+					<tr>
 						<th class="text-center">SO No</th>
 						<th class="text-center">SO Date</th>				
 						<th class="text-center">Customer</th>
@@ -92,6 +93,7 @@ $this->load->view('include/side_menu');
 				</tbody>
 				
 			</table>
+			</div>
 		</div>
 		
 		<!-- /.box-body -->
@@ -146,6 +148,84 @@ $this->load->view('include/side_menu');
 		border-left-width: thin !important;
 		border-top-width: 0;
 	}
+/* Start Css Box */
+	.box-cs01{
+		border-radius: 18px;
+		box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+	}
+/* End Css Box */
+
+/* Start Css Table */
+	table.dataTable tbody td {
+		vertical-align: middle;
+	}
+	table.dataTable thead th {
+		text-align: center;
+		vertical-align: middle;
+	}
+	.dataTables_filter {
+		padding-top: 10px;
+	}
+	.Btntable {
+		font-size: 13.3px !important;
+		padding: 6px !important;
+		margin: 4px !important;
+		margin-bottom: 10px !important;
+		border-radius: 4px !important;
+		width: 85px;
+		border: none !important;
+		box-shadow: 0 1px 2px rgba(0,0,0,0.07), 
+                0 2px 4px rgba(0,0,0,0.07), 
+                0 4px 8px rgba(0,0,0,0.07), 
+                0 8px 16px rgba(0,0,0,0.07),
+                0 16px 32px rgba(0,0,0,0.07), 
+                0 32px 64px rgba(0,0,0,0.07);
+	}
+	.Btntable1 {
+		background-color: #2F92E4 !important;
+		color: white !important;
+	}
+
+/* End Css Table */
+
+/* Start Css Button */
+	.Btn-cs {
+		font-size: 14px;
+		padding: 7px;
+		margin: 4px;
+		margin-bottom: 0px !important;
+		border-radius: 8px;
+		width: 85px;
+		border: none;
+		box-shadow: 0 1px 2px rgba(0,0,0,0.07), 
+                0 2px 4px rgba(0,0,0,0.07), 
+                0 4px 8px rgba(0,0,0,0.07), 
+                0 8px 16px rgba(0,0,0,0.07),
+                0 16px 32px rgba(0,0,0,0.07), 
+                0 32px 64px rgba(0,0,0,0.07);
+	}
+	.Btn-cs:hover {
+		color: white;
+		transition: all 150ms linear;
+		opacity: .88;
+	}
+	.Btn-cs1 {
+		background-color: #2F92E4;
+		color: white;
+	}
+	.Btn-cs2 {
+		background-color: #d9534f;
+		color: white;
+	}
+/* End Css Button */
+
+/* Start Css Modal */
+	.modal-cs{
+		-webkit-border-radius: 20px !important;
+		-moz-border-radius: 20px !important;
+		border-radius: 20px !important; 
+	}
+/* End Css Modal */
 </style>
 <script type="text/javascript">
 	var base_url			= '<?php echo site_url(); ?>';
@@ -208,7 +288,7 @@ $this->load->view('include/side_menu');
 				{"targets":5,"sClass":"text-center","searchable":false,"orderable": false}
 			],
 			"sPaginationType": "simple_numbers", 
-			"iDisplayLength": 10,
+			"iDisplayLength": 5,
 			"aLengthMenu": [[5, 10, 20, 50, 100, 150], [5, 10, 20, 50, 100, 150]],
 			"ajax":{
 				url 	: base_url +'/'+ active_controller+'/get_data_display',
