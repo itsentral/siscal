@@ -630,22 +630,37 @@ if ($rows_approve) {
 					<td align='left' valign='top' width='15%'>Bank</td>
 					<td align='left' valign='top' width='85%'>: Bank OCBC NISP</td>
 				</tr>
-				<tr>
-					<td align='left' valign='top' width='15%'>No Virtual Account</td>
-					<td align='left' valign='top' width='85%'>:
-						<?php
-						echo $rows_cust['va_no']
-						?>
-					</td>
-				</tr>
-				<tr>
-					<td align='left' valign='top' width='15%'>Atas Nama</td>
-					<td align='left' valign='top' width='85%'>:
-						<?php
-						echo $rows_cust['name'];
-						?>
-					</td>
-				</tr>
+				<?php if(substr($rows_cust['va_no'], 0, 4) == '6889'){ ?> 
+					<tr>
+						<td align='left' valign='top' width='15%'>No Virtual Account</td>
+						<td align='left' valign='top' width='85%'>:
+							<?php
+							echo $rows_cust['va_no'];
+							?>
+						</td>
+					</tr>
+					<tr>
+						<td align='left' valign='top' width='15%'>Atas Nama</td>
+						<td align='left' valign='top' width='85%'>:
+							<?php
+							echo $rows_cust['name'];
+							?>
+						</td>
+					</tr>
+				<?php }else{ ?>
+					<tr>
+						<td align='left' valign='top' width='15%'>No Rekening</td>
+						<td align='left' valign='top' width='85%'>:
+							029800006099
+						</td>
+					</tr>
+					<tr>
+						<td align='left' valign='top' width='15%'>Atas Nama</td>
+						<td align='left' valign='top' width='85%'>:
+							PT. SENTRAL TEHNOLOGI MANAGEMEN
+						</td>
+					</tr>
+				<?php } ?>
 
 			</table>
 		</td>
