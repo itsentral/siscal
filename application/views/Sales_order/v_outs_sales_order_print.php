@@ -354,13 +354,13 @@ $Header	="
 <table class='noborder2' width='100%'>
 	<tr>
 		<td width='25%' align='left'>
-			<img src='".$img_file."' width='90' height='70'/>
+			<img src='".$img_file."' width='120' height='70'/>
 		</td>
 		<td width='50%' align='center'>
 			<div style='font-size:17px;font-weight: bold;'>PT. SENTRAL TEHNOLOGI MANAGEMEN</div>
 		</td>
 		<td width='25%' align='right'>
-			<img src='".$img_file2."' width='90' height='70'/>
+			<img src='".$img_file2."' width='120' height='70'/>
 		</td>
 	</tr>
 	

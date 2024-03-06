@@ -2241,7 +2241,8 @@ class Calibration_result extends CI_Controller {
 								<img src="./assets/img/logo-sc.jpg" style="width: 78%">
 							</div>
 							<div style="position: fixed; top: 2px; left: 77%;">
-								<img src="./assets/img/kan.png" style="width: 90%">
+								<!--<img src="./assets/img/kan.png" style="width: 90%">-->
+								<img src="./assets/img/kan.png" style="width: 110%;margin-top:40px;">
 							</div>';
 		}else{
 			$Logo_Path	= '	<div style="position: fixed; top: 1px; left: 50%;">

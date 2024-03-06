@@ -354,13 +354,13 @@ if($rows_user){
 <table class='noborder2' width='100%'>
 	<tr>
 		<td width='25%' align='left'>
-			<img src='".$img_file."' width='90' height='50'/>
+			<img src='".$img_file."' width='100' height='50'/>
 		</td>
 		<td width='50%' align='center'>
 			<div style='font-size:17px;font-weight: bold;'>PT. SENTRAL TEHNOLOGI MANAGEMEN</div>
 		</td>
 		<td width='25%' align='right'>
-			<img src='".$img_file3."' width='90' height='50'/>
+			<img src='".$img_file3."' width='100' height='50'/>
 		</td>
 	</tr>
 	<tr>

@@ -353,11 +353,11 @@ $Header	="
 <table class='noborder2' width='100%'>
 	<tr>
 		<td width='50%' align='left'>
-			<img src='".$img_file."' width='90' height='70'/>
+			<img src='".$img_file."' width='120' height='70' style='margin-left:-17px;'/>
 		</td>
-		
+
 		<td width='50%' align='right'>
-			<img src='".$img_file2."' width='90' height='70'/>
+			<img src='".$img_file2."' width='120' height='70'/>
 		</td>
 	</tr>
 	

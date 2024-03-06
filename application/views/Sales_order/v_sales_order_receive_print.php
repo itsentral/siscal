@@ -352,11 +352,11 @@ $Header	="
 <table class='noborder2' width='100%'>
 	<tr>
 		<td width='50%' align='left'>
-			<img src='".$img_file."' width='90' height='70'/>
+			<img src='".$img_file."' width='120' height='70'/>
 		</td>
 		
 		<td width='50%' align='right'>
-			<img src='".$img_file2."' width='90' height='70'/>
+			<img src='".$img_file2."' width='120' height='70'/>
 		</td>
 	</tr>
 	
@@ -384,7 +384,7 @@ echo $Header;
 	
 ?>
 <div id='space'></div>
-<h2 align='center'><b>SALES ORDER</b></h2>
+<h2 align='center' style='margin-top:-20px;'><b>SALES ORDER</b></h2>
 <div id='space'></div>
 <table class="noborder3" width='100%'>		
 	<tr>
