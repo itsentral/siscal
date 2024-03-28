@@ -723,7 +723,7 @@ class Invoice_process extends CI_Controller
 									INNER JOIN customers ON letter_orders.customer_id = customers.id
 									WHERE
 										letter_orders.flag_invoice <> 'Y'
-									AND trans_details.qty_proses > 0
+									-- AND trans_details.qty_proses > 0
 									AND customers.flag_billing = 'FULL'
 									GROUP BY
 										trans_details.quotation_id
