@@ -334,8 +334,10 @@ class Technician_result extends CI_Controller
 
 	function calibration_result_process()
 	{
-		$rows_Header = $rows_Detail = $rows_Teknisi = $rows_Supplier = array();
-		$Code_Back	= $Code_Teknisi = '';
+		$rows_Header 	= $rows_Detail = $rows_Teknisi = $rows_Supplier = array();
+		$Code_Back		= $Code_Teknisi = '';
+		$Penyelia 		= $this->getPenyelia('10');
+
 		if ($this->input->post()) {
 			$Code_Unik 		= urldecode($this->input->post('code'));
 			$Split_Code		= explode('^', $Code_Unik);
@@ -392,12 +394,30 @@ class Technician_result extends CI_Controller
 			'Code_Back'		=> $Code_Back,
 			'code_teknisi'	=> $Code_Teknisi,
 			'rows_teknisi'	=> $rows_Teknisi,
-			'rows_supplier'	=> $rows_Supplier
+			'rows_supplier'	=> $rows_Supplier,
+			'Penyelia'		=> $Penyelia
 		);
 
 		$this->load->view($this->folder . '/v_technician_result_process', $data);
 	}
 
+	public function getPenyelia($id)
+	{
+		$this->db->select('a.*, b.nama');
+		$this->db->from('users a'); 
+		$this->db->join('members b', 'b.id=a.member_id', 'right');
+		$this->db->where('a.group_id', $id);
+		$this->db->order_by('a.id','asc');         
+		$query = $this->db->get(); 
+		if($query->num_rows() != 0)
+		{
+			return $query->result_array();
+		}
+		else
+		{
+			return false;
+		}
+	}
 
 
 	function save_calibration_result_process()
@@ -451,6 +471,8 @@ class Technician_result extends CI_Controller
 				$Tool_Humadity	= $this->input->post('kelembaban');
 				$Tool_Procedure	= $this->input->post('prosedur_kalibrasi');
 				$Tool_Standard	= $this->input->post('standar_kalibrasi');
+				$id_selia		= $this->input->post('id_selia');
+				$status_selia	= "PENDING";
 			}
 
 
@@ -494,6 +516,8 @@ class Technician_result extends CI_Controller
 					$UPD_Detail['kelembaban']			= $Tool_Humadity;
 					$UPD_Detail['standar_kalibrasi']	= $Tool_Standard;
 					$UPD_Detail['prosedur_kalibrasi']	= $Tool_Procedure;
+					$UPD_Detail['id_selia']				= $id_selia;
+					$UPD_Detail['status_selia']			= $status_selia;
 
 					if ($Subcon == 'Y') {
 						$UPD_Detail['actual_subcon_id']		= $Code_Actual_Subcon;
@@ -729,6 +753,30 @@ class Technician_result extends CI_Controller
 					$Pesan_Error	= 'Error Update Trans Detail';
 				}
 
+				## INSERT LOG CALIBRATION FILE
+				if ($Flag_Proses == 'Y') {
+
+					$Rename_File	= $Code_Detail.'-'.date('YmdHis').'.'.$Type_File;
+
+					$Ins_Log		= array(
+						'trans_data_detail_id'	=> $Code_Detail,
+						'file_kalibrasi'		=> $Rename_File,
+						'file_type'				=> $Type_File,
+						'reopen_reason'			=> $Reason_Fail,
+						'reopen_by'				=> $Created_By,
+						'reopen_date'			=> $Created_Date,
+						'id_selia'				=> $id_selia,
+						'status_selia'			=> $status_selia,
+						'created_date'			=> $Created_Date
+					);
+	
+					$Has_Ins_Log	= $this->db->insert('trans_data_detail_cals_file_log',$Ins_Log);
+					
+					if($Has_Ins_Log !== TRUE){
+						$Pesan_Error	= 'Error Insert Log Calibration File';
+					}
+				}
+				
 				## MODIFIED BY ALI ~ 2023-02-18 ##
 				if ($rows_Trans->insitu === 'Y') {
 					$Code_Order			= $Code_Driver = '';

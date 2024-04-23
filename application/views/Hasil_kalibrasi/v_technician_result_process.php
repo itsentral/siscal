@@ -1,11 +1,12 @@
 
 <form action="#" method="POST" id="form-proses-reopen" enctype="multipart/form-data">
-	<div class="box box-warning">
+	<div class="box box-primary">
 		
 		<div class="box-body">
 			<div class="row">
-				<div class="col-sm-12 text-center sub-heading" style="color:white;">
-					<h5><?php echo $title;?></h5>
+				<div class="col-sm-12">
+					<h5 class="title-cs"><i class="fa fa-list fa-md"></i> <?php echo $title;?></h5>
+					<hr/>
 				</div>
 				
 			</div>
@@ -97,8 +98,9 @@
 					</div>				
 				</div>
 				<div class="row">
-					<div class="col-sm-12 text-center sub-heading" style="color:white;">
-						<h5>CALIBRATION RESULT</h5>
+					<div class="col-sm-12">
+						<h5 class="title-cs"><i class="fa fa-file-text fa-md"></i> CALIBRATION RESULT</h5>
+						<hr/>
 					</div>
 					
 				</div>
@@ -157,8 +159,9 @@
 				</div>
 				<div id="div_gambar" <?php echo $Style_Div;?>>
 					<div class="row">
-						<div class="col-sm-12 col-xs-12 text-center sub-heading" style="color:white;">
-							<h5>DETAIL TOOL PICTURE </h5>
+						<div class="col-sm-12">
+							<h5 class="title-cs"><i class="fa fa-camera fa-md"></i> DETAIL TOOL PICTURE</h5>
+							<hr/>
 						</div>					
 					</div>
 					<div class='row'>
@@ -226,11 +229,13 @@
 					</div>
 				</div>
 				<div id="div_gagal" style="display:none !important;">
-					<div class="row">
-						<div class="col-sm-12 text-center sub-heading" style="color:white;">
-							<h5>FAILED RESULT</h5>
-						</div>						
-					</div>
+					<div class="row">	
+						<div class="col-sm-12">
+							<h5 class="title-cs"><i class="fa fa-minus-square fa-md"></i> FAILED RESULT</h5>
+							<hr/>
+						</div>
+					</div>	
+					
 					<div class='row'>
 						
 						<div class="col-sm-6">
@@ -254,10 +259,11 @@
 						<div class="col-sm-6">&nbsp;</div>	
 					</div>
 				</div>
-				<div id="div_berhasil" style="display:none !important;">
+				<div class="col-sm-12" id="div_berhasil" style="display:none !important;">
 					<div class="row">
-						<div class="col-sm-12 text-center sub-heading" style="color:white;">
-							<h5>SUCCESS RESULT</h5>
+						<div class="col-sm-12">
+							<h5 class="title-cs"><i class="fa fa-check-square fa-md"></i> SUCCESS RESULT</h5>
+							<hr/>
 						</div>						
 					</div>
 					<div class='row'>
@@ -315,7 +321,7 @@
 								<label class="control-label">Calibration Date <span class="text-red"> *</span></label>
 								
 								<?php
-									echo form_input(array('id'=>'tgl_proses','name'=>'tgl_proses','class'=>'form-control input-sm','readOnly'=>true));								
+									echo form_input(array('id'=>'tgl_proses','name'=>'tgl_proses','class'=>'form-control input-sm','readOnly'=>true),date('d-m-Y'));								
 								?>
 								
 							</div>
@@ -325,13 +331,13 @@
 						<div class="col-sm-6">
 							<div class="form-group">
 								<label class="control-label">Calibration Time <span class="text-red"> *</span></label>
-								<div class="rows">
-									<div class="col-sm-6 col-xs-6">
+								<div class="row">
+									<div class="col-sm-6">
 										<?php
 											echo form_input(array('id'=>'jam_awal','name'=>'jam_awal','class'=>'form-control input-sm jam_picker','autocompete'=>'off', 'placeholder'=>'Start Time'));						
 										?>
 									</div>
-									<div class="col-sm-6 col-xs-6">
+									<div class="col-sm-6">
 										<?php
 											echo form_input(array('id'=>'jam_akhir','name'=>'jam_akhir','class'=>'form-control input-sm jam_picker','autocompete'=>'off', 'placeholder'=>'End Time'));						
 										?>
@@ -430,6 +436,24 @@
 						</div>
 								
 					</div>
+
+					<div class='row'>
+						<div class="col-sm-6">
+							<div class="form-group">
+								<label class="control-label">Penyelia <span class="text-red"> *</span></label>
+								<select class="form-control select" name="id_selia" id="id_selia">
+									<option value="">==Pilih==</option>
+									<?php
+									if($Penyelia){
+									foreach($Penyelia as $val){?>
+										<option value="<?Php echo $val['id']?>"><?php echo $val['nama']; ?></option>
+									<?php }
+									} ?>
+								</select>
+							</div>
+						</div>
+									
+					</div>
 					
 				</div>
 				
@@ -440,8 +464,8 @@
 		</div>		
 		<?php
 		if(!empty($rows_detail)){
-			echo"<div class='footer'>";
-				echo'<button type="button" id="btn-process-reopen" class="btn btn-md" style="background-color:#37474f; color:white;vertical-align:middle !important;" title="SAVE PROCESS"> SAVE PROCESS <i class="fa fa-long-arrow-right" style="width:40px;"></i> </button>';
+			echo"<div class='modal-footer'>";
+				echo'<button type="button" id="btn-process-reopen" class="btn btn-md Btn-cs Btn-cs1" style="vertical-align:middle !important;" title="SAVE PROCESS"> SAVE PROCESS <i class="fa fa-long-arrow-right" style="width:40px;"></i> </button>';
 			echo"</div>";
 		}
 		?>

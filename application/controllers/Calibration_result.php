@@ -235,8 +235,10 @@ class Calibration_result extends CI_Controller {
 	
 	
 	function calibration_result_process(){
-		$rows_Header = $rows_Detail = $rows_Teknisi = $rows_Supplier = array();
-		$Code_Back	= $Code_Teknisi = '';
+		$rows_Header 	= $rows_Detail = $rows_Teknisi = $rows_Supplier = array();
+		$Code_Back		= $Code_Teknisi = '';
+		$Penyelia 		= $this->getPenyelia('10');
+		
 		if($this->input->post()){
 			$Code_Alat 		= $this->input->post('code');			
 			$rows_Detail	= $this->db->get_where('trans_data_details',array('id'=>$Code_Alat))->row();
@@ -246,6 +248,7 @@ class Calibration_result extends CI_Controller {
 			
 			
 		}
+
 		$Arr_Akses			= $this->Arr_Akses;
 		$data = array(
 			'title'			=> 'CALIBRATION RESULT PROCESS',
@@ -253,12 +256,30 @@ class Calibration_result extends CI_Controller {
 			'akses_menu'	=> $Arr_Akses,
 			'rows_detail'	=> $rows_Detail,
 			'rows_header'	=> $rows_Header,
-			'Code_Back'		=> $Code_Back
+			'Code_Back'		=> $Code_Back,
+			'Penyelia'		=> $Penyelia
 		);
 		
 		$this->load->view($this->folder.'/v_calibration_result_process',$data);
 	}
 	
+	public function getPenyelia($id)
+	{
+		$this->db->select('a.*, b.nama');
+		$this->db->from('users a'); 
+		$this->db->join('members b', 'b.id=a.member_id', 'right');
+		$this->db->where('a.group_id', $id);
+		$this->db->order_by('a.id','asc');         
+		$query = $this->db->get(); 
+		if($query->num_rows() != 0)
+		{
+			return $query->result_array();
+		}
+		else
+		{
+			return false;
+		}
+	}
 	
 	
 	function save_calibration_result_process(){
@@ -272,6 +293,8 @@ class Calibration_result extends CI_Controller {
 			$Created_Date	= date('Y-m-d H:i:s');
 			
 			$Code_Detail	= $this->input->post('code_detail');
+			$id_selia		= $this->input->post('id_selia');
+			$status_selia	= "PENDING";
 			$Reason_Fail	= strtoupper($this->input->post('failed_reason'));
 			$rows_Find		= $this->db->get_where('trans_data_details',array('id'=>$Code_Detail))->row();
 			
@@ -288,7 +311,10 @@ class Calibration_result extends CI_Controller {
 				'file_type'				=> $Old_File_Tipe,
 				'reopen_reason'			=> $Reason_Fail,
 				'reopen_by'				=> $Created_By,
-				'reopen_date'			=> $Created_Date
+				'reopen_date'			=> $Created_Date,
+				'id_selia'				=> $id_selia,
+				'status_selia'			=> $status_selia,
+				'created_date'			=> $Created_Date
 			);
 			$Has_Ins_Log	= $this->db->insert('trans_data_detail_cals_file_log',$Ins_Log);
 			if($Has_Ins_Log !== TRUE){
@@ -300,7 +326,9 @@ class Calibration_result extends CI_Controller {
 			
 			$UPD_Detail			= array(
 				'modified_by'		=> $Created_By,
-				'modified_date'		=> $Created_Date
+				'modified_date'		=> $Created_Date,
+				'id_selia'			=> $id_selia,
+				'status_selia'		=> $status_selia
 			);
 				
 			

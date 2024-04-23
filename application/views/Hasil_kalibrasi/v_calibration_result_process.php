@@ -1,11 +1,12 @@
 
 <form action="#" method="POST" id="form-proses-revisi" enctype="multipart/form-data">
-	<div class="box box-warning">
+	<div class="box box-primary">
 		
 		<div class="box-body">
 			<div class="row">
-				<div class="col-sm-12 text-center sub-heading" style="color:white;">
-					<h5><?php echo $title;?></h5>
+				<div class="col-sm-12">
+					<h5 class="title-cs"><i class="fa fa-list fa-md"></i> <?php echo $title;?></h5>
+					<hr/>
 				</div>
 				
 			</div>
@@ -71,8 +72,9 @@
 					</div>				
 				</div>
 				<div class="row">
-					<div class="col-sm-12 text-center sub-heading" style="color:white;">
-						<h5>CALIBRATION FILE</h5>
+					<div class="col-sm-12">
+						<h5 class="title-cs"><i class="fa fa-file-text fa-md"></i> CALIBRATION FILE</h5>
+						<hr/>
 					</div>
 					
 				</div>
@@ -144,6 +146,27 @@
 					</div>
 								
 				</div>
+
+				<div class='row'>
+					<div class="col-sm-6">
+					</div>
+					<div class="col-sm-6">
+						<div class="form-group">
+							<label class="control-label">Penyelia <span class="text-red"> *</span></label>
+							<select class="form-control select" name="id_selia" id="id_selia">
+								<option value="">==Pilih==</option>
+								<?php
+								if($Penyelia){
+								foreach($Penyelia as $val){?>
+									<option value="<?Php echo $val['id']?>"><?php echo $val['nama']; ?></option>
+								<?php }
+								} ?>
+							</select>
+						</div>
+					</div>
+								
+				</div>
+
 				
 			<?php
 			}
@@ -163,8 +186,8 @@
 					</div>
 				</div>
 			</div>";
-			echo"<div class='footer'>";
-				echo'<button type="button" id="btn-process-reopen" class="btn btn-md" style="background-color:#37474f; color:white;vertical-align:middle !important;" title="SAVE PROCESS"> SAVE PROCESS <i class="fa fa-long-arrow-right" style="width:40px;"></i> </button>';
+			echo"<div class='modal-footer'>";
+				 echo'<button type="button" id="btn-process-reopen" class="btn btn-md Btn-cs Btn-cs1" style="vertical-align:middle !important;" title="SAVE PROCESS"> SAVE PROCESS <i class="fa fa-long-arrow-right" style="width:40px;"></i> </button>';
 			echo"</div>";
 		}
 		?>

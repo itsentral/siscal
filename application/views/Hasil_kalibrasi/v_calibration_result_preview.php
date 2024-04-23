@@ -2,24 +2,19 @@
 $this->load->view('include/side_menu');
 ?> 
 <form action="#" method="POST" id="form-proses" enctype="multipart/form-data">
-	<div class="box box-warning">
-		<div class="box-header">			
-			<div class="box-tools pull-right">
-				<?php 
-					echo"<button type='button' class='btn btn-md btn-danger' id='btn-back'> <i class='fa fa-angle-double-left'></i> BACK </button>&nbsp;&nbsp;&nbsp;";			
-				?>
-			</div>
+	<div class="box box-primary box-cs01">
+		<div class="box-header" style="margin:0px 0px -15px 5px;">
+			<!-- <button type="button" class="btn Btn-cs Btn-cs2" id="btn-back"><i class="fa fa-angle-double-left"></i>&nbsp; BACK &nbsp;&nbsp;</button> -->
 		</div> 
 		<div class="box-body">
-			<div class="row">
-				<div class="col-sm-12 col-xs-12 text-center sub-heading" style="color:white;">
-					<h5><?php echo $title;?></h5>
-				</div>
-				
+		
+			<div class="col-sm-12">
+				<h4 class="title-cs"><i class="fa fa-list fa-md"></i> <?php echo $title;?></h4>
+				<hr/>
 			</div>
 			<?php
 			if(empty($rows_trans)){
-				echo"<div class='row'>
+				echo"<div class=''>
 						<div class='col-sm-12'>
 							<h4 class='text-red'><b>NO RECORD WAS FOUND.....</b></h4>
 						</div>
@@ -27,7 +22,7 @@ $this->load->view('include/side_menu');
 			}else{
 				
 			?>
-				<div class='row'>
+				<div class=''>
 					<div class="col-sm-6">
 						<div class="form-group">
 							<label class="control-label">SO No</label>
@@ -46,7 +41,7 @@ $this->load->view('include/side_menu');
 						</div>
 					</div>				
 				</div>
-				<div class='row'>
+				<div class=''>
 					<div class="col-sm-6">
 						<div class="form-group">
 							<label class="control-label">Customer</label>
@@ -65,7 +60,7 @@ $this->load->view('include/side_menu');
 					</div>
 									
 				</div>
-				<div class='row'>					
+				<div class=''>					
 					<div class="col-sm-6">
 						<div class="form-group">
 							<label class="control-label">PO No</label>
@@ -84,13 +79,13 @@ $this->load->view('include/side_menu');
 					</div>
 				</div>
 				
-				<div class="row">
-					<div class="col-sm-12 col-xs-12 text-center sub-heading" style="color:white;">
-						<h5>PIC LAB CUSTOMER</h5>
-					</div>
-					<div class="col-sm-12 col-xs-12">&nbsp;</div>
+				<div class="col-sm-12">
+					<h4 class="title-cs"><i class="fa fa-user fa-md"></i> PIC LAB CUSTOMER</h4>
+					<hr/>
 				</div>
-				<div class='row'>					
+				
+				
+				<div class=''>					
 					<div class="col-sm-6">
 						<div class="form-group">
 							<label class="control-label">Name</label>
@@ -108,7 +103,7 @@ $this->load->view('include/side_menu');
 						</div>
 					</div>
 				</div>
-				<div class='row'>					
+				<div class=''>					
 					<div class="col-sm-6">
 						<div class="form-group">
 							<label class="control-label">Email</label>
@@ -122,20 +117,23 @@ $this->load->view('include/side_menu');
 					</div>
 				</div>
 				
-				<div class="row">
-					<div class="col-sm-12 col-xs-12 text-center sub-heading" style="color:white;">
-						<h5>TOOL DETAIL</h5>
+				<div class="col-sm-12 text-left" style="margin-bottom:-10px;">
+					<h4 class="title-cs"><i class="fa fa-check-square-o fa-md"></i> <u>TOOL DETAIL</u></h4>
+					<hr/>
+				</div>
+
+				<div class="">
+
+					<div class="col-sm-12 text-center">
+						<button type="button" class="btn Btn-cs bg-red" id="btn-back"><i class="fa fa-angle-double-left"></i>&nbsp; BACK &nbsp;&nbsp;</button>
+						<button type="button" class="btn Btn-cs bg-orange" onclick="PrintBarcodeBatch();"><i class="fa fa-print"></i> QRCode Batch</button>
+						<br/><br/><!-- <button type="button" class="btn bg-orange" onclick="location.href='<?php echo base_url();?>calibration_result/GenerateQRCodeBatch'"><i class="fa fa-print"></i> QRCode Batch</button> -->
 					</div>
-					<div class="col-sm-12 col-xs-12">&nbsp;</div>
-				</div>
-				<div class="row">
-				<div class="col-sm-12 text-right">
-					<button type="button" class="btn bg-orange" onclick="PrintBarcodeBatch();"><i class="fa fa-print"></i> QRCode Batch</button>
-				</div>
-					<div class="col-sm-12" style="overflow-x:scroll !important;">
-						<table class="table table-striped table-bordered" id="my-grid">
-							<thead>
-								<tr style="background-color:#16697A !important;color:white !important;">
+
+					<div class="table-responsive col-sm-12" style="padding-bottom:65px;padding-top:10px;">
+						<table id="table-cs" class="table table-bordered table-striped" style="" width="100%">
+							<thead style="background-color:#E9ECF9;color:#0A1A60;">
+								<tr>
 									<th class="text-center">Code</th>
 									<th class="text-center">Tool Name</th>
 									<th class="text-center">Range</th>
@@ -175,50 +173,53 @@ $this->load->view('include/side_menu');
 										
 										$Identify_No	= $valK->no_identifikasi;
 										$Serial_No		= $valK->no_serial_number;
+										$StatusSelia	= $valK->status_selia;
 										
 										$Template		= '';
 										
 										if(!empty($File_Before) && $File_Before !=='-'){
-											if(!empty($Template))$Template	.='&nbsp;&nbsp;';
+											if(!empty($Template))$Template	.='&nbsp;';
 											$Template	.='<a href="'.$this->file_attachement.'hasil_kalibrasi/'.$File_Before.'" target="_blank" class="btn btn-sm blue_grey" title="DOWNLOAD BEFORE CALIBRATION IMAGE"> <i class="fa fa-download"></i> </a>';											
 											
 										}
 										
 										if(!empty($File_After) && $File_After !=='-'){
-											if(!empty($Template))$Template	.='&nbsp;&nbsp;';
+											if(!empty($Template))$Template	.='&nbsp;';
 											$Template	.='<a href="'.$this->file_attachement.'hasil_kalibrasi/'.$File_After.'" target="_blank" class="btn btn-sm brown" title="DOWNLOAD AFTER CALIBRATION IMAGE"> <i class="fa fa-download"></i> </a>';											
 											
 										}
 										
 										if($Cal_Result === 'Y'){
-											$Status		= "<span class='badge bg-green'>SUCCESS</span>";
+											$Status		= "<span class='badge bg-green' style='font-size:10.5px;'>SUCCESS</span>";
 											if(!empty($File_Cals) && $File_Cals !=='-'){
-												if(!empty($Template))$Template	.='&nbsp;&nbsp;';
+												if(!empty($Template))$Template	.='&nbsp;';
 												$Template	.='<a href="'.$this->file_attachement.'hasil_kalibrasi/'.$File_Cals.'" target="_blank" class="btn btn-sm btn-danger" title="DOWNLOAD CALIBRATION FILE"> <i class="fa fa-download"></i> </a>';
 												
 												if($Status_Approve !== 'APV'){
-													if(!empty($Template))$Template	.='&nbsp;&nbsp;';
-													$Template .= '<button type="button" class="btn btn-sm bg-navy-active" onClick = "ActionPreview({code:\''.$ID_Alat.'\',action :\'calibration_result_process\',title:\'UPDATE CALIBRATION FILE\'});" title="UPDATE CALIBRATION FILE"> <i class="fa fa-arrow-right fa-lg"></i> </button>';
+													if($StatusSelia == 'REVISI'){
+														if(!empty($Template))$Template	.='&nbsp;';
+														$Template .= '<button type="button" class="btn btn-sm bg-navy-active" onClick = "ActionPreview({code:\''.$ID_Alat.'\',action :\'calibration_result_process\',title:\'UPDATE CALIBRATION FILE\'});" title="UPDATE CALIBRATION FILE"> <i class="fa fa-arrow-right"></i> </button>';
+													}
 												}
 											}
 											if(!empty($valK->sentral_code_tool) && $valK->sentral_code_tool !== '-'){
-												if(!empty($Template))$Template	.='&nbsp;&nbsp;';
+												if(!empty($Template))$Template	.='&nbsp;';
 												$Template  .= '<button type="button" onClick="PrintBarcode(\''.$ID_Alat.'\',\'Y\')" class="btn btn-sm btn-warning" title="PRINT CALIBRATIONS BARCODE QR"> <i class="fa fa-print"></i> </button>';
 												
-												if(!empty($Template))$Template	.='&nbsp;&nbsp;';
+												if(!empty($Template))$Template	.='&nbsp;';
 												$Template  .= '<button type="button" onClick="PrintBarcode(\''.$ID_Alat.'\',\'N\')" class="btn btn-sm bg-orange-active" title="PRINT CALIBRATIONS BARCODE NON QR"> <i class="fa fa-print"></i> </button>';
 											}
 										}else if($Cal_Result === 'N'){
 											if($Cal_Reschedule === 'Y'){
-												$Status		= "<span class='badge bg-light-blue'>RESCHEDULE</span>";
+												$Status		= "<span class='badge bg-light-blue' style='font-size:10.5px;'>RESCHEDULE</span>";
 											}else{
-												$Status		= "<span class='badge bg-red'>FAIL / CANCEL</span>";
+												$Status		= "<span class='badge bg-red' style='font-size:10.5px;'>FAIL / CANCEL</span>";
 											}
 										}else{
 											if($Cal_Reschedule === 'Y'){
-												$Status		= "<span class='badge bg-blue'>PLAN RESCHEDULE</span>";
+												$Status		= "<span class='badge bg-blue' style='font-size:10.5px;'>PLAN RESCHEDULE</span>";
 											}else{
-												$Status		= "<span class='badge bg-purple'>UNPROCESSED</span>";
+												$Status		= "<span class='badge bg-purple' style='font-size:10.5px;'>UNPROCESSED</span>";
 											}
 										}
 										
@@ -230,10 +231,10 @@ $this->load->view('include/side_menu');
 											echo"<td class='text-center'>";
 												echo $Status;
 											echo"</td>";
-											echo"<td class='text-center'>".$Real_Tech."</td>";
+											echo"<td class='text-left'>".$Real_Tech."</td>";
 											echo"<td class='text-center'>".$Identify_No."</td>";	
 											echo"<td class='text-center'>".$Serial_No."</td>";											
-											echo"<td class='text-center'>".$Template."</td>";	
+											echo"<td class='wide text-center'>".$Template."</td>";	
 										echo"</tr>";
 									}
 								}
@@ -253,23 +254,26 @@ $this->load->view('include/side_menu');
 </form>
 <div class="modal fade" id="MyModalView" tabindex="-1" role="dialog" aria-labelledby="MyModal" data-backdrop="static">
 	<div class="modal-dialog" role="document" style="min-width:70% !important;">
-		 <div class="modal-content">
+		 <div class="modal-content modal-cs">
 			<div class="modal-header">
-				<h5 class="modal-title" id="MyModalTitle"></h5>
 				<button class="close" data-dismiss="modal" aria-label="close" id="btn-modal-close">
 					<span aria-hidden="true"><i class="fa fa-close"></i></span>
 				</button>
+				<h4 class="modal-title" id="MyModalTitle">UPDATE CALIBRATION</h4>
 			</div>
 			<div class="modal-body" id="MyModalDetail">
 			
 			</div>
+			<!-- <div class="modal-footer">
+			<button type="button" id="btn-process-reopen" class="btn btn-md Btn-cs Btn-cs1" style="vertical-align:middle !important;" title="SAVE PROCESS"> SAVE PROCESS <i class="fa fa-long-arrow-right" style="width:40px;"></i> </button>
+			</div> -->
 		</div>
 	</div>
 </div>
 
 <div class="modal fade" id="FormModalQR">
 	<div class="modal-dialog modal-sm" style="margin-top:250px;">
-		<div class="modal-content">
+		<div class="modal-content modal-cs">
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 				<span aria-hidden="true">&times;</span></button>
@@ -301,8 +305,8 @@ $this->load->view('include/side_menu');
 
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-danger" data-dismiss="modal"><i class="glyphicon glyphicon-remove"></i> Batal</button>
-				<button type="button" class="btn btn-primary" id="btnSave"><i class="glyphicon glyphicon-print"></i> Print</button>
+				<button type="button" class="btn Btn-cs Btn-cs2" data-dismiss="modal"><i class="glyphicon glyphicon-remove"></i> Batal</button>
+				<button type="button" class="btn Btn-cs Btn-cs1" id="btnSave"><i class="glyphicon glyphicon-print"></i> Print</button>
 			</div>	
 		</form>
 		</div>
@@ -311,7 +315,7 @@ $this->load->view('include/side_menu');
 
 <div class="modal fade" id="FormModalQRBatch">
 	<div class="modal-dialog modal-sm" style="margin-top:250px;">
-		<div class="modal-content">
+		<div class="modal-content modal-cs">
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 				<span aria-hidden="true">&times;</span></button>
@@ -334,16 +338,85 @@ $this->load->view('include/side_menu');
 
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-danger" data-dismiss="modal"><i class="glyphicon glyphicon-remove"></i> Batal</button>
-				<button type="button" class="btn btn-primary" id="btnSaveBatch"><i class="glyphicon glyphicon-print"></i> Download</button>
+				<button type="button" class="btn Btn-cs Btn-cs2" data-dismiss="modal"><i class="glyphicon glyphicon-remove"></i> Batal</button>
+				<button type="button" class="btn Btn-cs Btn-cs1" id="btnSaveBatch"><i class="glyphicon glyphicon-print"></i> Download</button>
 			</div>	
 		</form>
 		</div>
 	</div>
 </div>
 
+
+
 <?php $this->load->view('include/footer'); ?>
 <style>
+/* Start Css Button */
+	.Btn-cs {
+		font-size: 14px;
+		padding: 7px;
+		margin: 4px;
+		margin-bottom: 0px !important;
+		border-radius: 8px;
+		width: auto;
+		border: none;
+		box-shadow: 0 1px 2px rgba(0,0,0,0.07), 
+                0 2px 4px rgba(0,0,0,0.07), 
+                0 4px 8px rgba(0,0,0,0.07), 
+                0 8px 16px rgba(0,0,0,0.07),
+                0 16px 32px rgba(0,0,0,0.07), 
+                0 32px 64px rgba(0,0,0,0.07);
+	}
+
+	.Btn-cs:hover {
+		color: white;
+		transition: all 150ms linear;
+		opacity: .88;
+	}
+	.Btn-cs1 {
+		background-color: #2F92E4;
+		color: white;
+	}
+	.Btn-cs2 {
+		background-color: #d9534f;
+		color: white;
+	}
+/* End Css Button */
+	.title-cs{
+		padding-top:20px;
+		font-weight: bold;
+	}
+	.box-cs01{
+		border-radius: 18px;
+		box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+	}
+	.modal-cs{
+		-webkit-border-radius: 20px !important;
+		-moz-border-radius: 20px !important;
+		border-radius: 20px !important; 
+	}
+
+	table.dataTable tbody td {
+		vertical-align: middle;
+	}
+	table.dataTable thead th {
+		text-align: center;
+		vertical-align: middle;
+	}
+
+	.dataTables_filter {
+		float: right !important;
+	}
+
+	.highlight {
+		color: #3c8dbc;
+		/* cursor: pointer; */
+	}
+
+	td.wide {
+		white-space: nowrap;;
+	}
+	
+
 	.sub-heading{
 		border-radius :5px;
 		background-color :#03506F;
@@ -370,12 +443,33 @@ $this->load->view('include/side_menu');
 	var base_url			= '<?php echo site_url(); ?>';
 	var active_controller	= '<?php echo($this->uri->segment(1)); ?>';
 	var _validFileExtensions = [".xls", ".xlsx", ".xlsm", ".xlsxm"];
+	var table;
+	
 	$(document).ready(function(){
 		
 		$('#btn-back').click(function(){			
 			loading_spinner();
 			window.location.href =  base_url+'/'+active_controller;
 		});
+
+		table = $('#table-cs').DataTable({
+			paging		: false,
+			ordering	: false,
+			//dom			: '<"top"f>rt<"bottom"lp><"clear">',
+			language	: {
+							// "search": "_INPUT_",
+							"searchPlaceholder": "Cari Tool Detail..."
+						},
+
+			fnDrawCallback: function(nRow, aData, iDisplayIndex) {
+				$('#table-cs tbody tr').hover(function() {
+					$(this).addClass('highlight');
+				}, function() {
+					$(this).removeClass('highlight');
+				});
+			}
+		});
+
 		
 	});
 	
@@ -402,10 +496,12 @@ $this->load->view('include/side_menu');
 		let CodeDetail		= $('#code_detail').val();
 		let Lampiran_File	= $('#lampiran_kalibrasi').val();
 		let reason			= $('#failed_reason').val();
+		let id_selia		= $('#id_selia').val();
 		
 		const ValueCheck	= {
 			'file':{'nilai':Lampiran_File,'error':'Empty Calibration result file. Please upload calibration result file first..'},
-			'alasan':{'nilai':reason,'error':'Empty Reason. Please input reason first..'}
+			'alasan':{'nilai':reason,'error':'Empty Reason. Please input reason first..'},
+			'alasan':{'nilai':id_selia,'error':'Empty Penyelia. Please input penyelia first..'}
 		};
 		
 		
@@ -552,5 +648,6 @@ $this->load->view('include/side_menu');
 			$('#btnSaveBatch').html('<i class="glyphicon glyphicon-print"></i> Download');
 			$('#btnSaveBatch').attr('disabled', false);
 	});
+
 	
 </script>

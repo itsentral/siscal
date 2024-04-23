@@ -2,21 +2,20 @@
 $this->load->view('include/side_menu');
 ?>
 <form action="#" method="POST" id="form-proses" enctype="multipart/form-data">
-	<div class="box box-warning">
+	<div class="box box-primary box-cs01">
 		<div class="box-header">
-			<div class="box-tools pull-right">
+			<div class="box-tools pull-left">
 				<?php
-				echo "<button type='button' class='btn btn-md btn-danger' id='btn-back'> <i class='fa fa-angle-double-left'></i> BACK </button>&nbsp;&nbsp;&nbsp;";
+				echo "<button type='button' class='btn Btn-cs bg-red' id='btn-back'> <i class='fa fa-angle-double-left'></i>&nbsp; BACK &nbsp;&nbsp;</button>&nbsp;&nbsp;&nbsp;";
 				?>
 			</div>
 		</div>
 		<div class="box-body">
-			<div class="row">
-				<div class="col-sm-12 col-xs-12 text-center sub-heading" style="color:white;">
-					<h5><?php echo $title; ?></h5>
-				</div>
-
+			<div class="col-sm-12">
+				<h4 class="title-cs"><i class="fa fa-list fa-md"></i> <?php echo $title;?></h4>
+				<hr/>
 			</div>
+
 			<?php
 			if (empty($rows_header)) {
 				echo "<div class='row'>
@@ -27,7 +26,7 @@ $this->load->view('include/side_menu');
 			} else {
 
 			?>
-				<div class='row'>
+				<div class=''>
 					<div class="col-sm-6">
 						<div class="form-group">
 							<label class="control-label">SO No</label>
@@ -46,7 +45,7 @@ $this->load->view('include/side_menu');
 						</div>
 					</div>
 				</div>
-				<div class='row'>
+				<div class=''>
 					<div class="col-sm-6">
 						<div class="form-group">
 							<label class="control-label">Customer</label>
@@ -65,7 +64,7 @@ $this->load->view('include/side_menu');
 					</div>
 
 				</div>
-				<div class='row'>
+				<div class=''>
 					<div class="col-sm-6">
 						<div class="form-group">
 							<label class="control-label">PO No</label>
@@ -83,7 +82,7 @@ $this->load->view('include/side_menu');
 						</div>
 					</div>
 				</div>
-				<div class='row'>
+				<div class=''>
 					<div class="col-sm-6">
 						<div class="form-group">
 							<label class="control-label">Tgl SPK</label>
@@ -97,13 +96,13 @@ $this->load->view('include/side_menu');
 					</div>
 
 				</div>
-				<div class="row">
-					<div class="col-sm-12 col-xs-12 text-center sub-heading" style="color:white;">
-						<h5>PIC LAB CUSTOMER</h5>
-					</div>
-					<div class="col-sm-12 col-xs-12">&nbsp;</div>
+
+				<div class="col-sm-12">
+					<h4 class="title-cs"><i class="fa fa-user fa-md"></i> PIC LAB CUSTOMER</h4>
+					<hr/>
 				</div>
-				<div class='row'>
+
+				<div class=''>
 					<div class="col-sm-6">
 						<div class="form-group">
 							<label class="control-label">Name</label>
@@ -121,7 +120,7 @@ $this->load->view('include/side_menu');
 						</div>
 					</div>
 				</div>
-				<div class='row'>
+				<div class=''>
 					<div class="col-sm-6">
 						<div class="form-group">
 							<label class="control-label">Email</label>
@@ -135,17 +134,16 @@ $this->load->view('include/side_menu');
 					</div>
 				</div>
 
-				<div class="row">
-					<div class="col-sm-12 col-xs-12 text-center sub-heading" style="color:white;">
-						<h5>TOOL DETAIL</h5>
-					</div>
-					<div class="col-sm-12 col-xs-12">&nbsp;</div>
+				<div class="col-sm-12 text-left" style="margin-bottom:-10px;">
+					<h4 class="title-cs"><i class="fa fa-check-square-o fa-md"></i> <u>TOOL DETAIL</u></h4>
+					<hr/>
 				</div>
-				<div class="row">
-					<div class="col-sm-12" style="overflow-x:scroll !important;">
-						<table class="table table-striped table-bordered" id="my-grid">
-							<thead>
-								<tr style="background-color:#16697A !important;color:white !important;">
+
+				<div class="">
+				<div class="table-responsive col-sm-12" style="padding-bottom:65px;padding-top:10px;">
+						<table class="table table-striped table-bordered" id="my-grid" width="100%">
+							<thead style="background-color:#E9ECF9;color:#0A1A60;">
+								<tr>
 									<th class="text-center">Code</th>
 									<th class="text-center">Tool Name</th>
 									<th class="text-center">Range</th>
@@ -252,7 +250,7 @@ $this->load->view('include/side_menu');
 										echo "<td class='text-center'>" . $Real_Technician . "</td>";
 										echo "<td class='text-left'>" . $rows_Quot_Detail->descr . "</td>";
 										echo "<td class='text-left'>" . $Tool_Descr . "</td>";
-										echo "<td class='text-center'>" . $Template . $Add_Print . "</td>";
+										echo "<td class='wide text-center'>" . $Template . $Add_Print . "</td>";
 										echo "</tr>";
 									}
 								}
@@ -272,12 +270,12 @@ $this->load->view('include/side_menu');
 </form>
 <div class="modal fade" id="MyModalView" tabindex="-1" role="dialog" aria-labelledby="MyModal" data-backdrop="static">
 	<div class="modal-dialog" role="document" style="min-width:70% !important;">
-		<div class="modal-content">
+		<div class="modal-content modal-cs">
 			<div class="modal-header">
-				<h5 class="modal-title" id="MyModalTitle"></h5>
 				<button class="close" data-dismiss="modal" aria-label="close" id="btn-modal-close">
 					<span aria-hidden="true"><i class="fa fa-close"></i></span>
 				</button>
+				<h4 class="modal-title" id="MyModalTitle">UPDATE CALIBRATION</h4>
 			</div>
 			<div class="modal-body" id="MyModalDetail">
 
@@ -287,6 +285,71 @@ $this->load->view('include/side_menu');
 </div>
 <?php $this->load->view('include/footer'); ?>
 <style>
+/* Start Css Button */
+	.Btn-cs {
+		font-size: 14px;
+		padding: 7px;
+		margin: 4px;
+		margin-bottom: 0px !important;
+		border-radius: 8px;
+		width: auto;
+		border: none;
+		box-shadow: 0 1px 2px rgba(0,0,0,0.07), 
+                0 2px 4px rgba(0,0,0,0.07), 
+                0 4px 8px rgba(0,0,0,0.07), 
+                0 8px 16px rgba(0,0,0,0.07),
+                0 16px 32px rgba(0,0,0,0.07), 
+                0 32px 64px rgba(0,0,0,0.07);
+	}
+
+	.Btn-cs:hover {
+		color: white;
+		transition: all 150ms linear;
+		opacity: .88;
+	}
+	.Btn-cs1 {
+		background-color: #2F92E4;
+		color: white;
+	}
+	.Btn-cs2 {
+		background-color: #d9534f;
+		color: white;
+	}
+/* End Css Button */
+	.title-cs{
+		padding-top:20px;
+		font-weight: bold;
+	}
+	.box-cs01{
+		border-radius: 18px;
+		box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+	}
+	.modal-cs{
+		-webkit-border-radius: 20px !important;
+		-moz-border-radius: 20px !important;
+		border-radius: 20px !important; 
+	}
+
+	table.dataTable tbody td {
+		vertical-align: middle;
+	}
+	table.dataTable thead th {
+		text-align: center;
+		vertical-align: middle;
+	}
+
+	.dataTables_filter {
+		float: right !important;
+	}
+
+	.highlight {
+		color: #3c8dbc;
+		/* cursor: pointer; */
+	}
+
+	td.wide {
+		white-space: nowrap;;
+	}
 	.sub-heading {
 		border-radius: 5px;
 		background-color: #03506F;
@@ -319,11 +382,31 @@ $this->load->view('include/side_menu');
 	var active_controller = '<?php echo ($this->uri->segment(1)); ?>';
 	var _validFileExtensions = [".xls", ".xlsx", ".xlsm", ".xlsxm"];
 	var _validFileExtensions2 = [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".JPEG", ".JPG"];
+	var table;
+
 	$(document).ready(function() {
 
 		$('#btn-back').click(function() {
 			loading_spinner();
 			window.location.href = base_url + '/' + active_controller;
+		});
+
+		table = $('#my-grid').DataTable({
+			paging		: false,
+			ordering	: false,
+			//dom			: '<"top"f>rt<"bottom"lp><"clear">',
+			language	: {
+							// "search": "_INPUT_",
+							"searchPlaceholder": "Cari Tool Detail..."
+						},
+
+			fnDrawCallback: function(nRow, aData, iDisplayIndex) {
+				$('#my-grid tbody tr').hover(function() {
+					$(this).addClass('highlight');
+				}, function() {
+					$(this).removeClass('highlight');
+				});
+			}
 		});
 
 	});
@@ -438,12 +521,13 @@ $this->load->view('include/side_menu');
 				}
 			}
 
-			let Datet = $('#tgl_proses').val();
-			let TimeStart = $('#jam_awal').val();
-			let TimeEnd = $('#jam_akhir').val();
-			let ToolIdentify = $('#no_identifikasi').val();
-			let SerialNumber = $('#no_serial_number').val();
-			let Lampiran_File = $('#lampiran_kalibrasi').val();
+			let Datet 			= $('#tgl_proses').val();
+			let TimeStart 		= $('#jam_awal').val();
+			let TimeEnd 		= $('#jam_akhir').val();
+			let ToolIdentify 	= $('#no_identifikasi').val();
+			let SerialNumber 	= $('#no_serial_number').val();
+			let Lampiran_File 	= $('#lampiran_kalibrasi').val();
+			let Selia			= $('#id_selia').val();
 
 			if (Datet == null || Datet == '' || Datet == '-') {
 				swal({
@@ -509,6 +593,16 @@ $this->load->view('include/side_menu');
 				swal({
 					title: "Error Message !",
 					text: 'Empty Calibration result file. Please upload calibration result file first...',
+					type: "warning"
+				});
+				$('#btn-modal-close, #btn-process-reopen').prop('disabled', false);
+				return false;
+			}
+
+			if (Selia == null || Selia == '') {
+				swal({
+					title: "Error Message !",
+					text: 'Empty Penyelia. Please input penyelia first...',
 					type: "warning"
 				});
 				$('#btn-modal-close, #btn-process-reopen').prop('disabled', false);

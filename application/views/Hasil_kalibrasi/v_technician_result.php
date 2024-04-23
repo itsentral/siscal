@@ -2,7 +2,7 @@
 $this->load->view('include/side_menu'); 
 ?> 
 <form action="#" method="POST" id="form-proses" enctype="multipart/form-data">
-	<div class="box box-warning">
+	<div class="box box-primary box-cs01">
 		<div class="box-header">
 			<h4 class="box-title"><i class="fa fa-check-square"></i> <?php echo $title;?></h4>
 			
@@ -13,9 +13,10 @@ $this->load->view('include/side_menu');
 			<div id="Loading_tes" class="overlay_load">
 				<center>Please Wait . . .  &nbsp;<img src="<?php echo base_url('assets/img/loading_small.gif') ?>"></center>
 			</div>
+			<div class="table-responsive col-sm-12" style="padding-bottom:65px;padding-top:10px;">
 			<table id="my-grid" class="table table-bordered table-striped">
-				<thead>
-					<tr class="bg-blue">
+				<thead style="background-color:#E9ECF9;color:#0A1A60;">
+					<tr>
 						<th class="text-center">SO No</th>
 						<th class="text-center">SPK No</th>
 						<th class="text-center">SPK Date</th>				
@@ -31,6 +32,7 @@ $this->load->view('include/side_menu');
 				</tbody>
 				
 			</table>
+			</div>
 		</div>
 		
 		<!-- /.box-body -->
@@ -57,6 +59,17 @@ $this->load->view('include/side_menu');
 	}
 	.ui-datepicker-calendar{
 		display : none;
+	}
+	.box-cs01{
+		border-radius: 18px;
+		box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+	}
+	table.dataTable tbody td {
+		vertical-align: middle;
+	}
+	table.dataTable thead th {
+		text-align: center;
+		vertical-align: middle;
 	}
 </style>
 <script type="text/javascript">
