@@ -39,9 +39,9 @@ class M_toprint extends CI_Model
 		$this->db->join('trans_details', 'trans_data_details.trans_detail_id = trans_details.id');
 		$this->db->where('trans_data_details.status_selia', 'SELESAI');
 
-		if($siscalGroup != "1"){
-			$this->db->where('trans_data_details.id_selia', $Penyelia);
-		}
+		// if($siscalGroup != "1"){
+		// 	$this->db->where('trans_data_details.id_selia', $Penyelia);
+		// }
 		
 
 
