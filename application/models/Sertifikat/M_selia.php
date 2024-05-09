@@ -4,21 +4,25 @@ class M_selia extends CI_Model
 {
 
 	var $table 			= 'trans_data_details';
-	var $column_order 	= array('trans_data_details.id', 
+	var $column_order 	= array(null,
+								// 'trans_data_details.id', 
 								'trans_details.no_so', 
 								'trans_data_details.tool_name', 
 								'trans_data_details.no_identifikasi', 
 								'trans_data_details.no_serial_number', 
-								'trans_details.address_so', 
+								//'trans_details.address_so', 
 								null,
+								'trans_data_details.datet',
 								null); 
-	var $column_search 	= array('trans_data_details.id', 
+	var $column_search 	= array(
+								'trans_data_details.id', 
 								'trans_details.no_so', 
 								'trans_data_details.tool_name', 
 								'trans_data_details.no_identifikasi', 
 								'trans_data_details.no_serial_number', 
-								'trans_details.address_so'); 
-	var $order 			= array('trans_data_details.id' => 'asc');
+								'trans_details.address_so',
+								'trans_data_details.datet'); 
+	var $order 			= array('trans_data_details.datet' => 'asc');
 
 	public function __construct()
 	{
@@ -33,7 +37,7 @@ class M_selia extends CI_Model
 
 		$this->db->select('	trans_data_details.id, trans_details.no_so, trans_data_details.tool_name, 
 							trans_data_details.no_identifikasi, trans_data_details.no_serial_number, 
-							trans_details.address_so, trans_data_details.status_selia, trans_data_details.file_kalibrasi,
+							trans_details.address_so, trans_data_details.datet, trans_data_details.status_selia, trans_data_details.file_kalibrasi,
 							trans_data_details.modified_date');
 		$this->db->from($this->table);
 		$this->db->join('trans_details', 'trans_data_details.trans_detail_id = trans_details.id');
@@ -96,7 +100,7 @@ class M_selia extends CI_Model
 
 		$this->db->select('	trans_data_details.id, trans_details.no_so, trans_data_details.tool_name, 
 							trans_data_details.no_identifikasi, trans_data_details.no_serial_number, 
-							trans_details.address_so, trans_data_details.status_selia, trans_data_details.file_kalibrasi,
+							trans_details.address_so, trans_data_details.datet, trans_data_details.status_selia, trans_data_details.file_kalibrasi,
 							trans_data_details.modified_date');
 		$this->db->from($this->table);
 		$this->db->join('trans_details', 'trans_data_details.trans_detail_id = trans_details.id');
@@ -112,7 +116,8 @@ class M_selia extends CI_Model
 	{
 		$this->db->select('	trans_data_details.id, trans_details.no_so, trans_data_details.tool_name, 
 							trans_data_details.no_identifikasi, trans_data_details.no_serial_number, 
-							trans_details.address_so, trans_data_details.status_selia, trans_data_details.file_kalibrasi,
+							trans_details.address_so, trans_data_details.datet, trans_details.customer_name, trans_data_details.actual_teknisi_name, 
+							trans_data_details.status_selia, trans_data_details.file_kalibrasi,
 							trans_data_details.modified_date');
 		$this->db->from($this->table);
 		$this->db->join('trans_details', 'trans_data_details.trans_detail_id = trans_details.id');

@@ -52,7 +52,7 @@ class Toprint extends CI_Controller {
 				$Arr_Akses			= getAcccesmenu($controller);
 
 				$queryLate 	= "SELECT * FROM trans_data_detail_cals_file_log 
-							where trans_data_detail_id = '".$item->id."' AND status_selia = 'PENDING' 
+							where trans_data_detail_id = '".$item->id."' AND status_selia = 'SELESAI' 
 							ORDER BY id DESC LIMIT 1";
 				$rowsLate	= $this->db->query($queryLate)->result_array();
 
@@ -79,7 +79,7 @@ class Toprint extends CI_Controller {
 
 						<ul class="dropdown-menu pull-right">
 						<li><a href="'.$this->file_attachement.'hasil_kalibrasi/'.$item->file_kalibrasi.'" target="_blank"><i class="fa fa-download"></i>&nbsp; Unduh File</a></li>
-						<li><a href="javascript:void(0)" onClick="toprintData(' . "'" . $item->id . "'" . ');"><i class="fa fa-eye"></i>&nbsp; View Detail</a></li>
+						<li><a href="javascript:void(0)" onClick="toprintData(' . "'" . $item->id . "'" . ');"><i class="fa fa-print"></i>&nbsp; Print</a></li>
 						</ul>
 				  	</div>';
 
@@ -110,7 +110,7 @@ class Toprint extends CI_Controller {
 	function update_func_toprint(){
 		$sessionGet 	= $this->session->userdata('siscal_username');
 		$id				= $this->input->post('id');
-		$status_selia	= $this->input->post('status_selia');
+		$status_selia	= "PRINT";
 		$catatan_mt		= $this->input->post('catatan_mt');
 		$Created_By		= $this->session->userdata('siscal_userid');
 		$Created_Date	= date('Y-m-d H:i:s');
@@ -129,7 +129,7 @@ class Toprint extends CI_Controller {
 			'reopen_reason'			=> $rowsLog[0]['reopen_reason'],
 			'reopen_by'				=> $rowsLog[0]['reopen_by'],
 			'reopen_date'			=> $rowsLog[0]['reopen_date'],
-			'id_toprint'				=> $Created_By,
+			'id_selia'				=> $Created_By,
 			'status_selia'			=> $status_selia,
 			'catatan_mt'			=> $catatan_mt,
 			'created_date'			=> $Created_Date
@@ -155,12 +155,12 @@ class Toprint extends CI_Controller {
 			$this->db->trans_rollback();
 			$result['status'] 	= false;
 			$result['msg'] 		= 'Data gagal diupdate!';
-			history($sessionGet.' Update Selia Process Code '.$id.' - '.$Pesan_Error);
+			history($sessionGet.' Update ToPrint Process Code '.$id.' - '.$Pesan_Error);
 		}else{
 			$this->db->trans_commit();
 			$result['status'] 	= true;
 			$result['msg'] 		= 'Data berhasil diupdate!';
-			history($sessionGet.' Update Selia Process Code '.$id);
+			history($sessionGet.' Update ToPrint Process Code '.$id);
 		}
         echo json_encode($result);
     }

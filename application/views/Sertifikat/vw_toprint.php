@@ -64,7 +64,7 @@ $this->load->view('include/side_menu');
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 				<span aria-hidden="true"><i class="fa fa-close"></i></span></button>
-				<h4 class="modal-title">FORM SELIA</h4>
+				<h4 class="modal-title">CONFIRM UPDATE TO PRINT</h4>
 			</div>
 			<form action="#" id="formSelia" method="POST">
 			<div class="modal-body">
@@ -77,18 +77,10 @@ $this->load->view('include/side_menu');
 				</div>
 				<div class="form-group">
 					<label class="control-label">STATUS</label>
-					<select class="form-control" name="status_selia" id="status_selia" style="width:100%">
-						<option value="">==PILIH==</option>
-						<option value="REVISI">Revisi</option>
-						<option value="SELESAI">Selesai</option>
-					</select>
-				</div>
-				<div class="form-group">
-					<label class="control-label">CATATAN MT</label>
-					<textarea class="form-control input" name="catatan_mt" id ="catatan_mt" rows=4></textarea>
+					<input type="text" class="form-control input sm" value="PRINT" name="status_selia" id ="status_selia" readonly>
 					<span class="help-block"></span>
 				</div>
-
+				<text style="color:red;">*<i>data yang sudah diupdate akan hilang dari list table</i></text>
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn Btn-cs Btn-cs2" data-dismiss="modal"><i class="glyphicon glyphicon-remove"></i> <text id="closeModalSelia"></text></button>
@@ -332,7 +324,7 @@ function viewAddress(id) {
 	});
 }
 
-function seliaData(id) {
+function toprintData(id) {
 	$('#formSelia')[0].reset();
 	$('#kode').attr('readonly', true);
 
@@ -373,7 +365,7 @@ $("#formSelia").submit(async(e)=> {
 	}
 	var formData = new FormData($('#formSelia')[0]);
 	$.ajax({
-		url: "<?php echo site_url('selia/update_func_selia') ?>",
+		url: "<?php echo site_url('toprint/update_func_toprint') ?>",
 		type: "POST",
 		data: formData,
 		contentType: false,

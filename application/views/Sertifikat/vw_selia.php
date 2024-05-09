@@ -9,23 +9,26 @@ $this->load->view('include/side_menu');
 			<!-- <h4>Filter Data:</h4> -->
 		</div>
 		<div class="table-responsive col-sm-12" style="padding-bottom:65px;">
+		<form action="#" id="selectFile" method="POST">
 			<table id="table-cs" class="table table-bordered table-striped" width="100%">
 				<thead class="thead-cs" style="background-color:#E9ECF9;color:#0A1A60;">
 					<tr style="font-size: 13px;height: 50px;">
 						
-						<th width="13%">KODE</th>
-						<th width="13%">NO SO</th>
-						<th width="25%">NAMA ALAT</th>
+						<th width="1%"><input type="checkbox" id="chk_all" name="chk_all"></th>
+						<!-- <th width="13%">KODE</th> -->
+						<th width="18%">NO SO</th>
+						<th width="32%">NAMA ALAT</th>
 						<th width="10%">ID NUMBER</th>
-						<th width="10%">SERIAL NUMBER</th>
-						<th width="12%">ALAMAT SO</th>
-						<th width="7%">LATE</th>
+						<th width="10%">S/N NUMBER</th>
+						<th width="10%">DETAIL</th>
+						<th width="9%">LATE</th>
 						<th width="8%">ACTION</th>
 					</tr>
 				</thead>
-				<tbody>
+				<tbody id="list_selia">
 				</tbody>
 			</table>
+		</form>
 		</div>
 		<br/>
 		<br/>
@@ -38,11 +41,28 @@ $this->load->view('include/side_menu');
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 				<span aria-hidden="true"><i class="fa fa-close"></i></span></button>
-				<h4 class="modal-title">Alamat SO</h4>
+				<h4 class="modal-title">Detail Customer</h4>
 			</div>
 			<div class="modal-body">
 			<form action="#" id="formAddress" method="POST">
 				<div class="form-group">
+					<label>Code SCH</label>
+					<input class="form-control input" name="code_sch" id ="code_sch">
+					<span class="help-block"></span>
+				</div>
+				<div class="form-group">
+					<label>Nama Teknisi</label>
+					<input class="form-control input" name="tk_name" id ="tk_name">
+					<span class="help-block"></span>
+				</div>
+				<div class="form-group">
+					<label>Nama Customer</label>
+					<textarea class="form-control input" name="cs_name" id ="cs_name" rows=2>
+					</textarea>
+					<span class="help-block"></span>
+				</div>
+				<div class="form-group">
+					<label>Alamat SO</label>
 					<textarea class="form-control input" name="alamat_so" id ="alamat_so" rows=4>
 					</textarea>
 					<span class="help-block"></span>
@@ -51,7 +71,7 @@ $this->load->view('include/side_menu');
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn Btn-cs Btn-cs2" data-dismiss="modal"><i class="glyphicon glyphicon-remove"></i> <text id="closeModal"></text></button>
-				<button type="button" class="btn Btn-cs Btn-cs1" id="btnCopy" onClick="BtnCopy();"><i class="fa fa-copy"></i> Copy</button>
+				<button type="button" class="btn Btn-cs Btn-cs1" id="btnCopy" onClick="BtnCopy();"><i class="fa fa-copy"></i> Copy Alamat</button>
 			</div>	
 			</form>
 		</div>
@@ -76,13 +96,20 @@ $this->load->view('include/side_menu');
 					<span class="help-block"></span>
 				</div>
 				<div class="form-group">
-					<label class="control-label">STATUS</label>
+					<label class="control-label">STATUS<text style="color:red;">*</text></label>
 					<select class="form-control" name="status_selia" id="status_selia" style="width:100%">
 						<option value="">==PILIH==</option>
 						<option value="REVISI">Revisi</option>
 						<option value="SELESAI">Selesai</option>
 					</select>
 				</div>
+
+				<div class="form-group fileSelia">
+					<label class="control-label">File Selia<text style="color:red;">*</text></label>
+					<input type="file" class="form-control input sm" name="file_selia_1" id ="file_selia_1">
+					<span class="help-block"></span>
+				</div>
+
 				<div class="form-group">
 					<label class="control-label">CATATAN MT</label>
 					<textarea class="form-control input" name="catatan_mt" id ="catatan_mt" rows=4></textarea>
@@ -93,6 +120,30 @@ $this->load->view('include/side_menu');
 			<div class="modal-footer">
 				<button type="button" class="btn Btn-cs Btn-cs2" data-dismiss="modal"><i class="glyphicon glyphicon-remove"></i> <text id="closeModalSelia"></text></button>
 				<button type="submit" class="btn Btn-cs Btn-cs1" id="btnSave"><i class="fa fa-save"></i> Update</button>
+			</div>	
+			</form>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="FormModalUpload" tabindex="-1" role="dialog" aria-labelledby="FormModal" data-backdrop="static">
+	<div class="modal-dialog modal-dialog-centered" style="min-width:60% !important;">
+		<div class="modal-content modal-cs">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+				<span aria-hidden="true"><i class="fa fa-close"></i></span></button>
+				<h4 class="modal-title">Upload File Selia</h4>
+			</div>
+			<form action="#" id="formUpload" method="POST">
+			<div class="modal-body">
+
+				<div id="fileUpload"></div>
+				<br/>
+				<text style="color:red;">*<i>data yang akan diupload akan hilang dari list table dan dianggap telah diselia</i></text>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn Btn-cs Btn-cs2" data-dismiss="modal"><i class="glyphicon glyphicon-remove"></i> Close</button>
+				<button type="submit" class="btn Btn-cs Btn-cs1" id="btnUpload"><i class="fa fa-upload"></i> Upload</button>
 			</div>	
 			</form>
 		</div>
@@ -136,6 +187,12 @@ $this->load->view('include/side_menu');
 	.Btntable1 {
 		background-color: #2F92E4 !important;
 		color: white !important;
+		width: 105px;
+	}
+	.Btntable2 {
+		background-color: #FFAC05 !important;
+		color: white !important;
+		width: 95px;
 	}
 
 /* End Css Table */
@@ -162,6 +219,7 @@ $this->load->view('include/side_menu');
 		opacity: .88;
 	}
 	.Btn-cs1 {
+		width: auto;
 		background-color: #2F92E4;
 		color: white;
 	}
@@ -199,20 +257,35 @@ $this->load->view('include/side_menu');
 		border-radius: 20px !important; 
 	}
 /* End Css Modal */
+	.inputfileUpload{
+		display: none;
+	}
 </style>
 
 
 <?php $this->load->view('include/footer'); ?>
-
 <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
+<link rel="stylesheet" href="<?php echo base_url("assets/fileUpload/fileUpload.css")?>">
 <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+<!-- <script src="<?php echo base_url("assets/fileUpload/fileUpload.js")?>"></script> -->
 <script>
 var table;
 var save_method;
+
+$(function() {
+    $('.fileSelia').hide(); 
+    $('#status_selia').change(function(){
+        if($('#status_selia').val() == 'SELESAI') {
+            $('.fileSelia').show(); 
+        } else {
+            $('.fileSelia').hide(); 
+        } 
+    });
+});
 
 $(document).ready(function() {
 	const today = new Date();
@@ -260,27 +333,37 @@ $(document).ready(function() {
 								className: "Btntable reload-table",
 							},
 							
+							// {
+							// 	extend: 'excelHtml5',
+							// 	text:      '<i class="fa fa-download fa-lg"></i> &nbsp;<b>Excel</b>',
+							// 	titleAttr: 'Excel',
+							// 	className: "Btntable",
+							// 	title: 'Master Alat Kalibrasi - Data Per '+formattedToday,
+							// 	messageTop: 'SISCAL DASHBOARD',
+							// 	exportOptions: {
+							// 			columns: [0,1,2,3,4,5]
+							// 	}
+							// },
+
 							{
-								extend: 'excelHtml5',
-								text:      '<i class="fa fa-download fa-lg"></i> &nbsp;<b>Excel</b>',
-								titleAttr: 'Excel',
-								className: "Btntable",
-								title: 'Master Alat Kalibrasi - Data Per '+formattedToday,
-								messageTop: 'SISCAL DASHBOARD',
-								exportOptions: {
-										columns: [0,1,2,3,4,5]
-								}
+								text:      '<i class="fa fa-download fa-lg"></i> &nbsp;<b>Download</b>',
+								className: "Btntable Btntable1 saveFile",
+							},
+
+							{
+								text:      '<i class="fa fa-upload fa-lg"></i> &nbsp;<b>Upload</b>',
+								className: "Btntable Btntable2 uploadFile",
 							},
 
 						],
 
 		columnDefs	: [ 
 							{
-								"targets": [ 0,1,3,4,5,6,7 ],
+								"targets": [ 1,3,4,5,6,7 ],
 								"className": 'text-center',
 							}, 
 							{
-								"targets": [ 7 ],
+								"targets": [ 0,5,7 ],
 								"orderable": false,
 							}, 
 						],
@@ -312,8 +395,86 @@ $(document).ready(function() {
 
 });
 
-function viewAddress(id) {
+$(document).on('click', '#chk_all', () => {
+	if ($('#chk_all').is(':checked')) {
+		$('#list_selia input[type="checkbox"]').prop('checked', true);
+	} else {
+		$('#list_selia input[type="checkbox"]').prop('checked', false);
+	}
+});
+
+$(document).on("click", ".saveFile", function (e) {
+	e.preventDefault();
+
+	let slct = $('#list_selia').find('input[type="checkbox"]:checked').length;
+
+	if (parseInt(slct) <= 0 || slct == '') {
+		swal({
+			title: "Warning !",
+			text: 'No record was selected. Please choose at least one record....',
+			type: "warning"
+		});
+		return false;
+	}
+	
+	const ChosenOrder = [];
+	
+	$('#list_selia').find('input[type="checkbox"]:checked').each(function() {
+		ChosenOrder.push($(this).val());
+	});
+
+	let CodeTerpilih = ChosenOrder.join('^');
+
+	let Link_Process = base_url + '/' + active_controller + '/downloadFile?checkID=' + encodeURIComponent(CodeTerpilih);
+	window.location.href = Link_Process;
+	
+	
+	// else{
+	// 	$('.saveFile').html('<i class="fa fa-download fa-lg"></i> &nbsp;<b>Loading...</b>');
+	// 	$('.saveFile').attr('disabled', true);
+
+	// 	var formData = new FormData($('#selectFile')[0]);
+	// 	$.ajax({
+	// 		url: "<?php echo site_url('selia/downloadFile') ?>",
+	// 		type: "POST",
+	// 		data: formData,
+	// 		processData: false,
+    //    	 	contentType: false,
+	// 		success: function(data) {
+				
+	// 			alert(data.msg);
+	// 			$('.saveFile').html('<i class="fa fa-download fa-lg"></i> &nbsp;<b>Download</b>');
+	// 			$('.saveFile').attr('disabled', false);
+	// 			table.ajax.reload(null, false);
+
+
+	// 		},
+	// 		error: function(jqXHR, textStatus, errorThrown) {
+	// 			alert('Download gagal, hubungin Administrator!');
+	// 			$('.saveFile').html('<i class="fa fa-download fa-lg"></i> &nbsp;<b>Download</b>');
+	// 			$('.saveFile').attr('disabled', false);
+	// 			table.ajax.reload(null, false);
+
+	// 		}
+	// 	});
+	// }
+});
+
+$(document).on("click", ".uploadFile", function (e) {
+	e.preventDefault();
+	
+	$('#formUpload')[0].reset();
+
+	$('#FormModalUpload').modal('show');
+	
+
+});
+
+function viewDetail(id) {
 	$('#formAddress')[0].reset();
+	$('#code_sch').attr('readonly', true);
+	$('#tk_name').attr('readonly', true);
+	$('#cs_name').attr('readonly', true);
 	$('#alamat_so').attr('readonly', true);
 
 	$.ajax({
@@ -321,6 +482,9 @@ function viewAddress(id) {
 		type: "GET",
 		dataType: "JSON",
 		success: function(data) {
+			$('[name="code_sch"]').val(data.id);
+			$('[name="tk_name"]').val(data.actual_teknisi_name);
+			$('[name="cs_name"]').val(data.customer_name);
 			$('[name="alamat_so"]').val(data.address_so);
 			$('#closeModal').text('Close');
 			$('#FormModal').modal('show');
@@ -335,6 +499,7 @@ function viewAddress(id) {
 function seliaData(id) {
 	$('#formSelia')[0].reset();
 	$('#kode').attr('readonly', true);
+	$('.fileSelia').hide();
 
 	$.ajax({
 		url: "<?php echo site_url('selia/getById') ?>/" + id,
@@ -359,9 +524,20 @@ $("#formSelia").submit(async(e)=> {
 	$('#btnSave').attr('disabled', true);
 
 	let status_selia	= $('#status_selia').val();
-	const ValueCheck	= {
-		'status_selia':{'nilai':status_selia,'error':'Empty Status. Please input reason first..'}
-	};
+	let file_selia		= $('#file_selia_1').val();
+
+	var ValueCheck;
+	
+	if(status_selia == 'SELESAI'){
+		ValueCheck	= {
+			'status_selia':{'nilai':status_selia,'error':'Empty Status. Please input reason first..'},
+			'file_selia_1':{'nilai':file_selia,'error':'Empty File Selia. Please input reason first..'}
+		};
+	}else{
+		ValueCheck	= {
+			'status_selia':{'nilai':status_selia,'error':'Empty Status. Please input reason first..'}
+		};
+	}
 
 	try{
 		const ResultCheck	= await GeneralCheckEmptyValue(ValueCheck);
@@ -389,15 +565,69 @@ $("#formSelia").submit(async(e)=> {
 			} else {
 				alert(data.msg);
 			}
-			$('#btnSave').text('simpan');
+			$('#btnSave').html('<i class="fa fa-save"></i> Update');
 			$('#btnSave').attr('disabled', false);
 
 
 		},
 		error: function(jqXHR, textStatus, errorThrown) {
 			alert('Error adding / update data');
-			$('#btnSave').text('simpan');
+			$('#btnSave').html('<i class="fa fa-save"></i> Update');
 			$('#btnSave').attr('disabled', false);
+
+		}
+	});
+});
+
+$("#formUpload").submit(async(e)=> {
+	e.preventDefault();
+
+	$('#btnUpload').html('<i class="fa fa-spinner"></i> Uploading...');
+	$('#btnUpload').attr('disabled', true);
+
+	let file_seliaBatch		= $('#fileUpload-1').val();
+
+	var ValueCheck;
+	
+	ValueCheck	= {
+		'file_selia_batch':{'nilai':file_seliaBatch,'error':'Empty File Selia. Please input reason first..'}
+	};
+
+	try{
+		const ResultCheck	= await GeneralCheckEmptyValue(ValueCheck);
+	}catch(error){
+		GeneralShowMessageError('error',error.message);
+		$('#btnUpload').html('<i class="fa fa-upload"></i> Upload');
+		$('#btnUpload').attr('disabled', false);
+		return false;
+	}
+	var formDataBatch = new FormData($('#formUpload')[0]);
+	$.ajax({
+		url: "<?php echo site_url('selia/upload_seliaBatch') ?>",
+		type: "POST",
+		data: formDataBatch,
+		contentType: false,
+		processData: false,
+		dataType: "JSON",
+		success: function(data) {
+
+			if (data.status)
+			{
+				$('#FormModalUpload').modal('hide');
+				alert(data.msg);
+				reload_table();
+			} else {
+				alert(data.msg);
+			}
+			$('#btnUpload').html('<i class="fa fa-upload"></i> Upload');
+			$('#btnUpload').attr('disabled', false);
+
+
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			alert('Error adding / upload data');
+			$('#btnUpload').html('<i class="fa fa-upload"></i> Upload');
+			$('#btnUpload').attr('disabled', false);
 
 		}
 	});
@@ -430,4 +660,123 @@ function BtnCopy() {
 function reload_table() {
 	table.ajax.reload(null, false);
 }
+
+
+//FUNGSI DRAG & DROP FILE
+(function ($) {
+	var fileUploadCount = 0;
+
+	$.fn.fileUpload = function () {
+		return this.each(function () {
+			var fileUploadDiv = $(this);
+			var fileUploadId = `fileUpload-${++fileUploadCount}`;
+
+			var fileDivContent = `
+                <label for="${fileUploadId}" class="file-upload">
+                    <div>
+                        <i class="fa fa-cloud-upload"></i> 
+						<text style="font-size:28px;" class="ya">Upload File Selia</text>
+                        <p>Drag & Drop Files Here</p>
+                        <span>OR</span>
+                        <div>Browse Files</div>
+						<div class="inputfileUpload">
+							<input type="file" id="${fileUploadId}" class="" name=file_selia_batch[] multiple="multiple" hidden />
+						</div>
+                    	
+					</div>
+                </label>
+            `;
+
+			fileUploadDiv.html(fileDivContent).addClass("file-container");
+
+			var table = null;
+			var tableBody = null;
+
+			function createTable() {
+				table = $(`
+                    <table>
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th style="width: 60%;">File Name</th>
+                                <!--<th>Preview</th>-->
+                                <th style="width: 30%;">Size</th>
+                                <!--<th>Type</th>-->
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                `);
+
+				tableBody = table.find("tbody");
+				fileUploadDiv.append(table);
+			}
+
+			function handleFiles(files) {
+				if (!table) {
+					createTable();
+				}
+
+				tableBody.empty();
+				if (files.length > 0) {
+					$.each(files, function (index, file) {
+						var fileName = file.name;
+						var fileSize = (file.size / 1024).toFixed(2) + " KB";
+						var fileType = file.type;
+						var preview = fileType.startsWith("image")
+							? `<img src="${URL.createObjectURL(
+									file
+							  )}" alt="${fileName}" height="30">`
+							: `<i class="fa fa-eye-slash">None</i>`;
+
+						tableBody.append(`
+                            <tr>
+                                <td>${index + 1}</td>
+                                <td>${fileName}</td>
+                                <!--<td>${preview}</td>-->
+                                <td>${fileSize}</td>
+                                <!--<td>${fileType}</td>-->
+                                <td><button type="button" class="deleteBtn"><i class="fa fa-trash"></i></button></td>
+                            </tr>
+                        `);
+					});
+
+					tableBody.find(".deleteBtn").click(function () {
+						$(this).closest("tr").remove();
+
+						if (tableBody.find("tr").length === 0) {
+							tableBody.append(
+								'<tr><td colspan="6" class="no-file">No files selected!</td></tr>'
+							);
+						}
+					});
+				}
+			}
+
+			// Events triggered after dragging files.
+			fileUploadDiv.on({
+				dragover: function (e) {
+					e.preventDefault();
+					fileUploadDiv.toggleClass("dragover", e.type === "dragover");
+				},
+				drop: function (e) {
+					e.preventDefault();
+					fileUploadDiv.removeClass("dragover");
+					handleFiles(e.originalEvent.dataTransfer.files);
+				},
+			});
+
+			// Event triggered when file is selected.
+			fileUploadDiv.find(`#${fileUploadId}`).change(function () {
+				handleFiles(this.files);
+			});
+		});
+	};
+})(jQuery);
+
+$(document).ready(function () {
+	$("#fileUpload").fileUpload();
+});
 </script>
