@@ -463,9 +463,24 @@ $(document).on("click", ".saveFile", function (e) {
 $(document).on("click", ".uploadFile", function (e) {
 	e.preventDefault();
 	
-	$('#formUpload')[0].reset();
+	var userGroup = '<?php echo $this->session->userdata('siscal_group_id');?>';
+	if(userGroup=='1' || userGroup=='10'){
+		const file = document.querySelector('.fileUploadBatch');
+            		 file.value = '';
 
-	$('#FormModalUpload').modal('show');
+		$(".fileList > tbody").empty();
+		
+		if ($(".fileList > tbody").find("tr").length === 0) {
+			$(".fileList > tbody").append(
+				'<tr><td colspan="6" class="no-file">No files selected!</td></tr>'
+			);
+		}
+
+		$('#formUpload')[0].reset();
+		$('#FormModalUpload').modal('show')
+	}else{
+		alert('Mohon Maaf fitur ini hanya bisa digunakan oleh MT!');
+	}
 	
 
 });
@@ -588,9 +603,9 @@ $("#formUpload").submit(async(e)=> {
 	let file_seliaBatch		= $('#fileUpload-1').val();
 
 	var ValueCheck;
-	
+
 	ValueCheck	= {
-		'file_selia_batch':{'nilai':file_seliaBatch,'error':'Empty File Selia. Please input reason first..'}
+		'file_selia_batch':{'nilai':file_seliaBatch,'error':'File Selia Kosong, Mohon upload File untuk Update data Selia Anda...'}
 	};
 
 	try{
@@ -676,11 +691,11 @@ function reload_table() {
                     <div>
                         <i class="fa fa-cloud-upload"></i> 
 						<text style="font-size:28px;" class="ya">Upload File Selia</text>
-                        <p>Drag & Drop Files Here</p>
-                        <span>OR</span>
+                        <!--<p>Drag & Drop Files Here</p>-->
+                        <!--<span>OR</span>-->
                         <div>Browse Files</div>
 						<div class="inputfileUpload">
-							<input type="file" id="${fileUploadId}" class="" name=file_selia_batch[] multiple="multiple" hidden />
+							<input type="file" id="${fileUploadId}" class="fileUploadBatch" name=file_selia_batch[] multiple="multiple" hidden />
 						</div>
                     	
 					</div>
@@ -694,7 +709,7 @@ function reload_table() {
 
 			function createTable() {
 				table = $(`
-                    <table>
+                    <table class="fileList">
                         <thead>
                             <tr>
                                 <th></th>
@@ -702,7 +717,7 @@ function reload_table() {
                                 <!--<th>Preview</th>-->
                                 <th style="width: 30%;">Size</th>
                                 <!--<th>Type</th>-->
-                                <th></th>
+                                <--<th></th>-->
                             </tr>
                         </thead>
                         <tbody>
@@ -738,7 +753,7 @@ function reload_table() {
                                 <!--<td>${preview}</td>-->
                                 <td>${fileSize}</td>
                                 <!--<td>${fileType}</td>-->
-                                <td><button type="button" class="deleteBtn"><i class="fa fa-trash"></i></button></td>
+                                <!--<td><button type="button" class="deleteBtn"><i class="fa fa-trash"></i></button></td>-->
                             </tr>
                         `);
 					});
