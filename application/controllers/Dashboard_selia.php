@@ -11,7 +11,7 @@ class Dashboard_selia extends CI_Controller {
 
 		$this->load->model('Sertifikat/M_dashboard_selia', 'Dashboardselia');
 
-		$this->folder	='View_dashboard/';
+		$this->folder	='view_dashboard/';
 		$this->file_attachement	= $this->config->item('link_file');
 		$this->file_loc			= $this->config->item('location_file');
 	}
