@@ -690,7 +690,7 @@ function reload_table() {
                 <label for="${fileUploadId}" class="file-upload">
                     <div>
                         <i class="fa fa-cloud-upload"></i> 
-						<text style="font-size:28px;" class="ya">Upload File Selia</text>
+						<text style="font-size:26px;" class="ya">Upload File Selia</text>
                         <!--<p>Drag & Drop Files Here</p>-->
                         <!--<span>OR</span>-->
                         <div>Browse Files</div>
@@ -717,7 +717,7 @@ function reload_table() {
                                 <!--<th>Preview</th>-->
                                 <th style="width: 30%;">Size</th>
                                 <!--<th>Type</th>-->
-                                <--<th></th>-->
+                                <!--<th></th>-->
                             </tr>
                         </thead>
                         <tbody>

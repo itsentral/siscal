@@ -49,7 +49,8 @@
 		.navbar{
 			border-radius: 0px 0px 30px 0px !important;
 			background: rgba(255, 255, 255, 0.1) !important;
-			backdrop-filter: blur(15px) !important;
+			backdrop-filter: blur(1rem);
+    		-webkit-backdrop-filter: blur(1rem);
 			box-shadow: 0 15px 25px rgba(0, 0, 0, 0.1) !important;
 		}
 		.logo{
