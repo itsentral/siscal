@@ -8,7 +8,11 @@ $Nama_APP		= $Split_Beda[$Jum_Beda - 2];
 //echo"<pre>";print_r($Split_Beda);exit;
 
 //Pembaharuan Boy
-$this->load->library('MPDF57/mpdf');
+//$this->load->library('MPDF57/mpdf');
+
+include $sroot.'/Siscal_Dashboard/application/libraries/MPDF57/mpdf.php';
+
+$directory_file	= $sroot.'/assets/file/';
 $img_file	= base_url().'/assets/img/logo.jpg';
 $img_file2  = base_url().'/assets/img/line.jpg';
 
