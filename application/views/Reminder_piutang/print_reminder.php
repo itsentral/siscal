@@ -1,37 +1,28 @@
 <?php
-//set_time_limit(0);
+set_time_limit(0);
 $sroot 			= $_SERVER['DOCUMENT_ROOT'];
 $data_url		= base_url();
 $Split_Beda		= explode('/',$data_url);
 $Jum_Beda		= count($Split_Beda);
 $Nama_APP		= $Split_Beda[$Jum_Beda - 2];
 //echo"<pre>";print_r($Split_Beda);exit;
-
-//Pembaharuan Boy
-include $sroot."/application/libraries/MPDF57/mpdf.php";
-//$this->load->library('MPDF57/mpdf');
-//$directory_file	= $sroot.'/assets/file/';
-
-
-//OLD
-// $directory_file	= $sroot.'/assets/file/';
-// if(file_exists($sroot."/application/libraries/MPDF57/mpdf.php")){
-// 	include $sroot."/application/libraries/MPDF57/mpdf.php";
-// 	$img_file	= $sroot.'/assets/img/logo.jpg';
-// 	$img_file2 = $sroot.'/assets/img/line.jpg';
-// }else{
-// 	include $sroot."/".$Nama_APP."/application/libraries/MPDF57/mpdf.php";
-// 	$directory_file	= $sroot."/".$Nama_APP.'/assets/file/';
-// 	$img_file		= $sroot."/".$Nama_APP.'/assets/img/logo.jpg';
-// 	$img_file2 		= $sroot."/".$Nama_APP.'/assets/img/line.jpg';
-// }
-
+$directory_file	= $sroot.'/assets/file/';
+if(file_exists($sroot."/application/libraries/MPDF57/mpdf.php")){
+	include $sroot."/application/libraries/MPDF57/mpdf.php";
+	// $img_file	= $sroot.'/assets/img/logo.jpg';
+	// $img_file2 = $sroot.'/assets/img/line.jpg';
+}else{
+	include $sroot."/".$Nama_APP."/application/libraries/MPDF57/mpdf.php";
+	$directory_file	= $sroot."/".$Nama_APP.'/assets/file/';
+	// $img_file		= $sroot."/".$Nama_APP.'/assets/img/logo.jpg';
+	// $img_file2 		= $sroot."/".$Nama_APP.'/assets/img/line.jpg';
+}
 $mpdf		= new mPDF('utf-8', 'A4');
 $ArrBulan	= array(1=>'Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','Nopember','Desember');
 ob_start();
-$directory_file	= base_url().'/assets/file/';
-$img_file	= base_url().'/assets/img/logo.jpg';
-$img_file2  = base_url().'/assets/img/line.jpg';
+
+$img_file		= base_url('/assets/img/logo.jpg');
+$img_file2 		= base_url('/assets/img/line.jpg');
 
 if($type_file=='D'){
 	$File_Name	= $rows_header[0]->id;
