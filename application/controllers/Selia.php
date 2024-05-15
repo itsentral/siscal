@@ -327,7 +327,7 @@ class Selia extends CI_Controller {
 		$Has_Ins_Log	= $this->db->insert_batch('trans_data_detail_cals_file_log',$insert_log);
 
 		//if($uploadSelia != "NOT"){
-		if($cekFile == 'NOT'){
+		if($cekFile == 'YES'){
 			if($Has_Upd_Trans == TRUE && $Has_Ins_Log == TRUE){
 				$Pesan_Error	= '';
 			}else{
