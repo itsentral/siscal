@@ -8,7 +8,8 @@ $Nama_APP		= $Split_Beda[$Jum_Beda - 2];
 //echo"<pre>";print_r($Split_Beda);exit;
 
 //Pembaharuan Boy
-$this->load->library('MPDF57/mpdf');
+include $sroot."/application/libraries/MPDF57/mpdf.php";
+//$this->load->library('MPDF57/mpdf');
 //$directory_file	= $sroot.'/assets/file/';
 
 
@@ -24,6 +25,7 @@ $this->load->library('MPDF57/mpdf');
 // 	$img_file		= $sroot."/".$Nama_APP.'/assets/img/logo.jpg';
 // 	$img_file2 		= $sroot."/".$Nama_APP.'/assets/img/line.jpg';
 // }
+
 $mpdf		= new mPDF('utf-8', 'A4');
 $ArrBulan	= array(1=>'Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','Nopember','Desember');
 ob_start();
@@ -583,5 +585,5 @@ $mpdf->WriteHTML($html);
 
 $mpdf->Output($File_Name.".pdf" ,$tipe_file);
 //$mpdf->Error();
-exit;
+//exit;
 ?>
