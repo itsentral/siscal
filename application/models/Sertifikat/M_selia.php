@@ -41,6 +41,7 @@ class M_selia extends CI_Model
 							trans_data_details.modified_date');
 		$this->db->from($this->table);
 		$this->db->join('trans_details', 'trans_data_details.trans_detail_id = trans_details.id');
+		$this->db->where('trans_data_details.flag_proses', 'Y');
 		$this->db->where('trans_data_details.status_selia', 'PENDING');
 
 		if($siscalGroup != "1"){
@@ -104,6 +105,7 @@ class M_selia extends CI_Model
 							trans_data_details.modified_date');
 		$this->db->from($this->table);
 		$this->db->join('trans_details', 'trans_data_details.trans_detail_id = trans_details.id');
+		$this->db->where('trans_data_details.flag_proses', 'Y');
 		$this->db->where('trans_data_details.status_selia', 'PENDING');
 
 		if($siscalGroup != "1"){
