@@ -5,21 +5,25 @@ class M_selia extends CI_Model
 
 	var $table 			= 'trans_data_details';
 	var $column_order 	= array(null,
-								// 'trans_data_details.id', 
+								'trans_data_details.id', 
+								'trans_details.customer_name', 
+								'trans_details.address_so', 
 								'trans_details.no_so', 
 								'trans_data_details.tool_name', 
 								'trans_data_details.no_identifikasi', 
-								'trans_data_details.no_serial_number', 
-								//'trans_details.address_so', 
-								null,
+								'trans_data_details.no_serial_number',
+								'trans_data_details.actual_teknisi_name', 
 								'trans_data_details.datet',
 								null); 
 	var $column_search 	= array(
 								'trans_data_details.id', 
+								'trans_details.customer_name', 
+								'trans_details.address_so',
 								'trans_details.no_so', 
 								'trans_data_details.tool_name', 
 								'trans_data_details.no_identifikasi', 
-								'trans_data_details.no_serial_number', 
+								'trans_data_details.no_serial_number',
+								'trans_data_details.actual_teknisi_name', 
 								'trans_details.address_so',
 								'trans_data_details.datet'); 
 	var $order 			= array('trans_data_details.datet' => 'asc');
@@ -37,12 +41,14 @@ class M_selia extends CI_Model
 
 		$this->db->select('	trans_data_details.id, trans_details.no_so, trans_data_details.tool_name, 
 							trans_data_details.no_identifikasi, trans_data_details.no_serial_number, 
-							trans_details.address_so, trans_data_details.datet, trans_data_details.status_selia, trans_data_details.file_kalibrasi,
+							trans_details.address_so, trans_data_details.datet, trans_details.customer_name, trans_data_details.actual_teknisi_name,
+							trans_data_details.status_selia, trans_data_details.file_kalibrasi,
 							trans_data_details.modified_date');
 		$this->db->from($this->table);
 		$this->db->join('trans_details', 'trans_data_details.trans_detail_id = trans_details.id');
 		$this->db->where('trans_data_details.flag_proses', 'Y');
 		$this->db->where('trans_data_details.status_selia', 'PENDING');
+		$this->db->where('trans_data_details.approve_certificate !=', 'APV');
 
 		if($siscalGroup != "1"){
 			$this->db->where('trans_data_details.id_selia', $Penyelia);
@@ -101,12 +107,14 @@ class M_selia extends CI_Model
 
 		$this->db->select('	trans_data_details.id, trans_details.no_so, trans_data_details.tool_name, 
 							trans_data_details.no_identifikasi, trans_data_details.no_serial_number, 
-							trans_details.address_so, trans_data_details.datet, trans_data_details.status_selia, trans_data_details.file_kalibrasi,
+							trans_details.address_so, trans_data_details.datet, trans_details.customer_name, trans_data_details.actual_teknisi_name,
+							trans_data_details.status_selia, trans_data_details.file_kalibrasi,
 							trans_data_details.modified_date');
 		$this->db->from($this->table);
 		$this->db->join('trans_details', 'trans_data_details.trans_detail_id = trans_details.id');
 		$this->db->where('trans_data_details.flag_proses', 'Y');
 		$this->db->where('trans_data_details.status_selia', 'PENDING');
+		$this->db->where('trans_data_details.approve_certificate !=', 'APV');
 
 		if($siscalGroup != "1"){
 			$this->db->where('trans_data_details.id_selia', $Penyelia);
@@ -118,7 +126,7 @@ class M_selia extends CI_Model
 	{
 		$this->db->select('	trans_data_details.id, trans_details.no_so, trans_data_details.tool_name, 
 							trans_data_details.no_identifikasi, trans_data_details.no_serial_number, 
-							trans_details.address_so, trans_data_details.datet, trans_details.customer_name, trans_data_details.actual_teknisi_name, 
+							trans_details.address_so, trans_data_details.datet, trans_details.customer_name, trans_data_details.actual_teknisi_name,
 							trans_data_details.status_selia, trans_data_details.file_kalibrasi,
 							trans_data_details.modified_date');
 		$this->db->from($this->table);

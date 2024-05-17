@@ -62,29 +62,35 @@ class Selia extends CI_Controller {
 				$terlambat = date_diff($t, $n);
 				$lateday = $terlambat->d.' hari';
 
+				$id_sn = '';
+				if($item->no_identifikasi == '' || $item->no_identifikasi == '0'){
+					$id_sn = 'SN('.$item->no_serial_number.')';
+				}elseif($item->no_serial_number == '' || $item->no_serial_number == '0'){
+					$id_sn = 'ID('.$item->no_identifikasi.')';
+				}else{
+					$id_sn = 'SN('.$item->no_serial_number.')__ID('.$item->no_identifikasi.')';
+				}
+
+				$renameFile = strtoupper($item->actual_teknisi_name).'__'.$item->customer_name.'__'.$item->tool_name.'__'.$id_sn;
+
 				$row[] = '<input type="checkbox" id="checkID_' . $item->id . '" name="checkID[]" value="' . $item->file_kalibrasi . '">';
-				//$row[] = $item->id;
+				$row[] = $item->id;
+				$row[] = $item->customer_name;
+				$row[] = $item->address_so;
 				$row[] = $item->no_so;
 				$row[] = $item->tool_name;
 				$row[] = $item->no_identifikasi;
 				$row[] = $item->no_serial_number;
-				$row[] = '<a href="#" href="javascript:void(0)" onClick="viewDetail(' . "'" . $item->id . "'" . ');" class="btn"><i class="fa fa-eye"></i> <b>View Detail</b></a>';
-				//$row[] = '<span class="badge bg-red">'.$item->status_selia.'</span>';
+				$row[] = $item->actual_teknisi_name;
+				//$row[] = '<a href="#" href="javascript:void(0)" onClick="viewDetail(' . "'" . $item->id . "'" . ');" class="btn"><i class="fa fa-eye"></i> <b>View Detail</b></a>';
 				$row[] = '<span class="badge bg-red">'.$lateday.'</span><p style="font-size:10px;">Tgl: '.$item->datet.'</p>';
 				
 				if($Arr_Akses['create'] =='1'){
-					$row[] = '
-					<div class="btn-group">
-						<button type="button" class="btn btn-warning btn-sm dropdown-toggle" data-toggle="dropdown" aria-expanded="true"><text style="font-weight: 600;letter-spacing: 0.3px;">Actions </text>
-							<span class="fa fa-caret-down"></span>
-						</button>
+					// $row[] = '<a href="'.$this->file_attachement.'hasil_kalibrasi/'.$item->file_kalibrasi.'" class="btn btn-sm btn-success" style="border-radius:25%;" target="_blank"><i class="fa fa-download"></i></a>
+					// <a href="javascript:void(0)" onClick="seliaData(' . "'" . $item->id . "'" . ');" class="btn btn-sm btn-warning" style="border-radius:25%;"><i class="fa fa-pencil"></i></a>';
 
-						<ul class="dropdown-menu pull-right">
-						<li><a href="'.$this->file_attachement.'hasil_kalibrasi/'.$item->file_kalibrasi.'" target="_blank"><i class="fa fa-download"></i>&nbsp; Unduh File</a></li>
-						<li><a href="javascript:void(0)" onClick="seliaData(' . "'" . $item->id . "'" . ');"><i class="fa fa-pencil"></i>&nbsp; Update Data</a></li>
-						</ul>
-				  	</div>';
-
+					$row[] = '<a href="'.site_url('selia/downloadbyName?getFile='.$item->file_kalibrasi.'&'.'setName='.$renameFile).'" class="btn btn-sm btn-success" style="border-radius:25%;" target="_blank"><i class="fa fa-download"></i></a>
+					<a href="javascript:void(0)" onClick="seliaData(' . "'" . $item->id . "'" . ');" class="btn btn-sm btn-warning" style="border-radius:25%;"><i class="fa fa-pencil"></i></a>';
 				}else{
 					$row[] = '<a class="btn btn-sm btn-success" href="javascript:void(0)" title="Sorry!" disabled><i class="fa fa-eye"></i></a>';
 				}
@@ -418,7 +424,7 @@ class Selia extends CI_Controller {
 			if($List){
 				$uploaddir 		= $this->file_loc.'hasil_kalibrasi/';
 		
-				$Nama_Folder	= 'File-Selia_'.$sessionGet;
+				$Nama_Folder	= 'File-Selia_'.$sessionGet.'_'.date('d-m-Y');
 				$Folder_ZIP		= './hasil_kalibrasi/'.$Nama_Folder;
 				
 				$Nama_ZIP		= $Nama_Folder.'.zip';
@@ -495,5 +501,24 @@ class Selia extends CI_Controller {
 		}
 		
 		
+	}
+
+	function downloadbyName(){
+		$path			= $this->file_attachement.'hasil_kalibrasi/';
+		$file_name 		= $path.$_GET['getFile'];
+		$new_filename 	= $_GET['setName'].'__'.$_GET['getFile'];
+
+		$mime = 'application/force-download';
+		header('Pragma: public');    
+		header('Expires: 0');        
+		header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+		header('Cache-Control: private',false);
+		header('Content-Type: '.$mime);
+		header('Content-Disposition: filename="'.$new_filename.'"');
+		header('Content-Transfer-Encoding: binary');
+		header('Connection: close');
+		readfile($file_name);    
+		exit();
+
 	}
 }

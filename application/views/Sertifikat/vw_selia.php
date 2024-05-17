@@ -14,18 +14,20 @@ $this->load->view('include/side_menu');
 				<thead class="thead-cs" style="background-color:#E9ECF9;color:#0A1A60;">
 					<tr style="font-size: 13px;height: 50px;">
 						
-						<th width="1%"><input type="checkbox" id="chk_all" name="chk_all"></th>
-						<!-- <th width="13%">KODE</th> -->
-						<th width="18%">NO SO</th>
-						<th width="32%">NAMA ALAT</th>
-						<th width="10%">ID NUMBER</th>
-						<th width="10%">S/N NUMBER</th>
-						<th width="10%">DETAIL</th>
-						<th width="9%">LATE</th>
-						<th width="8%">ACTION</th>
+						<th><input type="checkbox" id="chk_all" name="chk_all"></th>
+						<th>KODE</th>
+						<th>CUSTOMER</th>
+						<th>ALAMAT SO</th>
+						<th>NO SO</th>
+						<th>NAMA ALAT</th>
+						<th>ID NUMBER</th>
+						<th>S/N NUMBER</th>
+						<th>TEKNISI</th>
+						<th>LATE</th>
+						<th>ACTION</th>
 					</tr>
 				</thead>
-				<tbody id="list_selia">
+				<tbody id="list_selia" style="font-size: 12px;">
 				</tbody>
 			</table>
 		</form>
@@ -195,6 +197,10 @@ $this->load->view('include/side_menu');
 		width: 95px;
 	}
 
+	.highlight {
+		color: #3c8dbc;
+		/* cursor: pointer; */
+	}
 /* End Css Table */
 
 /* Start Css Button */
@@ -359,20 +365,25 @@ $(document).ready(function() {
 
 		columnDefs	: [ 
 							{
-								"targets": [ 1,3,4,5,6,7 ],
+								"targets": [ 1,4,6,7,9,10 ],
 								"className": 'text-center',
 							}, 
 							{
-								"targets": [ 0,5,7 ],
+								"targets": [ 0,10 ],
 								"orderable": false,
 							}, 
 						],
 		
 		fnDrawCallback: function(nRow, aData, iDisplayIndex) {
-			$('#table tbody tr').hover(function() {
+			$('#table-cs tbody tr').hover(function() {
 				$(this).addClass('highlight');
 			}, function() {
 				$(this).removeClass('highlight');
+			});
+			$('#table-cs tbody tr').each(function(){
+				$(this).find('td:eq(4)').attr('nowrap', 'nowrap');
+				$(this).find('td:eq(9)').attr('nowrap', 'nowrap');
+				$(this).find('td:eq(10)').attr('nowrap', 'nowrap');
 			});
 		}
 
