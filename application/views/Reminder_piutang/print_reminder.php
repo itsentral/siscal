@@ -21,8 +21,8 @@ $mpdf		= new mPDF('utf-8', 'A4');
 $ArrBulan	= array(1=>'Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','Nopember','Desember');
 ob_start();
 
-$img_file		= base_url('/assets/img/logo.jpg');
-$img_file2 		= base_url('/assets/img/line.jpg');
+$img_file		= './assets/img/logo.jpg';
+$img_file2 		= './assets/img/line.jpg';
 
 if($type_file=='D'){
 	$File_Name	= $rows_header[0]->id;
