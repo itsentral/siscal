@@ -14,10 +14,12 @@
               </div>
             </div>
             <div class="box-body no-padding">
-              <ul class="nav nav-pills nav-stacked">
-                <li class="active"><a href="#"><i class="fa fa-inbox"></i> Pending <span class="label label-danger pull-right">102</span></a></li>
-                <li><a href="#"><i class="fa fa-envelope-o"></i> Ready To Print <span class="label label-warning pull-right">65</span></a></li>
-                <li><a href="#"><i class="fa fa-file-text-o"></i> Selesai <span class="label label-success pull-right">105</span></a></li>
+			  <input type="hidden" id="set_status" value="PENDING">
+              <ul class="nav nav-pills nav-stacked" id="filterDashboard">
+                <li class="group-li active" id="PENDING"><a href="javascript:void(0)"><i class="fa fa-inbox"></i> Pending <span class="label label-danger pull-right"><?php echo $countPending;?></span></a></li>
+                <li class="group-li" id="REVISI"><a href="javascript:void(0)"><i class="fa fa-file-text-o"></i> Revisi Teknisi <span class="label label-warning pull-right"><?php echo $countRevisi;?></span></a></li>
+                <li class="group-li" id="SELESAI"><a href="javascript:void(0)"><i class="fa fa-file-text-o"></i> Selesai Selia <span class="label label-success pull-right"><?php echo $countSelesai;?></span></a></li>
+                <li class="group-li" id="PRINT"><a href="javascript:void(0)"><i class="fa fa-envelope-o"></i> Ready To Print <span class="label label-primary pull-right"><?php echo $countPrint;?></span></a></li>
               </ul>
             </div>
           </div>
@@ -39,38 +41,40 @@
         </div>
         <!-- /.col -->
         <div class="col-md-9">
-          <div class="box box-primary">
-            <div class="box-header with-border">
-              <h3 class="box-title">List Selia Pending</h3>
-            </div>
-            <!-- /.box-header -->
-            <div class="box-body no-padding">
-             
-            </div>
-            <!-- /.box-body -->
-            <div class="box-footer no-padding">
-				<div class="table-responsive col-sm-12" style="padding-bottom:65px;">
-					<table id="table-pending" class="table table-bordered table-striped" width="100%">
-						<thead class="thead-cs" style="background-color:#E9ECF9;color:#0A1A60;">
-							<tr style="font-size: 13px;height: 50px;">
-								<th width="19%">NO SO</th>
-								<th width="32%">NAMA ALAT</th>
-								<th width="14%">ID NUMBER</th>
-								<th width="14%">S/N NUMBER</th>
-								<th width="10%">DETAIL</th>
-								<th width="9%">LATE</th>
-							</tr>
-						</thead>
-						<tbody id="list_selia">
-						</tbody>
-					</table>
-            	</div>
-            </div>
-          </div>
-          <!-- /. box -->
+
+			<div class="box box-danger box-color-d">
+				<div class="box-header with-border">
+				<h3 class="box-title">LIST FILE <text id="titleList">PENDING</text></h3>
+				</div>
+
+				<div class="box-body no-padding">
+					<div class="table-responsive col-sm-12" style="padding-bottom:60px;padding-top:25px;">
+						<table id="table-pending" class="table table-bordered table-striped" width="100%">
+							<thead class="thead-cs" style="background-color:#E9ECF9;color:#0A1A60;">
+								<tr style="font-size: 11px;height: 40px;">
+									<th>KODE</th>
+									<th>CUSTOMER</th>
+									<!-- <th>ALAMAT SO</th> -->
+									<th>NO SO</th>
+									<th>NAMA ALAT</th>
+									<th>ID NUMBER</th>
+									<th>S/N NUMBER</th>
+									<th>TEKNISI</th>
+									<th>LATE</th>
+									<th>FILE</th>
+								</tr>
+							</thead>
+							<tbody id="list_selia" style="font-size: 10.8px;">
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+
         </div>
-        <!-- /.col -->
       </div>
+
+
 
 <?php $this->load->view('include/footer'); ?>
 
@@ -111,6 +115,11 @@
 		width: 95px;
 	}
 
+	.highlight {
+		color: #3c8dbc;
+		/* cursor: pointer; */
+	}
+
 	.Btn-cs {
 		font-size: 14px;
 		padding: 7px;
@@ -134,6 +143,11 @@
 	.Btn-cs1 {
 		width: auto;
 		background-color: #f39c12;
+		color: white;
+	}
+
+	.Btn-cs2 {
+		background-color: #d9534f;
 		color: white;
 	}
 
@@ -170,23 +184,24 @@
 <script src="<?php echo base_url();?>assets/plugins/morris/morris.min.js"></script>
 <script>
 	var donut;
-	var tablePending;
+	var tableDashboard;
 
 	donut = new Morris.Donut({
       element: 'selia-chart',
       resize: true,
-      colors: ["#dd4b39", "#f39c12", "#00a65a"],
+      colors: ["#dd4b39", "#f39c12", "#00a65a", "#3c8dbc"],
       data: [
-        {label: "Pending", value: 102},
-        {label: "Ready To Print", value: 65},
-        {label: "Selesai", value: 105}
+        {label: "Pending", value: <?php echo $countPending;?>},
+        {label: "Revisi", value: <?php echo $countRevisi;?>},
+        {label: "Selesai Selia", value: <?php echo $countSelesai;?>},
+        {label: "Ready To Print", value: <?php echo $countPrint;?>}
       ],
       hideHover: 'auto'
     });
 
-	tablePending = $('#table-pending').DataTable({
-		// processing		: true,
-		// serverSide		: true,
+	tableDashboard = $('#table-pending').DataTable({
+		processing		: true,
+		serverSide		: true,
 		paging			: true, 
 		order			: [],
 		//autoWidth		: false,
@@ -199,10 +214,14 @@
 			}
 		},
 
-		// ajax			: {
-		// 					"url"	: "<?php echo site_url('selia/list_func_selia') ?>",
-		// 					"type"	: "POST",
-		// 				},
+		ajax			: {
+							"url"	: "<?php echo site_url('dashboard_selia/list_func_selia') ?>",
+							"type"	: "POST",
+							"data"	: function (data) {
+										var set_status = $('#set_status').val();
+										data.status_dashboard = set_status;
+									}
+						},
 		dom				: 'Bfrtip', 
 		buttons			: [
 							{
@@ -219,16 +238,18 @@
 
 						],
 
-		// columnDefs	: [ 
-		// 					{
-		// 						"targets": [ 1,3,4,5,6,7 ],
-		// 						"className": 'text-center',
-		// 					}, 
-		// 					{
-		// 						"targets": [ 0,5,7 ],
-		// 						"orderable": false,
-		// 					}, 
-		// 				],
+		columnDefs	: [ 
+							{
+								// "targets": [ 0,3,5,6,7,8,9 ],
+								"targets": [ 0,2,4,5,6,7,8 ],
+								"className": 'text-center',
+							}, 
+							{
+								// "targets": [ 9 ],
+								"targets": [ 8 ],
+								"orderable": false,
+							},  
+						],
 		
 		fnDrawCallback: function(nRow, aData, iDisplayIndex) {
 			$('#table-pending tbody tr').hover(function() {
@@ -236,8 +257,72 @@
 			}, function() {
 				$(this).removeClass('highlight');
 			});
+			$('#table-pending tbody tr').each(function(){
+				$(this).find('td:eq(7)').attr('nowrap', 'nowrap');
+			});
 		}
 
+	});
+
+	function viewDetail(id) {
+		$('#formAddress')[0].reset();
+		$('#code_sch').attr('readonly', true);
+		$('#tk_name').attr('readonly', true);
+		$('#cs_name').attr('readonly', true);
+		$('#alamat_so').attr('readonly', true);
+
+		$.ajax({
+			url: "<?php echo site_url('dashboard_selia/getById') ?>/" + id,
+			type: "GET",
+			dataType: "JSON",
+			success: function(data) {
+				$('[name="code_sch"]').val(data.id);
+				$('[name="tk_name"]').val(data.actual_teknisi_name);
+				$('[name="cs_name"]').val(data.customer_name);
+				$('[name="alamat_so"]').val(data.address_so);
+				$('#closeModal').text('Close');
+				$('#FormModal').modal('show');
+
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				alert('Error get data from ajax');
+			}
+		});
+	}
+
+	$('.reload-table').click(function(){
+		tableDashboard.ajax.reload();
+	});
+
+	$("#filterDashboard li").click(function() {
+		var idDashboard = this.id;
+
+		$('li.group-li.active').removeClass("active");  
+		$(this).addClass("active");
+		
+		$('.box-color-d').removeClass("box-danger");
+		$('.box-color-d').removeClass("box-warning");
+		$('.box-color-d').removeClass("box-success");
+		$('.box-color-d').removeClass("box-primary");
+
+		if(idDashboard == "PENDING"){
+			$('.box-color-d').addClass("box-danger");
+		}
+		if(idDashboard == "REVISI"){
+			$('.box-color-d').addClass("box-warning");
+		}
+		if(idDashboard == "SELESAI"){
+			$('.box-color-d').addClass("box-success");
+		}
+		if(idDashboard == "PRINT"){
+			$('.box-color-d').addClass("box-primary");
+		}
+		
+
+		$('#titleList').html(idDashboard);
+
+		var status = $('#set_status').val(idDashboard);
+		tableDashboard.draw();
 	});
 
 

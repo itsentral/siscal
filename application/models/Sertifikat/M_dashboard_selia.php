@@ -4,22 +4,27 @@ class M_dashboard_selia extends CI_Model
 {
 
 	var $table 			= 'trans_data_details';
-	var $column_order 	= array(null,
-								// 'trans_data_details.id', 
+	var $column_order 	= array(
+								'trans_data_details.id', 
+								'trans_details.customer_name', 
+								//'trans_details.address_so', 
 								'trans_details.no_so', 
 								'trans_data_details.tool_name', 
 								'trans_data_details.no_identifikasi', 
-								'trans_data_details.no_serial_number', 
-								//'trans_details.address_so', 
-								null,
+								'trans_data_details.no_serial_number',
+								'trans_data_details.actual_teknisi_name', 
 								'trans_data_details.datet',
-								null); 
+								null
+								); 
 	var $column_search 	= array(
 								'trans_data_details.id', 
+								'trans_details.customer_name', 
+								'trans_details.address_so',
 								'trans_details.no_so', 
 								'trans_data_details.tool_name', 
 								'trans_data_details.no_identifikasi', 
-								'trans_data_details.no_serial_number', 
+								'trans_data_details.no_serial_number',
+								'trans_data_details.actual_teknisi_name', 
 								'trans_details.address_so',
 								'trans_data_details.datet'); 
 	var $order 			= array('trans_data_details.datet' => 'asc');
@@ -34,16 +39,20 @@ class M_dashboard_selia extends CI_Model
 	{
 		$Penyelia		= $this->session->userdata('siscal_userid');
 		$siscalGroup	= $this->session->userdata('siscal_group_id');
+		$Status			= $this->input->post('status_dashboard');
 
 		$this->db->select('	trans_data_details.id, trans_details.no_so, trans_data_details.tool_name, 
 							trans_data_details.no_identifikasi, trans_data_details.no_serial_number, 
-							trans_details.address_so, trans_data_details.datet, trans_data_details.status_selia, trans_data_details.file_kalibrasi,
+							trans_details.address_so, trans_data_details.datet, trans_details.customer_name, trans_data_details.actual_teknisi_name,
+							trans_data_details.status_selia, trans_data_details.file_kalibrasi,
 							trans_data_details.modified_date');
 		$this->db->from($this->table);
 		$this->db->join('trans_details', 'trans_data_details.trans_detail_id = trans_details.id');
-		$this->db->where('trans_data_details.status_selia', 'PENDING');
+		$this->db->where('trans_data_details.flag_proses', 'Y');
+		$this->db->where('trans_data_details.approve_certificate !=', 'APV');
+		$this->db->where('trans_data_details.status_selia', $Status);
 
-		if($siscalGroup != "1"){
+		if($siscalGroup == "10"){
 			$this->db->where('trans_data_details.id_selia', $Penyelia);
 		}
 		
@@ -97,16 +106,108 @@ class M_dashboard_selia extends CI_Model
 	{
 		$Penyelia		= $this->session->userdata('siscal_userid');
 		$siscalGroup	= $this->session->userdata('siscal_group_id');
+		$Status			= $this->input->post('status_dashboard');
 
 		$this->db->select('	trans_data_details.id, trans_details.no_so, trans_data_details.tool_name, 
 							trans_data_details.no_identifikasi, trans_data_details.no_serial_number, 
-							trans_details.address_so, trans_data_details.datet, trans_data_details.status_selia, trans_data_details.file_kalibrasi,
+							trans_details.address_so, trans_data_details.datet, trans_details.customer_name, trans_data_details.actual_teknisi_name,
+							trans_data_details.status_selia, trans_data_details.file_kalibrasi,
 							trans_data_details.modified_date');
 		$this->db->from($this->table);
 		$this->db->join('trans_details', 'trans_data_details.trans_detail_id = trans_details.id');
-		$this->db->where('trans_data_details.status_selia', 'PENDING');
+		$this->db->where('trans_data_details.flag_proses', 'Y');
+		$this->db->where('trans_data_details.approve_certificate !=', 'APV');
+		$this->db->where('trans_data_details.status_selia', $Status);
 
-		if($siscalGroup != "1"){
+		if($siscalGroup == "10"){
+			$this->db->where('trans_data_details.id_selia', $Penyelia);
+		}
+		return $this->db->count_all_results();
+	}
+
+	public function count_all_pending()
+	{
+		$Penyelia		= $this->session->userdata('siscal_userid');
+		$siscalGroup	= $this->session->userdata('siscal_group_id');
+
+		$this->db->select('	trans_data_details.id, trans_details.no_so, trans_data_details.tool_name, 
+							trans_data_details.no_identifikasi, trans_data_details.no_serial_number, 
+							trans_details.address_so, trans_data_details.datet, trans_details.customer_name, trans_data_details.actual_teknisi_name,
+							trans_data_details.status_selia, trans_data_details.file_kalibrasi,
+							trans_data_details.modified_date');
+		$this->db->from($this->table);
+		$this->db->join('trans_details', 'trans_data_details.trans_detail_id = trans_details.id');
+		$this->db->where('trans_data_details.flag_proses', 'Y');
+		$this->db->where('trans_data_details.status_selia', 'PENDING');
+		$this->db->where('trans_data_details.approve_certificate !=', 'APV');
+
+		if($siscalGroup == "10"){
+			$this->db->where('trans_data_details.id_selia', $Penyelia);
+		}
+		return $this->db->count_all_results();
+	}
+
+	public function count_all_revisi()
+	{
+		$Penyelia		= $this->session->userdata('siscal_userid');
+		$siscalGroup	= $this->session->userdata('siscal_group_id');
+
+		$this->db->select('	trans_data_details.id, trans_details.no_so, trans_data_details.tool_name, 
+							trans_data_details.no_identifikasi, trans_data_details.no_serial_number, 
+							trans_details.address_so, trans_data_details.datet, trans_details.customer_name, trans_data_details.actual_teknisi_name,
+							trans_data_details.status_selia, trans_data_details.file_kalibrasi,
+							trans_data_details.modified_date');
+		$this->db->from($this->table);
+		$this->db->join('trans_details', 'trans_data_details.trans_detail_id = trans_details.id');
+		$this->db->where('trans_data_details.flag_proses', 'Y');
+		$this->db->where('trans_data_details.status_selia', 'REVISI');
+		$this->db->where('trans_data_details.approve_certificate !=', 'APV');
+
+		if($siscalGroup == "10"){
+			$this->db->where('trans_data_details.id_selia', $Penyelia);
+		}
+		return $this->db->count_all_results();
+	}
+
+	public function count_all_print()
+	{
+		$Penyelia		= $this->session->userdata('siscal_userid');
+		$siscalGroup	= $this->session->userdata('siscal_group_id');
+
+		$this->db->select('	trans_data_details.id, trans_details.no_so, trans_data_details.tool_name, 
+							trans_data_details.no_identifikasi, trans_data_details.no_serial_number, 
+							trans_details.address_so, trans_data_details.datet, trans_details.customer_name, trans_data_details.actual_teknisi_name,
+							trans_data_details.status_selia, trans_data_details.file_kalibrasi,
+							trans_data_details.modified_date');
+		$this->db->from($this->table);
+		$this->db->join('trans_details', 'trans_data_details.trans_detail_id = trans_details.id');
+		$this->db->where('trans_data_details.flag_proses', 'Y');
+		$this->db->where('trans_data_details.status_selia', 'PRINT');
+		$this->db->where('trans_data_details.approve_certificate !=', 'APV');
+
+		if($siscalGroup == "10"){
+			$this->db->where('trans_data_details.id_selia', $Penyelia);
+		}
+		return $this->db->count_all_results();
+	}
+
+	public function count_all_selesai()
+	{
+		$Penyelia		= $this->session->userdata('siscal_userid');
+		$siscalGroup	= $this->session->userdata('siscal_group_id');
+
+		$this->db->select('	trans_data_details.id, trans_details.no_so, trans_data_details.tool_name, 
+							trans_data_details.no_identifikasi, trans_data_details.no_serial_number, 
+							trans_details.address_so, trans_data_details.datet, trans_details.customer_name, trans_data_details.actual_teknisi_name,
+							trans_data_details.status_selia, trans_data_details.file_kalibrasi,
+							trans_data_details.modified_date');
+		$this->db->from($this->table);
+		$this->db->join('trans_details', 'trans_data_details.trans_detail_id = trans_details.id');
+		$this->db->where('trans_data_details.flag_proses', 'Y');
+		$this->db->where('trans_data_details.status_selia', 'SELESAI');
+		$this->db->where('trans_data_details.approve_certificate !=', 'APV');
+
+		if($siscalGroup == "10"){
 			$this->db->where('trans_data_details.id_selia', $Penyelia);
 		}
 		return $this->db->count_all_results();
