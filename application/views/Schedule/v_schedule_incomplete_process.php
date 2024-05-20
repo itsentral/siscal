@@ -186,7 +186,7 @@ $this->load->view('include/side_menu');
 											}																		
 										}
 										
-										$Flag_Split		= $valD->sts_split;
+										$Flag_Split		= 'N';
 										$Waktu_Tempuh	= 0;
 										$Urut_ID		= 0;
 										
@@ -251,11 +251,11 @@ $this->load->view('include/side_menu');
 												echo form_input(array('id'=>'insitu_'.$intL,'name'=>'detDetail['.$intL.'][insitu]','type'=>'hidden'),$insitu);
 												echo form_input(array('id'=>'subcon_'.$intL,'name'=>'detDetail['.$intL.'][subcon]','type'=>'hidden'),$subcon);
 												echo form_input(array('id'=>'qty_process_'.$intL,'name'=>'detDetail['.$intL.'][qty_process]','type'=>'hidden'),$Qty_Outs);
-												echo form_input(array('id'=>'qty_'.$intL,'name'=>'detDetail['.$intL.'][qty]','type'=>'hidden'),$Qty_Outs);
 												echo form_input(array('id'=>'sts_split_'.$intL,'name'=>'detDetail['.$intL.'][sts_split]','type'=>'hidden'),$Flag_Split);
 												echo form_input(array('id'=>'waktu_tempuh_'.$intL,'name'=>'detDetail['.$intL.'][waktu_tempuh]','type'=>'hidden'),$Waktu_Tempuh);
 												echo form_input(array('id'=>'urut_id_'.$intL,'name'=>'detDetail['.$intL.'][urut_id]','type'=>'hidden', 'class'=>$Code_DetQuot),$Urut_ID);
 												echo form_input(array('id'=>'supplier_id_'.$intL,'name'=>'detDetail['.$intL.'][supplier_id]','type'=>'hidden'),$Def_CodeSupp);
+												echo form_input(array('id'=>'keterangan_'.$intL,'name'=>'detDetail['.$intL.'][keterangan]','type'=>'hidden'),$Keterangan);
 												
 												
 												echo'											
@@ -324,12 +324,22 @@ $this->load->view('include/side_menu');
 															echo"<button type='button' id='btn-jadwal' class='btn btn-sm btn-success' onClick='return viewJadwal(".$intL.");' data-role='qtip' title='SET DATE CALIBRATION'><i class='fa fa-calendar'></i></button>";
 														echo"</div>";
 														
-														echo"<div class='btn-group' id='btn_split_".$intL."'></div>";
 														
+														if($Qty_Outs > 1){
+															echo"<div class='btn-group' id='btn_split_".$intL."'>";
+																echo"<button type='button' id='btn-split' class='btn btn-sm btn-warning' onClick='return splitData(".$intL.");' data-role='qtip' title='SLIT DATA'><i class='fa fa-recycle'></i></button>";
+															echo"</div>";
+														}
 														
 														
 													}
-													echo"<div class='btn-group' id='btn_delete_".$intL."'></div>";
+													/*
+													if($Flag_Split == 'N'){
+														echo"<div class='btn-group' id='btn_delete_".$intL."'>";
+															echo"<button type='button' id='btn-delete' class='btn btn-sm btn-danger' onClick='return DeleteData(".$intL.");' data-role='qtip' title='DELETE DATA'><i class='fa fa-trash-o'></i></button>";
+														echo"</div>";
+													}
+													*/
 													
 												echo'
 												</td>
@@ -695,6 +705,201 @@ $this->load->view('include/side_menu');
 		
 	}
 	
+	function splitData(UrutJadwal){
+				
+		$("#MyModalSplitDetail").html('');
+		let Code_Alat	= $('#tool_id_'+UrutJadwal).val();
+		let Nama_Alat	= $('#tool_name_'+UrutJadwal).val();
+		let Qty_Alat	= $('#qty_'+UrutJadwal).val();
+		//console.log(Code_Alat);
+		if(parseInt(Qty_Alat) <= 1 || Qty_Alat == '' || Qty_Alat == null){
+			
+			GeneralShowMessageError('error','Incorrect Quantity. Quantity should be greater than 1');
+			return false;
+		}else{
+			loading_spinner_new();
+			let Template	= '<div class="row">'+
+								'<input type="hidden" id="urut_pecah" value="'+UrutJadwal+'">'+
+								'<input type="hidden" id="qty_pecah" value="'+Qty_Alat+'">'+
+								'<div class="col-sm-6 col-xs-12">'+
+									'<div class="form-group">'+
+										'<label class="control-label">Tool Code</label>'+
+										'<input type="text" class="form-control" name="code_alat_pecah" id="code_alat_pecah" value="'+Code_Alat+'" readOnly>'+
+									'</div>'+
+								'</div>'+
+								'<div class="col-sm-6 col-xs-12">'+
+									'<div class="form-group">'+
+										'<label class="control-label">Tool Name</label>'+
+										'<input type="text" class="form-control" name="nama_alat_pecah" id="nama_alat_pecah" value="'+Nama_Alat+'" readOnly>'+
+									'</div>'+
+								'</div>'+
+							 '</div>'+
+							 '<div class="row">'+
+								'<div class="col-sm-6 col-xs-12">'+
+									'<div class="form-group">'+
+										'<label class="control-label">Qty Split</label>'+
+										'<div><input type="text" class="form-control" name="qty_ambil" id="qty_ambil" value="'+Qty_Alat+'"></div>'+
+									'</div>'+
+								'</div>'+
+								'<div class="col-sm-6 col-xs-12">&nbsp;</div>'+
+							 '</div>';
+			close_spinner_new();
+            $("#MyModalSplitDetail").html(Template);
+			$("#MyModalSplit").modal('show');	
+			
+			let nil_old		= $('#qty_pecah').val();
+			
+			$('#qty_ambil').spinner({					
+				min: 1,
+				max: parseInt(nil_old)
+			 });
+		}			
+	}
+	
+	$(document).on('click','#btn_proses_split',(e)=>{
+		e.preventDefault();
+		$('#btn-modal-close2, #btn_proses_split').prop('disabled',true);
+		loading_spinner_new();
+		
+		let kode_lama		= $('#urut_pecah').val();
+		let qty_awal		= $('#qty_pecah').val();
+		let qty_ambil		= $('#qty_ambil').val();
+		let tr_urut			= $('#list_detail tr:last').attr('id');
+		const kode_urut		= tr_urut.split('_');
+		let next_urut		= parseInt(kode_urut[2]) + 1;
+		let sisa			= parseInt(qty_awal) - parseInt(qty_ambil);
+		
+		
+		if(qty_ambil=='' || qty_ambil==null){
+			GeneralShowMessageError('error','Empty Split Qty. Please Input Split Qty First');
+			close_spinner_new();
+			$('#btn-modal-close2, #btn_proses_split').prop('disabled',false);
+			return false;
+		}
+		if(parseInt(qty_ambil)==parseInt(qty_awal)){
+			GeneralShowMessageError('error','Qty Should  Be Less Than Qty Item. Please Input Correct Qty');
+			close_spinner_new();
+			$('#btn-modal-close2, #btn_proses_split').prop('disabled',false);
+			return false;
+		}
+		
+		let kode		= $('#quotation_detail_id_'+kode_lama).val();
+		let kode_detail	= $('#code_detail_'+kode_lama).val();
+		let kode_alat	= $('#tool_id_'+kode_lama).val();
+		let nama_alat	= $('#tool_name_'+kode_lama).val();
+		let cust_alat	= $('#tool_cust_'+kode_lama).val();
+		let labs		= $('#labs_'+kode_lama).val();
+		let insitu		= $('#insitu_'+kode_lama).val();
+		let subcon		= $('#subcon_'+kode_lama).val();
+		let sts_split	= $('#sts_split_'+kode_lama).val();
+		let waktu_tempuh= $('#waktu_tempuh_'+kode_lama).val();
+		let supplier_id	= $('#supplier_id_'+kode_lama).val();
+		let ket_detail	= $('#keterangan_'+kode_lama).val();
+		let kode_subcon	= subcon;
+		if(insitu=='Y' && supplier_id !='COMP-001'){
+			kode_subcon	= 'Y';
+		}
+		
+		let d_last		= $('#list_detail .'+kode+':last').attr('id');
+		let nil_urut	= parseInt($('#'+d_last).val()) + 1;
+			
+		let Template	='<tr id="tr_urut_'+next_urut+'">'+
+							'<input type="hidden" name="detDetail['+next_urut+'][quotation_detail_id]" id="quotation_detail_id_'+next_urut+'" value="'+kode+'">'+
+							'<input type="hidden" name="detDetail['+next_urut+'][code_detail]" id="code_detail_'+next_urut+'" value="'+kode_detail+'">'+
+							'<input type="hidden" name="detDetail['+next_urut+'][tool_id]" id="tool_id_'+next_urut+'" value="'+kode_alat+'">'+
+							'<input type="hidden" name="detDetail['+next_urut+'][tool_name]" id="tool_name_'+next_urut+'" value="'+nama_alat+'">'+
+							'<input type="hidden" name="detDetail['+next_urut+'][tool_cust]" id="tool_cust_'+next_urut+'" value="'+cust_alat+'">'+
+							'<input type="hidden" name="detDetail['+next_urut+'][labs]" id="labs_'+next_urut+'" value="'+labs+'">'+
+							'<input type="hidden" name="detDetail['+next_urut+'][insitu]" id="insitu_'+next_urut+'" value="'+insitu+'">'+
+							'<input type="hidden" name="detDetail['+next_urut+'][subcon]" id="subcon_'+next_urut+'" value="'+subcon+'">'+
+							'<input type="hidden" name="detDetail['+next_urut+'][qty_process]" id="qty_process_'+next_urut+'" value="'+qty_ambil+'">'+
+							'<input type="hidden" name="detDetail['+next_urut+'][sts_split]" id="sts_split_'+next_urut+'" value="Y">'+
+							'<input type="hidden" name="detDetail['+next_urut+'][waktu_tempuh]" id="waktu_tempuh_'+next_urut+'" value="0">'+
+							'<input type="hidden" name="detDetail['+next_urut+'][supplier_id]" id="supplier_id_'+next_urut+'" value="'+supplier_id+'">'+
+							'<input type="hidden" name="detDetail['+next_urut+'][keterangan]" id="keterangan_'+next_urut+'" value="'+ket_detail+'">'+
+							'<input type="hidden" name="detDetail['+next_urut+'][urut_id]" id="urut_id_'+next_urut+'" value="'+nil_urut+'" class="'+kode+'">'+
+							'<td class="text-left text-wrap">'+cust_alat+'</td>'+
+							'<td class="text-left text-wrap">'+nama_alat+'</td>'+
+							'<td class="text-center"><input type="text" class="form-control" name="detDetail['+next_urut+'][qty]" id="qty_'+next_urut+'" value="'+qty_ambil+'" readOnly></td>'+
+							'<td class="text-center">'+insitu+'</td>'+
+							'<td class="text-center">'+kode_subcon+'</td>'+
+							'<td class="text-center">'+labs+'</td>'+
+							'<td class="text-center">';
+							if(labs=='Y' || subcon=='Y'){
+								Template +='<input type="text" name="detDetail['+next_urut+'][delivery_date]" id="delivery_date_'+next_urut+'" class="form-control tanggal" readOnly>';
+							}else{
+								Template +='-';
+							}
+		    Template	 +='</td>'+
+							'<td class="text-center" id="proses_'+next_urut+'"></td>'+
+							'<td class="text-center">';
+							if(labs=='Y' || subcon=='Y'){
+								let tgl_ambil	= $('#pick_date_'+kode_lama).val();
+								Template		+='<input type="text" name="detDetail['+next_urut+'][pick_date]" id="pick_date_'+next_urut+'" class="form-control" value="'+tgl_ambil+'" readOnly>';
+							}else{
+								Template +='-';
+							}
+			  Template	 +='</td>'+
+							'<td class="text-center">';
+							if(insitu=='N' && subcon=='Y'){
+								
+								Template		+='<input type="text" name="detDetail['+next_urut+'][subcon_pick_date]" id="subcon_pick_date_'+next_urut+'" class="form-control tanggal" value="" readOnly>';
+							}else{
+								Template +='-';
+							}
+			   Template	 +='</td>'+
+							'<td class="text-center">';							
+							if(subcon=='Y'){								
+								Template		+='<input type="text" name="detDetail['+next_urut+'][process_date]" id="process_date_'+next_urut+'" class="form-control tanggal" value="" readOnly>';
+							}else{
+								Template +='-';
+							}
+			 Template	 +='</td>'+
+							'<td class="text-center">';		
+							if(insitu=='N' && subcon=='Y'){
+								
+								Template		+='<input type="text" name="detDetail['+next_urut+'][subcon_send_date]" id="subcon_send_date_'+next_urut+'" class="form-control tanggal" value="" readOnly>';
+							}else{
+								Template +='-';
+							}
+			 Template	 +='<td class="text-left text-wrap">'+ket_detail+'</td>';				
+			 Template	 +='</td>'+
+							'<td class="text-center">';
+							if(subcon=='N'){
+								Template		+='<button type="button" id="btn-jadwal" class="btn btn-sm btn-success" onClick="return viewJadwal('+next_urut+');" data-role="qtip" title="SET CALIBRATION DATE"><i class="fa fa-calendar"></i></button>';
+							}
+			 Template	 +='</td>'+
+						'</tr>';
+		
+		
+			
+			
+			$('#list_detail').append(Template);
+			
+			/*
+			$('#qty_'+kode_lama).spinner({					
+				min: 1,
+				max: parseInt(sisa)
+			 });
+			 */
+			 
+			 $('#qty_'+kode_lama).val(sisa);
+			 $('#btn_delete_'+kode_lama).hide(); 
+			 if(parseInt(sisa) <= 1){
+				 $('#btn_split_'+kode_lama).hide();
+			  }
+			
+			$('.tanggal').datepicker({
+				dateFormat: 'yy-mm-dd',
+				changeMonth:true,
+				changeYear:true,
+				minDate:'+0d'
+			});
+			close_spinner_new();
+			$('#MyModalSplitDetail').empty();	
+			$('#MyModalSplit').modal('hide');
+			$('#btn-modal-close2, #btn_proses_split').prop('disabled',false);
+	});
 	
 	
 	$(document).on('click','#btn_simpan_schedule',async(e)=>{

@@ -751,9 +751,7 @@ class Schedule_incomplete extends CI_Controller
 
 		if ($this->input->post()) {
 			//echo "<pre>";print_r($this->input->post());exit;
-
-
-
+			
 			$Created_By			= $this->session->userdata('siscal_username');
 			$Created_Id			= $this->session->userdata('siscal_userid');
 			$Created_Date		= date('Y-m-d H:i:s');
@@ -863,15 +861,18 @@ class Schedule_incomplete extends CI_Controller
 				if ($Has_Ins_Header !== TRUE) {
 					$Pesan_Error	= 'Error Insert Schedule Header...';
 				}
-
+				
 				if ($detDetail) {
 					$intL	= 0;
+					$Temp_Upd_Header	= $Temp_Upd_Code	= array();
 					foreach ($detDetail as $keyDet => $valDet) {
 						$intL++;
 						$Code_SchedDet	= $Code_Schedule . '-' . $intL;
 
 						$Code_Detail	= $valDet['code_detail'];
 						$Code_QuotDet	= $valDet['quotation_detail_id'];
+						
+						
 
 						$Code_Tool		= $valDet['tool_id'];
 						$Name_Tool		= $valDet['tool_name'];
@@ -885,6 +886,11 @@ class Schedule_incomplete extends CI_Controller
 						$Urut_ID		= $valDet['urut_id'];
 						$Supplier_Code	= $valDet['supplier_id'];
 						$Qty_Process	= $valDet['qty'];
+						
+						if(!isset($Temp_Upd_Header[$Code_Detail]) || empty($Temp_Upd_Header[$Code_Detail])){
+							$Temp_Upd_Header[$Code_Detail]	= 0;
+						}
+						$Temp_Upd_Header[$Code_Detail]	+= $Qty_Process;
 
 						$Pickup_Date	= $Cals_Date	= $Send_Date = $Subcon_Pickup = $Subcon_Send = $Time_Start = $Time_End = NULL;
 						$Code_Teknisi 	= $Name_Teknisi = '';
@@ -1076,6 +1082,10 @@ class Schedule_incomplete extends CI_Controller
 						}
 
 						$Arr_SentralTool	= array();
+						$Add_WHERE			= "";
+						if(isset($Temp_Upd_Code[$Code_Detail]) && !empty($Temp_Upd_Code[$Code_Detail])){
+							$Add_WHERE		= "AND sentral_code_tool NOT IN('".implode("','",$Temp_Upd_Code[$Code_Detail])."')";
+						}
 						## AMBIL TRANS DATA DETAIL ##
 						$Qry_Find_SentralTool	= "SELECT
 														*
@@ -1085,6 +1095,7 @@ class Schedule_incomplete extends CI_Controller
 														trans_detail_id = '" . $Code_Detail . "'
 													AND flag_proses <> 'Y'
 													AND plan_reschedule = 'Y'
+													".$Add_WHERE."
 													LIMIT " . $Qty_Process;
 						$rows_Find_SentralTool	= $this->db->query($Qry_Find_SentralTool)->result();
 						if ($rows_Find_SentralTool) {
@@ -1094,8 +1105,9 @@ class Schedule_incomplete extends CI_Controller
 								$Code_TransDet					= $valSentral->id;
 								$Code_Sentral					= $valSentral->sentral_code_tool;
 								$Arr_SentralTool[$intSentral]	= $Code_Sentral;
-
-								$Upd_Trans_DataDet		= "UPDATE trans_data_details SET flag_proses = 'N', keterangan = 'Item belum selesai dikalibrasi sehingga dijadwalkan ulang' WHERE id = '" . $Code_TransDet . "'";
+								
+								$Upd_Trans_DataDet		= "UPDATE trans_data_details SET flag_proses = 'N' WHERE id = '" . $Code_TransDet . "'";
+								//$Upd_Trans_DataDet		= "UPDATE trans_data_details SET flag_proses = 'N' , keterangan = 'Item belum selesai dikalibrasi sehingga dijadwalkan ulang' WHERE id = '" . $Code_TransDet . "'";
 								$Has_Upd_Trans_DataDet	= $this->db->query($Upd_Trans_DataDet);
 								if ($Has_Upd_Trans_DataDet !== TRUE) {
 									$Pesan_Error	= 'Error Update Trans Data Detail - OLD';
@@ -1118,6 +1130,7 @@ class Schedule_incomplete extends CI_Controller
 									$Serial_Number 	= $rows_CustTool->no_serial_number;
 								}
 								unset($Arr_SentralTool[$x]);
+								$Temp_Upd_Code[$Code_Detail][]	= $Code_ToolSentral;
 							}
 
 							$k_Detail								= $Code_SchedDet . '-' . $x;
@@ -1178,6 +1191,8 @@ class Schedule_incomplete extends CI_Controller
 			$rows_Header	= $this->db->get_where('schedules', array('id' => $SalesOrder))->row();
 			$this->db->trans_begin();
 			$Pesan_Error	= '';
+			
+			/*
 
 			$rows_Alocate	= $this->db->get_where('schedule_allocations', array('schedule_id' => $SalesOrder))->result();
 			$Text_Insert	= "";
@@ -1229,17 +1244,19 @@ class Schedule_incomplete extends CI_Controller
 									" . $Text_Insert . "
 									;";
 
-
+			*/
 			$Del_Temp_Alocate	= "DELETE FROM temp_allocations WHERE quotation_detail_id LIKE '" . $rows_Header->quotation_id . "%' AND kode_proses LIKE '" . $CodeProcess . "%'";
 			$Has_Del_Temp_Aloc	= $this->db->query($Del_Temp_Alocate);
 			if ($Has_Del_Temp_Aloc !== TRUE) {
 				$Pesan_Error	= 'Error Delete Schedule Temp Allocation';
 			}
-
+			
+			/*
 			$Has_Ins_Real		= $this->db->query($Query_Insert);
 			if ($Has_Ins_Real !== TRUE) {
 				$Pesan_Error	= 'Error Insert Schedule Temp Allocation - Real';
 			}
+			*/
 
 			if ($this->db->trans_status() != TRUE || !empty($Pesan_Error)) {
 				$this->db->trans_rollback();
