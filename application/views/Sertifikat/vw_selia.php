@@ -525,6 +525,7 @@ function viewDetail(id) {
 function seliaData(id) {
 	$('#formSelia')[0].reset();
 	$('#kode').attr('readonly', true);
+	$('[name="status_selia"]').val("").trigger('chosen:updated');
 	$('.fileSelia').hide();
 
 	$.ajax({
