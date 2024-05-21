@@ -12,18 +12,20 @@ $this->load->view('include/side_menu');
 			<table id="table-cs" class="table table-bordered table-striped" width="100%">
 				<thead class="thead-cs" style="background-color:#E9ECF9;color:#0A1A60;">
 					<tr style="font-size: 13px;height: 50px;">
-						
-						<th width="13%">KODE</th>
-						<th width="13%">NO SO</th>
-						<th width="25%">NAMA ALAT</th>
-						<th width="10%">ID NUMBER</th>
-						<th width="10%">SERIAL NUMBER</th>
-						<th width="12%">ALAMAT SO</th>
-						<th width="7%">LATE</th>
-						<th width="8%">ACTION</th>
+						<th>KODE</th>
+						<th>CUSTOMER</th>
+						<th>ALAMAT SO</th>
+						<th>NO SO</th>
+						<th>NAMA ALAT</th>
+						<th>ID NUMBER</th>
+						<th>S/N NUMBER</th>
+						<th>TEKNISI</th>
+						<th>MT</th>
+						<th>LATE</th>
+						<th>ACTION</th>
 					</tr>
 				</thead>
-				<tbody>
+				<tbody style="font-size: 12px;">
 				</tbody>
 			</table>
 		</div>
@@ -130,6 +132,11 @@ $this->load->view('include/side_menu');
 		color: white !important;
 	}
 
+	.highlight {
+		color: #3c8dbc;
+		/* cursor: pointer; */
+	}
+
 /* End Css Table */
 
 /* Start Css Button */
@@ -216,10 +223,6 @@ $(document).ready(function() {
 	const formattedToday = dd + '-' + mm + '-' + yyyy;
 
 	table = $('#table-cs').DataTable({
-		// scrollY			: 350,
-		// scrollX			: true,
-		// fixedColumns	: true,
-		// scrollCollapse	: true,     
 		processing		: true,
 		serverSide		: true,
 		paging			: true, 
@@ -252,36 +255,41 @@ $(document).ready(function() {
 								className: "Btntable reload-table",
 							},
 							
-							{
-								extend: 'excelHtml5',
-								text:      '<i class="fa fa-download fa-lg"></i> &nbsp;<b>Excel</b>',
-								titleAttr: 'Excel',
-								className: "Btntable",
-								title: 'Master Alat Kalibrasi - Data Per '+formattedToday,
-								messageTop: 'SISCAL DASHBOARD',
-								exportOptions: {
-										columns: [0,1,2,3,4,5]
-								}
-							},
+							// {
+							// 	extend: 'excelHtml5',
+							// 	text:      '<i class="fa fa-download fa-lg"></i> &nbsp;<b>Excel</b>',
+							// 	titleAttr: 'Excel',
+							// 	className: "Btntable",
+							// 	title: 'Master Alat Kalibrasi - Data Per '+formattedToday,
+							// 	messageTop: 'SISCAL DASHBOARD',
+							// 	exportOptions: {
+							// 			columns: [0,1,2,3,4,5]
+							// 	}
+							// },
 
 						],
 
 		columnDefs	: [ 
-							{
-								"targets": [ 0,1,3,4,5,6,7 ],
-								"className": 'text-center',
-							}, 
-							{
-								"targets": [ 7 ],
-								"orderable": false,
-							}, 
-						],
-		
+						{
+							"targets": [ 0,3,5,6,9,10 ],
+							"className": 'text-center',
+						}, 
+						{
+							"targets": [ 10 ],
+							"orderable": false,
+						}, 
+					],
+
 		fnDrawCallback: function(nRow, aData, iDisplayIndex) {
-			$('#table tbody tr').hover(function() {
+			$('#table-cs tbody tr').hover(function() {
 				$(this).addClass('highlight');
 			}, function() {
 				$(this).removeClass('highlight');
+			});
+			$('#table-cs tbody tr').each(function(){
+				$(this).find('td:eq(3)').attr('nowrap', 'nowrap');
+				$(this).find('td:eq(9)').attr('nowrap', 'nowrap');
+				$(this).find('td:eq(10)').attr('nowrap', 'nowrap');
 			});
 		}
 

@@ -4,21 +4,32 @@ class M_toprint extends CI_Model
 {
 
 	var $table 			= 'trans_data_details';
-	var $column_order 	= array('trans_data_details.id', 
+	var $column_order 	= array(
+								'trans_data_details.id', 
+								'trans_details.customer_name', 
+								//'trans_details.address_so', 
 								'trans_details.no_so', 
 								'trans_data_details.tool_name', 
 								'trans_data_details.no_identifikasi', 
-								'trans_data_details.no_serial_number', 
-								'trans_details.address_so', 
-								null,
-								null); 
-	var $column_search 	= array('trans_data_details.id', 
+								'trans_data_details.no_serial_number',
+								'trans_data_details.actual_teknisi_name', 
+								'members.nama', 
+								'trans_data_details.datet',
+								null
+								); 
+	var $column_search 	= array(
+								'trans_data_details.id', 
+								'trans_details.customer_name', 
+								'trans_details.address_so',
 								'trans_details.no_so', 
 								'trans_data_details.tool_name', 
 								'trans_data_details.no_identifikasi', 
-								'trans_data_details.no_serial_number', 
-								'trans_details.address_so'); 
-	var $order 			= array('trans_data_details.id' => 'asc');
+								'trans_data_details.no_serial_number',
+								'trans_data_details.actual_teknisi_name', 
+								'members.nama', 
+								'trans_details.address_so',
+								'trans_data_details.datet'); 
+	var $order 			= array('trans_data_details.datet' => 'asc');
 
 	public function __construct()
 	{
@@ -33,10 +44,15 @@ class M_toprint extends CI_Model
 
 		$this->db->select('	trans_data_details.id, trans_details.no_so, trans_data_details.tool_name, 
 							trans_data_details.no_identifikasi, trans_data_details.no_serial_number, 
-							trans_details.address_so, trans_data_details.status_selia, trans_data_details.file_kalibrasi,
-							trans_data_details.modified_date');
+							trans_details.address_so, trans_data_details.datet, trans_details.customer_name, trans_data_details.actual_teknisi_name,
+							trans_data_details.status_selia, trans_data_details.file_kalibrasi,
+							trans_data_details.modified_date, members.nama');
 		$this->db->from($this->table);
 		$this->db->join('trans_details', 'trans_data_details.trans_detail_id = trans_details.id');
+		$this->db->join('users', 'trans_data_details.id_selia = users.id');
+		$this->db->join('members', 'users.member_id = members.id');
+		$this->db->where('trans_data_details.flag_proses', 'Y');
+		$this->db->where('trans_data_details.approve_certificate !=', 'APV');
 		$this->db->where('trans_data_details.status_selia', 'SELESAI');
 
 		// if($siscalGroup != "1"){
@@ -96,10 +112,15 @@ class M_toprint extends CI_Model
 
 		$this->db->select('	trans_data_details.id, trans_details.no_so, trans_data_details.tool_name, 
 							trans_data_details.no_identifikasi, trans_data_details.no_serial_number, 
-							trans_details.address_so, trans_data_details.status_selia, trans_data_details.file_kalibrasi,
-							trans_data_details.modified_date');
+							trans_details.address_so, trans_data_details.datet, trans_details.customer_name, trans_data_details.actual_teknisi_name,
+							trans_data_details.status_selia, trans_data_details.file_kalibrasi,
+							trans_data_details.modified_date, members.nama');
 		$this->db->from($this->table);
 		$this->db->join('trans_details', 'trans_data_details.trans_detail_id = trans_details.id');
+		$this->db->join('users', 'trans_data_details.id_selia = users.id');
+		$this->db->join('members', 'users.member_id = members.id');
+		$this->db->where('trans_data_details.flag_proses', 'Y');
+		$this->db->where('trans_data_details.approve_certificate !=', 'APV');
 		$this->db->where('trans_data_details.status_selia', 'SELESAI');
 
 		// if($siscalGroup != "1"){
@@ -112,7 +133,8 @@ class M_toprint extends CI_Model
 	{
 		$this->db->select('	trans_data_details.id, trans_details.no_so, trans_data_details.tool_name, 
 							trans_data_details.no_identifikasi, trans_data_details.no_serial_number, 
-							trans_details.address_so, trans_data_details.status_selia, trans_data_details.file_kalibrasi,
+							trans_details.address_so, trans_data_details.datet, trans_details.customer_name, trans_data_details.actual_teknisi_name,
+							trans_data_details.status_selia, trans_data_details.file_kalibrasi,
 							trans_data_details.modified_date');
 		$this->db->from($this->table);
 		$this->db->join('trans_details', 'trans_data_details.trans_detail_id = trans_details.id');
