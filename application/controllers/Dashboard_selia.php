@@ -87,7 +87,8 @@ class Dashboard_selia extends CI_Controller {
 				$row[] = '<span class="badge bg-red">'.$lateday.'</span><p style="font-size:10px;">Tgl: '.$item->datet.'</p>';
 				
 				if($Arr_Akses['download'] =='1'){
-					$row[] = '<a href="'.site_url('selia/downloadbyName?getFile='.$item->file_kalibrasi.'&'.'setName='.$renameFile).'" class="btn btn-sm btn-success" style="border-radius:25%;" target="_blank"><i class="fa fa-download fa-sm"></i></a>';
+					//$row[] = '<a href="'.site_url('selia/downloadbyName?getFile='.$item->file_kalibrasi.'&'.'setName='.$renameFile).'" class="btn btn-sm btn-success" style="border-radius:25%;" target="_blank"><i class="fa fa-download fa-sm"></i></a>';
+					$row[] = '<a href="'.$this->file_attachement.'hasil_kalibrasi/'.$item->file_kalibrasi.'" class="btn btn-sm btn-success" style="border-radius:25%;" target="_blank"><i class="fa fa-download"></i></a>';
 				}else{
 					$row[] = '<a class="btn btn-sm btn-success" href="javascript:void(0)" title="Sorry!" style="border-radius:25%;" disabled><i class="fa fa-download"></i></a>';
 				}
