@@ -18,8 +18,8 @@
               <ul class="nav nav-pills nav-stacked" id="filterDashboard">
                 <li class="group-li active" id="PENDING"><a href="javascript:void(0)"><i class="fa fa-inbox"></i> Pending <span class="label label-danger pull-right"><?php echo $countPending;?></span></a></li>
                 <li class="group-li" id="REVISI"><a href="javascript:void(0)"><i class="fa fa-file-text-o"></i> Revisi Teknisi <span class="label label-warning pull-right"><?php echo $countRevisi;?></span></a></li>
-                <li class="group-li" id="SELESAI"><a href="javascript:void(0)"><i class="fa fa-file-text-o"></i> Selesai Selia <span class="label label-success pull-right"><?php echo $countSelesai;?></span></a></li>
-                <li class="group-li" id="PRINT"><a href="javascript:void(0)"><i class="fa fa-envelope-o"></i> Ready To Print <span class="label label-primary pull-right"><?php echo $countPrint;?></span></a></li>
+                <li class="group-li" id="SELESAI"><a href="javascript:void(0)"><i class="fa fa-file-text-o"></i> Ready To Print <span class="label label-success pull-right"><?php echo $countSelesai;?></span></a></li>
+                <li class="group-li" id="PRINT"><a href="javascript:void(0)"><i class="fa fa-envelope-o"></i> Print (pdf) <span class="label label-primary pull-right"><?php echo $countPrint;?></span></a></li>
               </ul>
             </div>
           </div>
@@ -60,6 +60,7 @@
 									<th>ID NUMBER</th>
 									<th>S/N NUMBER</th>
 									<th>TEKNISI</th>
+									<th>MT</th>
 									<th>LATE</th>
 									<th>FILE</th>
 								</tr>
@@ -193,8 +194,8 @@
       data: [
         {label: "Pending", value: <?php echo $countPending;?>},
         {label: "Revisi", value: <?php echo $countRevisi;?>},
-        {label: "Selesai Selia", value: <?php echo $countSelesai;?>},
-        {label: "Ready To Print", value: <?php echo $countPrint;?>}
+        {label: "Ready To Print", value: <?php echo $countSelesai;?>},
+        {label: "Print (pdf)", value: <?php echo $countPrint;?>}
       ],
       hideHover: 'auto'
     });
@@ -241,12 +242,12 @@
 		columnDefs	: [ 
 							{
 								// "targets": [ 0,3,5,6,7,8,9 ],
-								"targets": [ 0,2,4,5,6,7,8 ],
+								"targets": [ 0,2,4,5,6,8,9 ],
 								"className": 'text-center',
 							}, 
 							{
 								// "targets": [ 9 ],
-								"targets": [ 8 ],
+								"targets": [ 9 ],
 								"orderable": false,
 							},  
 						],
@@ -258,7 +259,7 @@
 				$(this).removeClass('highlight');
 			});
 			$('#table-pending tbody tr').each(function(){
-				$(this).find('td:eq(7)').attr('nowrap', 'nowrap');
+				$(this).find('td:eq(8)').attr('nowrap', 'nowrap');
 			});
 		}
 

@@ -84,6 +84,7 @@ class Dashboard_selia extends CI_Controller {
 				$row[] = $item->no_identifikasi;
 				$row[] = $item->no_serial_number;
 				$row[] = $item->actual_teknisi_name;
+				$row[] = $item->nama;
 				$row[] = '<span class="badge bg-red">'.$lateday.'</span><p style="font-size:10px;">Tgl: '.$item->datet.'</p>';
 				
 				if($Arr_Akses['download'] =='1'){
