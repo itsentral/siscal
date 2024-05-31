@@ -43,6 +43,8 @@ class M_dashboard_selia extends CI_Model
 		$siscalGroup	= $this->session->userdata('siscal_group_id');
 		$Status			= $this->input->post('status_dashboard');
 
+		$rows_Member	= $this->db->get_where('users',array('id'=>$Penyelia))->row();
+
 		$this->db->select('	trans_data_details.id, trans_details.no_so, trans_data_details.tool_name, 
 							trans_data_details.no_identifikasi, trans_data_details.no_serial_number, 
 							trans_details.address_so, trans_data_details.datet, trans_details.customer_name, trans_data_details.actual_teknisi_name,
@@ -65,10 +67,8 @@ class M_dashboard_selia extends CI_Model
 		}
 
 		if($siscalGroup == "8"){
-			$this->db->where('trans_data_details.actual_teknisi_id', $Penyelia);
+			$this->db->where('trans_data_details.actual_teknisi_id', $rows_Member->member_id); //harus join ke user dengan member
 		}
-		
-
 
 		$i = 0;
 
@@ -120,6 +120,8 @@ class M_dashboard_selia extends CI_Model
 		$siscalGroup	= $this->session->userdata('siscal_group_id');
 		$Status			= $this->input->post('status_dashboard');
 
+		$rows_Member	= $this->db->get_where('users',array('id'=>$Penyelia))->row();
+
 		$this->db->select('	trans_data_details.id, trans_details.no_so, trans_data_details.tool_name, 
 							trans_data_details.no_identifikasi, trans_data_details.no_serial_number, 
 							trans_details.address_so, trans_data_details.datet, trans_details.customer_name, trans_data_details.actual_teknisi_name,
@@ -137,7 +139,7 @@ class M_dashboard_selia extends CI_Model
 			$this->db->where('trans_data_details.id_selia', $Penyelia);
 		}
 		if($siscalGroup == "8"){
-			$this->db->where('trans_data_details.actual_teknisi_id', $Penyelia);
+			$this->db->where('trans_data_details.actual_teknisi_id', $rows_Member->member_id);
 		}
 		return $this->db->count_all_results();
 	}
@@ -146,6 +148,7 @@ class M_dashboard_selia extends CI_Model
 	{
 		$Penyelia		= $this->session->userdata('siscal_userid');
 		$siscalGroup	= $this->session->userdata('siscal_group_id');
+		$rows_Member	= $this->db->get_where('users',array('id'=>$Penyelia))->row();
 
 		$this->db->select('	trans_data_details.id, trans_details.no_so, trans_data_details.tool_name, 
 							trans_data_details.no_identifikasi, trans_data_details.no_serial_number, 
@@ -162,7 +165,7 @@ class M_dashboard_selia extends CI_Model
 			$this->db->where('trans_data_details.id_selia', $Penyelia);
 		}
 		if($siscalGroup == "8"){
-			$this->db->where('trans_data_details.actual_teknisi_id', $Penyelia);
+			$this->db->where('trans_data_details.actual_teknisi_id', $rows_Member->member_id);
 		}
 		return $this->db->count_all_results();
 	}
@@ -171,6 +174,7 @@ class M_dashboard_selia extends CI_Model
 	{
 		$Penyelia		= $this->session->userdata('siscal_userid');
 		$siscalGroup	= $this->session->userdata('siscal_group_id');
+		$rows_Member	= $this->db->get_where('users',array('id'=>$Penyelia))->row();
 
 		$this->db->select('	trans_data_details.id, trans_details.no_so, trans_data_details.tool_name, 
 							trans_data_details.no_identifikasi, trans_data_details.no_serial_number, 
@@ -187,7 +191,7 @@ class M_dashboard_selia extends CI_Model
 			$this->db->where('trans_data_details.id_selia', $Penyelia);
 		}
 		if($siscalGroup == "8"){
-			$this->db->where('trans_data_details.actual_teknisi_id', $Penyelia);
+			$this->db->where('trans_data_details.actual_teknisi_id', $rows_Member->member_id);
 		}
 		return $this->db->count_all_results();
 	}
@@ -196,6 +200,7 @@ class M_dashboard_selia extends CI_Model
 	{
 		$Penyelia		= $this->session->userdata('siscal_userid');
 		$siscalGroup	= $this->session->userdata('siscal_group_id');
+		$rows_Member	= $this->db->get_where('users',array('id'=>$Penyelia))->row();
 
 		$this->db->select('	trans_data_details.id, trans_details.no_so, trans_data_details.tool_name, 
 							trans_data_details.no_identifikasi, trans_data_details.no_serial_number, 
@@ -212,7 +217,7 @@ class M_dashboard_selia extends CI_Model
 			$this->db->where('trans_data_details.id_selia', $Penyelia);
 		}
 		if($siscalGroup == "8"){
-			$this->db->where('trans_data_details.actual_teknisi_id', $Penyelia);
+			$this->db->where('trans_data_details.actual_teknisi_id', $rows_Member->member_id);
 		}
 		return $this->db->count_all_results();
 	}
@@ -221,6 +226,7 @@ class M_dashboard_selia extends CI_Model
 	{
 		$Penyelia		= $this->session->userdata('siscal_userid');
 		$siscalGroup	= $this->session->userdata('siscal_group_id');
+		$rows_Member	= $this->db->get_where('users',array('id'=>$Penyelia))->row();
 
 		$this->db->select('	trans_data_details.id, trans_details.no_so, trans_data_details.tool_name, 
 							trans_data_details.no_identifikasi, trans_data_details.no_serial_number, 
@@ -237,7 +243,7 @@ class M_dashboard_selia extends CI_Model
 			$this->db->where('trans_data_details.id_selia', $Penyelia);
 		}
 		if($siscalGroup == "8"){
-			$this->db->where('trans_data_details.actual_teknisi_id', $Penyelia);
+			$this->db->where('trans_data_details.actual_teknisi_id', $rows_Member->member_id);
 		}
 		return $this->db->count_all_results();
 	}
