@@ -65,7 +65,7 @@ class M_dashboard_selia extends CI_Model
 		}
 
 		if($siscalGroup == "8"){
-			$this->db->where('trans_data_details.id_selia', $Penyelia);
+			$this->db->where('trans_data_details.actual_teknisi_id', $Penyelia);
 		}
 		
 
@@ -137,7 +137,7 @@ class M_dashboard_selia extends CI_Model
 			$this->db->where('trans_data_details.id_selia', $Penyelia);
 		}
 		if($siscalGroup == "8"){
-			$this->db->where('trans_data_details.id_selia', $Penyelia);
+			$this->db->where('trans_data_details.actual_teknisi_id', $Penyelia);
 		}
 		return $this->db->count_all_results();
 	}
@@ -162,7 +162,7 @@ class M_dashboard_selia extends CI_Model
 			$this->db->where('trans_data_details.id_selia', $Penyelia);
 		}
 		if($siscalGroup == "8"){
-			$this->db->where('trans_data_details.id_selia', $Penyelia);
+			$this->db->where('trans_data_details.actual_teknisi_id', $Penyelia);
 		}
 		return $this->db->count_all_results();
 	}
@@ -187,7 +187,7 @@ class M_dashboard_selia extends CI_Model
 			$this->db->where('trans_data_details.id_selia', $Penyelia);
 		}
 		if($siscalGroup == "8"){
-			$this->db->where('trans_data_details.id_selia', $Penyelia);
+			$this->db->where('trans_data_details.actual_teknisi_id', $Penyelia);
 		}
 		return $this->db->count_all_results();
 	}
@@ -212,7 +212,7 @@ class M_dashboard_selia extends CI_Model
 			$this->db->where('trans_data_details.id_selia', $Penyelia);
 		}
 		if($siscalGroup == "8"){
-			$this->db->where('trans_data_details.id_selia', $Penyelia);
+			$this->db->where('trans_data_details.actual_teknisi_id', $Penyelia);
 		}
 		return $this->db->count_all_results();
 	}
@@ -237,7 +237,7 @@ class M_dashboard_selia extends CI_Model
 			$this->db->where('trans_data_details.id_selia', $Penyelia);
 		}
 		if($siscalGroup == "8"){
-			$this->db->where('trans_data_details.id_selia', $Penyelia);
+			$this->db->where('trans_data_details.actual_teknisi_id', $Penyelia);
 		}
 		return $this->db->count_all_results();
 	}
