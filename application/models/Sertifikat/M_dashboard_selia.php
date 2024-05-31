@@ -52,8 +52,8 @@ class M_dashboard_selia extends CI_Model
 							trans_data_details.modified_date, members.nama');
 		$this->db->from($this->table);
 		$this->db->join('trans_details', 'trans_data_details.trans_detail_id = trans_details.id');
-		$this->db->join('users', 'trans_data_details.id_selia = users.id');
-		$this->db->join('members', 'users.member_id = members.id');
+		$this->db->join('users', 'trans_data_details.id_selia = users.id', 'LEFT');
+		$this->db->join('members', 'users.member_id = members.id', 'LEFT');
 		$this->db->where('trans_data_details.flag_proses', 'Y');
 		$this->db->where('trans_data_details.approve_certificate !=', 'APV');
 		$this->db->where('trans_data_details.status_selia', $Status);
@@ -129,8 +129,8 @@ class M_dashboard_selia extends CI_Model
 							trans_data_details.modified_date, members.nama');
 		$this->db->from($this->table);
 		$this->db->join('trans_details', 'trans_data_details.trans_detail_id = trans_details.id');
-		$this->db->join('users', 'trans_data_details.id_selia = users.id');
-		$this->db->join('members', 'users.member_id = members.id');
+		$this->db->join('users', 'trans_data_details.id_selia = users.id', 'LEFT');
+		$this->db->join('members', 'users.member_id = members.id', 'LEFT');
 		$this->db->where('trans_data_details.flag_proses', 'Y');
 		$this->db->where('trans_data_details.approve_certificate !=', 'APV');
 		$this->db->where('trans_data_details.status_selia', $Status);
