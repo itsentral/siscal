@@ -60,10 +60,9 @@ class M_dashboard_selia extends CI_Model
 			$this->db->where('trans_data_details.no_sertifikat !=', '');
 		}
 
-		if($siscalGroup == "10"){
+		if($siscalGroup == "10" || $siscalGroup == "8"){
 			$this->db->where('trans_data_details.id_selia', $Penyelia);
 		}
-		
 
 
 		$i = 0;
@@ -129,7 +128,7 @@ class M_dashboard_selia extends CI_Model
 		$this->db->where('trans_data_details.approve_certificate !=', 'APV');
 		$this->db->where('trans_data_details.status_selia', $Status);
 
-		if($siscalGroup == "10"){
+		if($siscalGroup == "10" || $siscalGroup == "8"){
 			$this->db->where('trans_data_details.id_selia', $Penyelia);
 		}
 		return $this->db->count_all_results();
@@ -151,7 +150,7 @@ class M_dashboard_selia extends CI_Model
 		$this->db->where('trans_data_details.status_selia', 'PENDING');
 		$this->db->where('trans_data_details.approve_certificate !=', 'APV');
 
-		if($siscalGroup == "10"){
+		if($siscalGroup == "10" || $siscalGroup == "8"){
 			$this->db->where('trans_data_details.id_selia', $Penyelia);
 		}
 		return $this->db->count_all_results();
@@ -173,7 +172,7 @@ class M_dashboard_selia extends CI_Model
 		$this->db->where('trans_data_details.status_selia', 'REVISI');
 		$this->db->where('trans_data_details.approve_certificate !=', 'APV');
 
-		if($siscalGroup == "10"){
+		if($siscalGroup == "10" || $siscalGroup == "8"){
 			$this->db->where('trans_data_details.id_selia', $Penyelia);
 		}
 		return $this->db->count_all_results();
@@ -195,7 +194,7 @@ class M_dashboard_selia extends CI_Model
 		$this->db->where('trans_data_details.status_selia', 'PRINT');
 		$this->db->where('trans_data_details.approve_certificate !=', 'APV');
 
-		if($siscalGroup == "10"){
+		if($siscalGroup == "10" || $siscalGroup == "8"){
 			$this->db->where('trans_data_details.id_selia', $Penyelia);
 		}
 		return $this->db->count_all_results();
@@ -217,7 +216,7 @@ class M_dashboard_selia extends CI_Model
 		$this->db->where('trans_data_details.status_selia', 'SELESAI');
 		$this->db->where('trans_data_details.approve_certificate !=', 'APV');
 
-		if($siscalGroup == "10"){
+		if($siscalGroup == "10" || $siscalGroup == "8"){
 			$this->db->where('trans_data_details.id_selia', $Penyelia);
 		}
 		return $this->db->count_all_results();
