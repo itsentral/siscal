@@ -78,6 +78,12 @@ $this->load->view('include/side_menu');
 						</div>
 					</div>
 				</div>
+				<div class='col-sm-6'>
+					<div class="form-group">
+						<label class="control-label">Alamat Sertifikat</label>
+						<textarea class="form-control" rows=4 readonly><?php if(!empty($row_letter)) echo $row_letter->address_sertifikat; ?></textarea>
+					</div>
+				</div>
 				
 				<div class="col-sm-12">
 					<h4 class="title-cs"><i class="fa fa-user fa-md"></i> PIC LAB CUSTOMER</h4>

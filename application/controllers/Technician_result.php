@@ -241,7 +241,7 @@ class Technician_result extends CI_Controller
 
 	function view_detail()
 	{
-		$rows_header	= $rows_Member = $rows_Cust = array();
+		$rows_header	= $rows_Member = $rows_Cust = $row_Letter = array();
 		$Code_Process	= '';
 		$Code_Alat		= '';
 		$OK_Proses      = 0;
@@ -309,6 +309,7 @@ class Technician_result extends CI_Controller
 			}
 
 			$rows_Cust		= $this->db->get_where('customers', array('id' => $rows_header[0]->customer_id))->row();
+			$row_Letter 	= $this->db->get_where('letter_orders', array('id' => $Code_SO))->row();
 		}
 
 		if ($OK_Proses == 1) {
@@ -320,7 +321,8 @@ class Technician_result extends CI_Controller
 				'rows_header'	=> $rows_header,
 				'code_process'	=> $Code_Process,
 				'rows_member'	=> $rows_Member,
-				'rows_cust'		=> $rows_Cust
+				'rows_cust'		=> $rows_Cust,
+				'row_letter'	=> $row_Letter
 			);
 
 			$this->load->view($this->folder . '/v_technician_result_detail', $data);

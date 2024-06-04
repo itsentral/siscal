@@ -183,7 +183,7 @@ class Calibration_result extends CI_Controller {
 	}
 	
 	function view_detail(){
-		$rows_Quot	= $rows_Letter = $rows_Trans = $rows_Cust = array();
+		$rows_Quot	= $rows_Letter = $rows_Trans = $rows_Cust = $row_Letter = array();
 		if($this->input->get()){
 			$Code_SO		= urldecode($this->input->get('kode'));
 			$rows_Letter	= $this->db->get_where('letter_orders',array('id'=>$Code_SO))->row();
@@ -208,6 +208,7 @@ class Calibration_result extends CI_Controller {
 				
 			}
 			$rows_Cust		= $this->db->get_where('customers',array('id'=>$rows_Letter->customer_id))->row();
+			$row_Letter 	= $this->db->get_where('letter_orders', array('id' => $Code_SO))->row();
 		}
 		
 		if($OK_Proses == 1){
@@ -220,7 +221,8 @@ class Calibration_result extends CI_Controller {
 				'rows_letter'	=> $rows_Letter,
 				'rows_trans'	=> $rows_Trans,
 				'rows_cust'		=> $rows_Cust,
-				'Code_SO'		=> $Code_SO
+				'Code_SO'		=> $Code_SO,
+				'row_letter'	=> $row_Letter
 			);
 			
 			$this->load->view($this->folder.'/v_calibration_result_preview',$data);
