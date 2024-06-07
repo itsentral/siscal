@@ -4,7 +4,7 @@ class M_toprint extends CI_Model
 {
 
 	var $table 			= 'trans_data_details';
-	var $column_order 	= array(
+	var $column_order 	= array(null,
 								'trans_data_details.id', 
 								'trans_details.customer_name', 
 								//'trans_details.address_so', 

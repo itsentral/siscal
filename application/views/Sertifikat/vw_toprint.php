@@ -12,6 +12,7 @@ $this->load->view('include/side_menu');
 			<table id="table-cs" class="table table-bordered table-striped" width="100%">
 				<thead class="thead-cs" style="background-color:#E9ECF9;color:#0A1A60;">
 					<tr style="font-size: 13px;height: 50px;">
+						<th><input type="checkbox" id="chk_all" name="chk_all"></th>
 						<th>KODE</th>
 						<th>CUSTOMER</th>
 						<th>ALAMAT SO</th>
@@ -25,7 +26,7 @@ $this->load->view('include/side_menu');
 						<th>ACTION</th>
 					</tr>
 				</thead>
-				<tbody style="font-size: 12px;">
+				<tbody id="list_selia" style="font-size: 12px;">
 				</tbody>
 			</table>
 		</div>
@@ -130,6 +131,7 @@ $this->load->view('include/side_menu');
 	.Btntable1 {
 		background-color: #2F92E4 !important;
 		color: white !important;
+		width: auto;
 	}
 
 	.highlight {
@@ -254,28 +256,21 @@ $(document).ready(function() {
 								text:      '<i class="fa fa-refresh fa-lg"></i> &nbsp;<b>Reload</b>',
 								className: "Btntable reload-table",
 							},
-							
-							// {
-							// 	extend: 'excelHtml5',
-							// 	text:      '<i class="fa fa-download fa-lg"></i> &nbsp;<b>Excel</b>',
-							// 	titleAttr: 'Excel',
-							// 	className: "Btntable",
-							// 	title: 'Master Alat Kalibrasi - Data Per '+formattedToday,
-							// 	messageTop: 'SISCAL DASHBOARD',
-							// 	exportOptions: {
-							// 			columns: [0,1,2,3,4,5]
-							// 	}
-							// },
+
+							{
+								text:      '<i class="fa fa-download fa-lg"></i> &nbsp;<b>Download</b>',
+								className: "Btntable Btntable1 saveFile",
+							},
 
 						],
 
 		columnDefs	: [ 
 						{
-							"targets": [ 0,3,5,6,9,10 ],
+							"targets": [ 0,4,6,7,8,11 ],
 							"className": 'text-center',
 						}, 
 						{
-							"targets": [ 10 ],
+							"targets": [ 0, 11 ],
 							"orderable": false,
 						}, 
 					],
@@ -287,9 +282,9 @@ $(document).ready(function() {
 				$(this).removeClass('highlight');
 			});
 			$('#table-cs tbody tr').each(function(){
-				$(this).find('td:eq(3)').attr('nowrap', 'nowrap');
-				$(this).find('td:eq(9)').attr('nowrap', 'nowrap');
+				$(this).find('td:eq(4)').attr('nowrap', 'nowrap');
 				$(this).find('td:eq(10)').attr('nowrap', 'nowrap');
+				$(this).find('td:eq(11)').attr('nowrap', 'nowrap');
 			});
 		}
 
@@ -310,6 +305,41 @@ $(document).ready(function() {
 		table.ajax.reload(null, false);
 	});
 
+});
+
+$(document).on('click', '#chk_all', () => {
+	if ($('#chk_all').is(':checked')) {
+		$('#list_selia input[type="checkbox"]').prop('checked', true);
+	} else {
+		$('#list_selia input[type="checkbox"]').prop('checked', false);
+	}
+});
+
+$(document).on("click", ".saveFile", function (e) {
+	e.preventDefault();
+
+	let slct = $('#list_selia').find('input[type="checkbox"]:checked').length;
+
+	if (parseInt(slct) <= 0 || slct == '') {
+		swal({
+			title: "Warning !",
+			text: 'No record was selected. Please choose at least one record....',
+			type: "warning"
+		});
+		return false;
+	}
+	
+	const ChosenOrder = [];
+	
+	$('#list_selia').find('input[type="checkbox"]:checked').each(function() {
+		ChosenOrder.push($(this).val());
+	});
+
+	let CodeTerpilih = ChosenOrder.join('^');
+
+	let Link_Process = base_url + '/' + active_controller + '/downloadFile?checkID=' + encodeURIComponent(CodeTerpilih);
+	window.location.href = Link_Process;
+	
 });
 
 function viewAddress(id) {
