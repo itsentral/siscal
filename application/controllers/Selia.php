@@ -429,6 +429,7 @@ class Selia extends CI_Controller {
 				
 				$Nama_ZIP		= $Nama_Folder.'.zip';
 				$Dir_ZIP		= './hasil_kalibrasi/'.$Nama_Folder.'.zip';
+				$bad 			= array_merge(array_map('chr', range(0,31)), array("<", ">", ":", '"', "/", "\\", "|", "?", "*"));
 				
 				@unlink($Dir_ZIP);
 				
@@ -460,13 +461,40 @@ class Selia extends CI_Controller {
 				
 				foreach ($files as $name => $file)
 				{
+					// if (!$file->isDir())
+					// {
+					// 	$filePath 		= $file->getRealPath();
+					// 	$relativePath 	= substr($filePath, strlen($rootPath) + 1);
+					// 	$zip->addFile($filePath, $relativePath);
+						
+					// }
+
 					if (!$file->isDir())
 					{
 						$filePath 		= $file->getRealPath();
 						$relativePath 	= substr($filePath, strlen($rootPath) + 1);
-						$zip->addFile($filePath, $relativePath);
+						$GetIDFile		= substr($relativePath , 0, (strlen($relativePath ))-(strlen(strrchr($relativePath, '.'))));
+						$rows_File		= $this->db->select('trans_data_details.actual_teknisi_name, trans_details.customer_name,
+												trans_data_details.tool_name, trans_data_details.no_identifikasi,
+												trans_data_details.no_serial_number')
+										->from('trans_data_details')
+										->join('trans_details', 'trans_data_details.trans_detail_id = trans_details.id')
+										->where('trans_data_details.id', $GetIDFile)->get()->row();
+
+						$id_sn = '';
+						if($rows_File->no_identifikasi == '' || $rows_File->no_identifikasi == '0'){
+							$id_sn = 'SN('.$rows_File->no_serial_number.')';
+						}elseif($rows_File->no_serial_number == '' || $rows_File->no_serial_number == '0'){
+							$id_sn = 'ID('.$rows_File->no_identifikasi.')';
+						}else{
+							$id_sn = 'SN('.$rows_File->no_serial_number.')_ID('.$rows_File->no_identifikasi.')';
+						}
+
+						$renameFilecs		= str_replace($bad, '_', strtoupper($rows_File->actual_teknisi_name).'_'.$rows_File->customer_name.'_'.$rows_File->tool_name.'_'.$id_sn);
+						$zip->addFile($filePath, $renameFilecs.'_'.$relativePath);
 						
 					}
+
 				}
 
 				$zip->close();
