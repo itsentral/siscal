@@ -235,6 +235,20 @@
 								text:      '<i class="fa fa-refresh fa-lg"></i> &nbsp;<b>Reload</b>',
 								className: "Btntable reload-table",
 							},
+
+							<?php if ($akses_menu['download'] == '1') { ?>
+							{
+								extend: 'excelHtml5',
+								text:      '<i class="fa fa-download fa-lg"></i> &nbsp;<b>Excel</b>',
+								titleAttr: 'Excel',
+								className: "Btntable",
+								title: 'DASHBOARD SELIA - <?php echo date('d-m-Y h:i');?>',
+								messageTop: 'SISCAL DASHBOARD',
+								exportOptions: {
+										columns: [0,1,2,3,4,5,6,7,8]
+								}
+							},
+							<?php } ?>
 							
 
 						],
