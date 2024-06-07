@@ -45,9 +45,11 @@ class Dashboard_selia extends CI_Controller {
 
 	function list_func_selia()
 	{
-			$list = $this->Dashboardselia->get_datatables();
-			$data = array();
-			$no = $_POST['start'];
+			$list 	= $this->Dashboardselia->get_datatables();
+			$data 	= array();
+			$no 	= $_POST['start'];
+			$Status	= $this->input->post('status_dashboard');
+
 			foreach ($list as $item) {
 				$no++; 
 				$row = array();
@@ -56,7 +58,7 @@ class Dashboard_selia extends CI_Controller {
 				$Arr_Akses			= getAcccesmenu($controller);
 
 				$queryLate 	= "SELECT * FROM trans_data_detail_cals_file_log 
-							where trans_data_detail_id = '".$item->id."' AND status_selia = 'PENDING' 
+							where trans_data_detail_id = '".$item->id."' AND status_selia = '".$Status."' 
 							ORDER BY id DESC LIMIT 1";
 				$rowsLate	= $this->db->query($queryLate)->result_array();
 
