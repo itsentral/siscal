@@ -1,5 +1,6 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
+date_default_timezone_set('Asia/Jakarta');
 
 class Schedule_order extends CI_Controller
 {
@@ -28,14 +29,46 @@ class Schedule_order extends CI_Controller
 			redirect(site_url('dashboard'));
 		}
 
+		$countLabs	= $this->db->select('*')->from('schedules')->join('letter_orders', 'schedules.letter_order_id = letter_orders.id')
+					->where('schedules.status' , 'OPN')->where('letter_orders.flag_so_insitu', 'N')->count_all_results();
+		$countIns	= $this->db->select('*')->from('schedules')->join('letter_orders', 'schedules.letter_order_id = letter_orders.id')
+					->where('schedules.status' , 'OPN')->where('letter_orders.flag_so_insitu', 'Y')->count_all_results();
+
 		$data = array(
-			'title'			=> 'SCHEDULE',
+			'title'			=> 'SCHEDULE INLAB',
 			'action'		=> 'index',
-			'akses_menu'	=> $Arr_Akses
+			'akses_menu'	=> $Arr_Akses,
+			'countLabs'		=> $countLabs,
+			'countIns'		=> $countIns
 		);
-		history('View List Schedule');
+		history('View List Schedule Labs');
 		$this->load->view($this->folder . '/v_schedule_order', $data);
 	}
+
+	public function view_insitu()
+	{
+		$Arr_Akses			= $this->Arr_Akses;
+		if ($Arr_Akses['read'] != '1') {
+			$this->session->set_flashdata("alert_data", "<div class=\"alert alert-warning\" id=\"flash-message\">You Don't Have Right To Access This Page, Please Contact Your Administrator....</div>");
+			redirect(site_url('dashboard'));
+		}
+
+		$countLabs	= $this->db->select('*')->from('schedules')->join('letter_orders', 'schedules.letter_order_id = letter_orders.id')
+					->where('schedules.status' , 'OPN')->where('letter_orders.flag_so_insitu', 'N')->count_all_results();
+		$countIns	= $this->db->select('*')->from('schedules')->join('letter_orders', 'schedules.letter_order_id = letter_orders.id')
+					->where('schedules.status' , 'OPN')->where('letter_orders.flag_so_insitu', 'Y')->count_all_results();
+
+		$data = array(
+			'title'			=> 'SCHEDULE INSITU',
+			'action'		=> 'index',
+			'akses_menu'	=> $Arr_Akses,
+			'countLabs'		=> $countLabs,
+			'countIns'		=> $countIns
+		);
+		history('View List Schedule Insitu');
+		$this->load->view($this->folder . '/v_schedule_order_insitu', $data);
+	}
+
 	function get_data_display()
 	{
 		$Arr_Akses		= $this->Arr_Akses;
@@ -90,10 +123,12 @@ class Schedule_order extends CI_Controller
 			$WHERE	.= "head_sched.status = '" . $Status_Find . "'";
 		}
 
-		if ($Type_Find) {
-			if (!empty($WHERE)) $WHERE .= " AND ";
-			$WHERE	.= "head_so.flag_so_insitu = '" . $Type_Find . "'";
-		}
+		// if ($Type_Find) {
+		// 	if (!empty($WHERE)) $WHERE .= " AND ";
+		// 	$WHERE	.= "head_so.flag_so_insitu = '" . $Type_Find . "'";
+		// }
+		
+		$WHERE	.= "AND head_so.flag_so_insitu = 'N'";
 
 		$sql = "SELECT
 					head_sched.*,
@@ -225,6 +260,199 @@ class Schedule_order extends CI_Controller
 
 		echo json_encode($json_data);
 	}
+
+	function get_data_display_insitu()
+	{
+		$Arr_Akses		= $this->Arr_Akses;
+
+		$WHERE			= "1=1";
+
+		$Month_Find		= $this->input->post('bulan');
+		$Year_Find		= $this->input->post('tahun');
+		$Status_Find	= $this->input->post('status');
+		$Type_Find		= $this->input->post('type');
+		$requestData	= $_REQUEST;
+
+		$like_value     = $requestData['search']['value'];
+		$column_order   = $requestData['order'][0]['column'];
+		$column_dir     = $requestData['order'][0]['dir'];
+		$limit_start    = $requestData['start'];
+		$limit_length   = $requestData['length'];
+
+		$columns_order_by = array(
+			0 => 'head_sched.nomor',
+			1 => 'head_sched.datet',
+			2 => 'head_sched.customer_name',
+			3 => 'head_quot.nomor',
+			4 => 'head_so.no_so'
+		);
+
+
+
+		if ($like_value) {
+			if (!empty($WHERE)) $WHERE	.= " AND ";
+			$WHERE	.= "(
+						  head_so.no_so LIKE '%" . $this->db->escape_like_str($like_value) . "%'
+						  OR DATE_FORMAT(head_sched.datet, '%d %b %Y') LIKE '%" . $this->db->escape_like_str($like_value) . "%'
+						  OR head_sched.customer_name LIKE '%" . $this->db->escape_like_str($like_value) . "%'
+						  OR head_quot.nomor LIKE '%" . $this->db->escape_like_str($like_value) . "%'
+						  OR head_sched.nomor LIKE '%" . $this->db->escape_like_str($like_value) . "%'
+						)";
+		}
+
+		if ($Month_Find) {
+			if (!empty($WHERE)) $WHERE .= " AND ";
+			$WHERE	.= "MONTH(head_sched.datet) = '" . $Month_Find . "'";
+		}
+
+		if ($Year_Find) {
+			if (!empty($WHERE)) $WHERE .= " AND ";
+			$WHERE	.= "YEAR(head_sched.datet) = '" . $Year_Find . "'";
+		}
+
+		if ($Status_Find) {
+			if (!empty($WHERE)) $WHERE .= " AND ";
+			$WHERE	.= "head_sched.status = '" . $Status_Find . "'";
+		}
+
+		// if ($Type_Find) {
+		// 	if (!empty($WHERE)) $WHERE .= " AND ";
+		// 	$WHERE	.= "head_so.flag_so_insitu = '" . $Type_Find . "'";
+		// }
+		
+		$WHERE	.= "AND head_so.flag_so_insitu = 'Y'";
+
+		$sql = "SELECT
+					head_sched.*,
+					head_quot.nomor AS quotation_nomor,
+					head_quot.datet AS quotation_date,
+					head_quot.pono,
+					head_quot.podate,
+					head_quot.member_id,
+					head_quot.member_name,
+					head_so.no_so,
+					head_so.tgl_so,
+					head_so.flag_so_insitu,
+					(@row:=@row+1) AS urut
+				FROM
+					schedules head_sched
+				INNER JOIN letter_orders head_so ON head_sched.letter_order_id=head_so.id
+				INNER JOIN quotations head_quot ON head_sched.quotation_id = head_quot.id,
+				(SELECT @row:=0) r 
+				WHERE " . $WHERE;
+		// print_r($this->input->post());
+		// exit();
+		$fetch['totalData'] 	= $this->db->query($sql)->num_rows();
+		$fetch['totalFiltered']	= $this->db->query($sql)->num_rows();
+
+
+
+		$sql .= " ORDER BY head_sched.datet DESC," . $columns_order_by[$column_order] . " " . $column_dir . " ";
+		$sql .= " LIMIT " . $limit_start . " ," . $limit_length . " ";
+
+		$fetch['query'] = $this->db->query($sql);
+
+		$totalData		= $fetch['totalData'];
+		$totalFiltered	= $fetch['totalFiltered'];
+		$query			= $fetch['query'];
+
+		$data		= array();
+		$urut1  	= 1;
+		$urut2  	= 0;
+		$Periode_Now = date('Y-m');
+		$Tahun_Now	= date('Y');
+		foreach ($query->result_array() as $row) {
+			$total_data     = $totalData;
+			$start_dari     = $requestData['start'];
+			$asc_desc       = $requestData['order'][0]['dir'];
+			if ($asc_desc == 'asc') {
+				$nomor = $urut1 + $start_dari;
+			}
+			if ($asc_desc == 'desc') {
+				$nomor = ($total_data - $start_dari) - $urut2;
+			}
+
+			$Code_Schedule		= $row['id'];
+			$Nomor_Schedule		= $row['nomor'];
+			$Date_Schedule		= date('d-m-Y', strtotime($row['datet']));
+			$Status_Schedule	= $row['status'];
+			$Nomor_SO			= $row['no_so'];
+			$Date_SO			= date('d-m-Y', strtotime($row['tgl_so']));
+			$Custid				= $row['customer_id'];
+			$Customer			= $row['customer_name'];
+			$Marketing			= strtoupper($row['member_name']);
+
+			$Quot_Nomor			= $row['quotation_nomor'];
+			$Quot_Date			= date('d-m-Y', strtotime($row['quotation_date']));
+			$Quot_PO			= $row['pono'];
+			$Quot_PO_Date		= date('d-m-Y', strtotime($row['podate']));
+
+			$Lable_Status	= 'OPEN';
+			$Color_Status	= 'bg-green-active';
+			if ($Status_Schedule === 'CNC') {
+				$Lable_Status	= 'CANCELED';
+				$Color_Status	= 'bg-orange-active';
+			} else if ($Status_Schedule === 'REV') {
+				$Lable_Status	= 'REVISION';
+				$Color_Status	= 'bg-navy-active';
+			} else if ($Status_Schedule === 'APV') {
+				$Lable_Status	= 'APPROVE BY CS';
+				$Color_Status	= 'bg-maroon-active';
+			}
+			$Ket_Status		= '<span class="badge ' . $Color_Status . '">' . $Lable_Status . '</span>';
+
+
+
+			$Template		= '<button type="button" class="btn btn-sm btn-primary" onClick = "ActionPreview({code:\'' . $Code_Schedule . '\',action :\'detail_schedule_order\',title:\'VIEW SCHEDULE\'});" title="VIEW SCHEDULE"> <i class="fa fa-search"></i> </button>';
+			if (($Arr_Akses['create'] == '1' || $Arr_Akses['update'] == '1') && $Status_Schedule === 'OPN') {
+				$Template		.= ' <button type="button" class="btn btn-sm btn-danger" onClick = "ActionPreview({code:\'' . $Code_Schedule . '\',action :\'cancel_schedule_order\',title:\'CANCEL SCHEDULE\'});" title="CANCEL SCHEDULE"> <i class="fa fa-trash-o"></i> </button>';
+				$Template		.= ' <a href="' . site_url() . '/Schedule_order/revisi_schedule_order?nomor_order=' . urlencode($Code_Schedule) . '" class="btn btn-sm btn-success" title="REVISION SCHEDULE"> <i class="fa fa-edit"></i> </a>';
+				if ($row['sts_email'] == 'N') {
+					$Template		.= ' <button type="button" class="btn btn-sm bg-maroon" onClick = "ActionPreview({code:\'' . $Code_Schedule . '\',action :\'email_schedule_order\',title:\'SEND EMAIL SCHEDULE\'});" title="SEND EMAIL"> <i class="fa fa-send"></i> </button>';
+				}
+
+				$Template		.= ' <button type="button" class="btn btn-sm bg-navy-active" onClick = "ActionPreview({code:\'' . $Code_Schedule . '\',action :\'approve_schedule_order\',title:\'APPROVE SCHEDULE\'});" title="APPROVE SCHEDULE"> <i class="fa fa-check-square"></i> </button>';
+			}
+
+			if (($Arr_Akses['create'] == '1' || $Arr_Akses['update'] == '1') && $Status_Schedule === 'APV') {
+				$Template		.= ' <a href="' . site_url() . '/Schedule_order/approve_reschedule_order?nomor_order=' . urlencode($Code_Schedule) . '" class="btn btn-sm bg-purple-active" title="APPROVE RESCHEDULE"> <i class="fa fa-recycle"></i> </a>';
+			}
+
+			if ($Arr_Akses['download'] == '1'  && $Status_Schedule === 'OPN') {
+				$Template		.= ' <a href="' . site_url() . '/Schedule_order/print_schedule?nomor_order=' . urlencode($Code_Schedule) . '" class="btn btn-sm btn-warning" target = "_blank" title="PRINT SCHEDULE"> <i class="fa fa-print"></i> </a>';
+			}
+
+			if ($row['flag_so_insitu'] == 'Y') {
+				$flag_so = "<td class='text-center'><span class='badge bg-green'>Insitu</span></td>";
+			} else {
+				$flag_so = "<td class='text-center'><span class='badge bg-maroon'>Labs</span></td>";
+			}
+
+
+			$nestedData		= array();
+			$nestedData[]	= $Nomor_Schedule;
+			$nestedData[]	= $Date_Schedule;
+			$nestedData[]	= $Customer;
+			$nestedData[]	= $flag_so;
+			$nestedData[]	= $Quot_Nomor;
+			$nestedData[]	= $Nomor_SO;
+			$nestedData[]	= $Ket_Status;
+			$nestedData[]	= $Template;
+			$data[] = $nestedData;
+			$urut1++;
+			$urut2++;
+		}
+
+		$json_data = array(
+			"draw"            => intval($requestData['draw']),
+			"recordsTotal"    => intval($totalData),
+			"recordsFiltered" => intval($totalFiltered),
+			"data"            => $data
+		);
+
+		echo json_encode($json_data);
+	}
+
 	function outs_schedule_order()
 	{
 		$Arr_Akses			= $this->Arr_Akses;
@@ -967,6 +1195,7 @@ class Schedule_order extends CI_Controller
 			$Created_Date	= date('Y-m-d H:i:s');
 
 
+			$Code_SO		= $this->input->post('no_so');
 			$Code_Sales		= $this->input->post('letter_order_id');
 			$Code_Process	= $this->input->post('kode_proses');
 			$Nocust			= $this->input->post('customer_id');
@@ -1175,6 +1404,53 @@ class Schedule_order extends CI_Controller
 						if ($Has_Ins_Detail_Aloc !== TRUE) {
 							$Pesan_Error	= 'Error Insert Schedule Allocation...';
 						}
+					}
+
+					$Find_Kalibrator	= $this->db->get_where('tools', array('id' => $Code_Tool))->row();
+					$Code_Kalibrator	= $Find_Kalibrator->calibrator;
+
+					if($Code_Kalibrator){
+						//ini untuk ngecek kalau calibrator lebih dari satu penyimpanannya gimana pikirin boy
+					}
+
+					$Ins_Peminjaman = array(
+						'id_schedule'		=> $Code_Schedule,
+						'id_teknisi'		=> $Code_Teknisi,
+						'no_so'				=> $Code_SO,
+						'tool_id'			=> $Code_Tool,
+						'kode_calibrator'	=> $Code_Kalibrator, //ini nanti where berdasarkan tool_id
+						'nama_calibrator'	=> 'Nanti ini join aja', //ini nanti hapus aja didbnya
+						'tgl_pinjam'		=> $Cals_Date,
+						'time_start'		=> $Time_Start,
+						'time_end'			=> $Time_End,
+						'status'			=> 'Dipinjam',
+						'created_date'		=> $Created_Date,
+						'created_by'		=> $Created_Id
+					);
+
+					$Has_Ins_Peminjaman 		= $this->db->insert('peminjaman_calibrator', $Ins_Peminjaman);
+					$idPinjam 					= $this->db->insert_id();
+
+					if ($Has_Ins_Peminjaman !== TRUE) {
+						$Pesan_Error	= 'Error Insert Peminjaman...';
+					}
+
+					$Ins_Riwayat_Peminjaman = array(
+						'id_peminjaman'		=> $idPinjam,
+						'id_teknisi'		=> $Code_Teknisi,
+						'kode_calibrator'	=> $Code_Kalibrator, //ini nanti where berdasarkan tool_id
+						'nama_calibrator'	=> 'Nanti ini join aja', //ini nanti where berdasarkan tool_id
+						'tgl_pinjam'		=> $Cals_Date,
+						'time_start'		=> $Time_Start,
+						'time_end'			=> $Time_End,
+						'status'			=> 'Dipinjam',
+						'created_date'		=> $Created_Date,
+						'created_by'		=> $Created_Id
+					);
+
+					$Has_Ins_Riwayat_Peminjaman = $this->db->insert('riwayat_peminjaman_calibrator', $Ins_Riwayat_Peminjaman);
+					if ($Has_Ins_Riwayat_Peminjaman !== TRUE) {
+						$Pesan_Error	= 'Error Insert Riwayat Peminjaman...';
 					}
 				}
 			}
@@ -1393,7 +1669,7 @@ class Schedule_order extends CI_Controller
 				$Pesan_Error	= '';
 
 				$sroot 	= $_SERVER['DOCUMENT_ROOT'];
-				include $sroot . '/application/libraries/PHPMailer/PHPMailerAutoload.php';
+				include $sroot . '/Siscal_Dashboard/application/libraries/PHPMailer/PHPMailerAutoload.php';
 
 
 				$Body = "<html xmlns=\"http://www.w3.org/1999/xhtml\">
@@ -1475,8 +1751,11 @@ class Schedule_order extends CI_Controller
 				$mail->From				= $rows_Sender->email_from; // sender email
 				$mail->FromName			= $rows_Sender->name_from; // name sender
 
-				$Email_To				= $Email_Address;
-				$Email_Name				= $Inisial . ' ' . $Email_Name;
+				// $Email_To				= $Email_Address;
+				// $Email_Name				= $Inisial . ' ' . $Email_Name;
+
+				$Email_To				= 'boyhaqi888999@gmail.com';
+				$Email_Name				= $Inisial . ' ' . 'BOY HAQI';
 
 				$mail->AddAddress($Email_To, ucwords(strtolower($Email_Name)));
 				if ($rows_Sender->cc_email) {
@@ -1514,8 +1793,8 @@ class Schedule_order extends CI_Controller
 
 				$mail->Body		= $Body;
 
-				$img_file	= $sroot . '/assets/img/logo.jpg';
-				$directory	= $sroot . '/assets/file/';
+				$img_file	= $sroot . '/Siscal_Dashboard/assets/img/logo.jpg';
+				$directory	= $sroot . '/Siscal_Dashboard/assets/file/';
 
 
 				$this->download_pdf($Code_Order);
@@ -1567,7 +1846,7 @@ class Schedule_order extends CI_Controller
 	function download_pdf($kode)
 	{
 		$sroot 	= $_SERVER['DOCUMENT_ROOT'];
-		include $sroot . '/application/libraries/MPDF57/mpdf.php';
+		include $sroot . '/Siscal_Dashboard/application/libraries/MPDF57/mpdf.php';
 		$mpdf	= new mPDF('utf-8', 'A4-P');
 
 		$ArrBulan	= array(1 => 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'Nopember', 'Desember');
@@ -1582,9 +1861,9 @@ class Schedule_order extends CI_Controller
 		);
 		//Beginning Buffer to save PHP variables and HTML tags
 
-		$img_file	= $sroot . '/assets/img/logo.jpg';
-		$img_file2	= $sroot . '/assets/img/kan.png';
-		$directory	= $sroot . '/assets/file/';
+		$img_file	= $sroot . '/Siscal_Dashboard/assets/img/logo.jpg';
+		$img_file2	= $sroot . '/Siscal_Dashboard/assets/img/kan.png';
+		$directory	= $sroot . '/Siscal_Dashboard/assets/file/';
 		$ArrBulan	= array(1 => 'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec');
 		//Beginning Buffer to save PHP variables and HTML tags
 		set_time_limit(0);
@@ -2357,6 +2636,39 @@ class Schedule_order extends CI_Controller
 							$Pesan_Error	= 'Error Update Letter Order Header';
 						}
 					}
+
+					$Find_peminjaman	= $this->db->get_where('peminjaman_calibrator', array('id_schedule' => $Code_Order))->row();
+					
+					if($Find_peminjaman){
+						$upd_peminjaman		= $this->db->update('peminjaman_calibrator', array(
+																								'status' 		=> "Cancel",
+																								'update_date' 	=> $Created_Date,
+																								'update_by' 	=> $Created_By
+																							));
+
+						if ($upd_peminjaman !== TRUE) {
+							$Pesan_Error	= 'Error Update Peminjaman';
+						}
+
+						$Ins_Riwayat_Peminjaman = array(
+							'id_peminjaman'		=> $Find_peminjaman->id,
+							'id_teknisi'		=> $Find_peminjaman->id_teknisi,
+							'kode_calibrator'	=> $Find_peminjaman->kode_calibrator, //ini nanti where berdasarkan tool_id
+							'nama_calibrator'	=> $Find_peminjaman->nama_calibrator, //ini nanti where berdasarkan tool_id
+							'tgl_pinjam'		=> $Find_peminjaman->tgl_pinjam,
+							'time_start'		=> $Find_peminjaman->time_start,
+							'time_end'			=> $Find_peminjaman->time_end,
+							'status'			=> 'Cancel',
+							'created_date'		=> $Created_Date,
+							'created_by'		=> $Created_By
+						);
+	
+						$Has_Ins_Riwayat_Peminjaman = $this->db->insert('riwayat_peminjaman_calibrator', $Ins_Riwayat_Peminjaman);
+						if ($Has_Ins_Riwayat_Peminjaman !== TRUE) {
+							$Pesan_Error	= 'Error Insert Riwayat Peminjaman...';
+						}
+					}
+					
 
 					if ($this->db->trans_status() != TRUE || !empty($Pesan_Error)) {
 						$this->db->trans_rollback();

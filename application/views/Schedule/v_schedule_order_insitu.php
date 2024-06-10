@@ -405,7 +405,7 @@ $this->load->view('include/side_menu');
 
 								],
 				"ajax": {
-					url: base_url + '/' + active_controller + '/get_data_display',
+					url: base_url + '/' + active_controller + '/get_data_display_insitu',
 					type: "post",
 					cache: false,
 					data: {
