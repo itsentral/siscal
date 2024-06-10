@@ -1428,30 +1428,30 @@ class Schedule_order extends CI_Controller
 						'created_by'		=> $Created_Id
 					);
 
-					$Has_Ins_Peminjaman 		= $this->db->insert('peminjaman_calibrator', $Ins_Peminjaman);
-					$idPinjam 					= $this->db->insert_id();
+					// $Has_Ins_Peminjaman 		= $this->db->insert('peminjaman_calibrator', $Ins_Peminjaman);
+					// $idPinjam 					= $this->db->insert_id();
 
-					if ($Has_Ins_Peminjaman !== TRUE) {
-						$Pesan_Error	= 'Error Insert Peminjaman...';
-					}
+					// if ($Has_Ins_Peminjaman !== TRUE) {
+					// 	$Pesan_Error	= 'Error Insert Peminjaman...';
+					// }
 
-					$Ins_Riwayat_Peminjaman = array(
-						'id_peminjaman'		=> $idPinjam,
-						'id_teknisi'		=> $Code_Teknisi,
-						'kode_calibrator'	=> $Code_Kalibrator, //ini nanti where berdasarkan tool_id
-						'nama_calibrator'	=> 'Nanti ini join aja', //ini nanti where berdasarkan tool_id
-						'tgl_pinjam'		=> $Cals_Date,
-						'time_start'		=> $Time_Start,
-						'time_end'			=> $Time_End,
-						'status'			=> 'Dipinjam',
-						'created_date'		=> $Created_Date,
-						'created_by'		=> $Created_Id
-					);
+					// $Ins_Riwayat_Peminjaman = array(
+					// 	'id_peminjaman'		=> $idPinjam,
+					// 	'id_teknisi'		=> $Code_Teknisi,
+					// 	'kode_calibrator'	=> $Code_Kalibrator, //ini nanti where berdasarkan tool_id
+					// 	'nama_calibrator'	=> 'Nanti ini join aja', //ini nanti where berdasarkan tool_id
+					// 	'tgl_pinjam'		=> $Cals_Date,
+					// 	'time_start'		=> $Time_Start,
+					// 	'time_end'			=> $Time_End,
+					// 	'status'			=> 'Dipinjam',
+					// 	'created_date'		=> $Created_Date,
+					// 	'created_by'		=> $Created_Id
+					// );
 
-					$Has_Ins_Riwayat_Peminjaman = $this->db->insert('riwayat_peminjaman_calibrator', $Ins_Riwayat_Peminjaman);
-					if ($Has_Ins_Riwayat_Peminjaman !== TRUE) {
-						$Pesan_Error	= 'Error Insert Riwayat Peminjaman...';
-					}
+					// $Has_Ins_Riwayat_Peminjaman = $this->db->insert('riwayat_peminjaman_calibrator', $Ins_Riwayat_Peminjaman);
+					// if ($Has_Ins_Riwayat_Peminjaman !== TRUE) {
+					// 	$Pesan_Error	= 'Error Insert Riwayat Peminjaman...';
+					// }
 				}
 			}
 
@@ -2637,37 +2637,37 @@ class Schedule_order extends CI_Controller
 						}
 					}
 
-					$Find_peminjaman	= $this->db->get_where('peminjaman_calibrator', array('id_schedule' => $Code_Order))->row();
+					// $Find_peminjaman	= $this->db->get_where('peminjaman_calibrator', array('id_schedule' => $Code_Order))->row();
 					
-					if($Find_peminjaman){
-						$upd_peminjaman		= $this->db->update('peminjaman_calibrator', array(
-																								'status' 		=> "Cancel",
-																								'update_date' 	=> $Created_Date,
-																								'update_by' 	=> $Created_By
-																							));
+					// if($Find_peminjaman){
+					// 	$upd_peminjaman		= $this->db->update('peminjaman_calibrator', array(
+					// 																			'status' 		=> "Cancel",
+					// 																			'update_date' 	=> $Created_Date,
+					// 																			'update_by' 	=> $Created_By
+					// 																		));
 
-						if ($upd_peminjaman !== TRUE) {
-							$Pesan_Error	= 'Error Update Peminjaman';
-						}
+					// 	if ($upd_peminjaman !== TRUE) {
+					// 		$Pesan_Error	= 'Error Update Peminjaman';
+					// 	}
 
-						$Ins_Riwayat_Peminjaman = array(
-							'id_peminjaman'		=> $Find_peminjaman->id,
-							'id_teknisi'		=> $Find_peminjaman->id_teknisi,
-							'kode_calibrator'	=> $Find_peminjaman->kode_calibrator, //ini nanti where berdasarkan tool_id
-							'nama_calibrator'	=> $Find_peminjaman->nama_calibrator, //ini nanti where berdasarkan tool_id
-							'tgl_pinjam'		=> $Find_peminjaman->tgl_pinjam,
-							'time_start'		=> $Find_peminjaman->time_start,
-							'time_end'			=> $Find_peminjaman->time_end,
-							'status'			=> 'Cancel',
-							'created_date'		=> $Created_Date,
-							'created_by'		=> $Created_By
-						);
+					// 	$Ins_Riwayat_Peminjaman = array(
+					// 		'id_peminjaman'		=> $Find_peminjaman->id,
+					// 		'id_teknisi'		=> $Find_peminjaman->id_teknisi,
+					// 		'kode_calibrator'	=> $Find_peminjaman->kode_calibrator, //ini nanti where berdasarkan tool_id
+					// 		'nama_calibrator'	=> $Find_peminjaman->nama_calibrator, //ini nanti where berdasarkan tool_id
+					// 		'tgl_pinjam'		=> $Find_peminjaman->tgl_pinjam,
+					// 		'time_start'		=> $Find_peminjaman->time_start,
+					// 		'time_end'			=> $Find_peminjaman->time_end,
+					// 		'status'			=> 'Cancel',
+					// 		'created_date'		=> $Created_Date,
+					// 		'created_by'		=> $Created_By
+					// 	);
 	
-						$Has_Ins_Riwayat_Peminjaman = $this->db->insert('riwayat_peminjaman_calibrator', $Ins_Riwayat_Peminjaman);
-						if ($Has_Ins_Riwayat_Peminjaman !== TRUE) {
-							$Pesan_Error	= 'Error Insert Riwayat Peminjaman...';
-						}
-					}
+					// 	$Has_Ins_Riwayat_Peminjaman = $this->db->insert('riwayat_peminjaman_calibrator', $Ins_Riwayat_Peminjaman);
+					// 	if ($Has_Ins_Riwayat_Peminjaman !== TRUE) {
+					// 		$Pesan_Error	= 'Error Insert Riwayat Peminjaman...';
+					// 	}
+					// }
 					
 
 					if ($this->db->trans_status() != TRUE || !empty($Pesan_Error)) {
