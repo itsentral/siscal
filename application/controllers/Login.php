@@ -56,7 +56,11 @@ class Login extends CI_Controller {
 				//echo Enkripsi('Ada');exit;
 				$this->session->set_userdata($data_Ses);
 				// history('Login');
-				redirect(site_url('dashboard'));
+				if($Group_id == '8'){
+					redirect(site_url('dashboard_selia'));
+				}else{
+					redirect(site_url('dashboard'));
+				}
 				
 			}else{
 				$this->session->set_flashdata("alert_data", "<text id=\"flash-message\">Username atau Password Anda Salah....</text>");
