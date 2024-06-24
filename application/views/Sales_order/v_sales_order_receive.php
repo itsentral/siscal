@@ -1,15 +1,16 @@
 <?php
 $this->load->view('include/side_menu');
+date_default_timezone_set('Asia/Jakarta');
 ?>
 <form action="#" method="POST" id="form-proses" enctype="multipart/form-data">
-	<div class="box box-warning">
+	<div class="box box-primary box-cs01">
 		<div class="box-header">
 			<h4 class="box-title"><i class="fa fa-check-square"></i> <?php echo $title; ?></h4>
 
 		</div>
 		<!-- /.box-header -->
 		<div class="box-body">
-			<div class="row">
+			<div class="">
 				<div class="col-sm-3">
 					<div class="form-group">
 						<label class="control-label">
@@ -84,7 +85,7 @@ $this->load->view('include/side_menu');
 					</div> <?php
 							if ($akses_menu['create'] == '1') {
 							?>
-						<div class="col-sm-6">
+						<!-- <div class="col-sm-6">
 							<div class="form-group">
 								<label class="control-label">
 									&nbsp;
@@ -94,17 +95,19 @@ $this->load->view('include/side_menu');
 									&nbsp;&nbsp;<button type="button" class="btn btn-sm bg-maroon-active" id="btn_add_driver" title="CREATE SO - DRIVER RECEIVE"> CREATE SO - DRIVER RECEIVE <i class="fa fa-plus"></i> </button>
 								</div>
 							</div>
-						</div>
+						</div> -->
 					<?php
 							}
 					?>
 				</div>
+
+				<div class="col-sm-12 table-responsive" style="margin-top:20px;">
 				<div id="Loading_tes" class="overlay_load">
 					<center>Please Wait . . . &nbsp;<img src="<?php echo base_url('assets/img/loading_small.gif') ?>"></center>
 				</div>
 				<table id="my-grid" class="table table-bordered table-striped">
-					<thead>
-						<tr style="background-color :#16697A !important;color : white !important;">
+					<thead style="background-color:#E9ECF9;color:#0A1A60;">
+						<tr>
 							<th class="text-center">SO No</th>
 							<th class="text-center">SO Date</th>
 							<th class="text-center">Customer</th>
@@ -121,6 +124,7 @@ $this->load->view('include/side_menu');
 					</tbody>
 
 				</table>
+				</div>
 			</div>
 
 			<!-- /.box-body -->
@@ -180,7 +184,74 @@ $this->load->view('include/side_menu');
 				border-left-width: thin !important;
 				border-top-width: 0;
 			}
+
+			.chosen-container-single .chosen-single{
+				height: 31px;
+				line-height: 31px;
+			}
+
+			/* Start Css Box */
+				.box-cs01{
+					border-radius: 18px;
+					box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+				}
+			/* End Css Box */
+
+			/* Start Css Table */
+				table.dataTable tbody td {
+					vertical-align: middle;
+				}
+				table.dataTable thead th {
+					text-align: center;
+					vertical-align: middle;
+				}
+				.dataTables_filter {
+					padding-top: 10px;
+				}
+				.Btntable {
+					font-size: 13.3px !important;
+					padding: 6px !important;
+					margin: 4px !important;
+					margin-bottom: 10px !important;
+					border-radius: 4px !important;
+					width: auto;
+					border: none !important;
+					box-shadow: 0 1px 2px rgba(0,0,0,0.07), 
+							0 2px 4px rgba(0,0,0,0.07), 
+							0 4px 8px rgba(0,0,0,0.07), 
+							0 8px 16px rgba(0,0,0,0.07),
+							0 16px 32px rgba(0,0,0,0.07), 
+							0 32px 64px rgba(0,0,0,0.07);
+				}
+				.Btntable1 {
+					background-color: #2F92E4 !important;
+					color: white !important;
+				}
+
+				.Btntable2 {
+					background-color: #f39c12 !important;
+					color: white !important;
+				}
+
+				.Btntable3 {
+					background-color: #00a65a !important;
+					color: white !important;
+				}
+
+				.highlight {
+					color: #3c8dbc;
+				}
+
+			/* End Css Table */
 		</style>
+
+		<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
+		<script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+		<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+
 		<script type="text/javascript">
 			var base_url = '<?php echo site_url(); ?>';
 			var active_controller = '<?php echo ($this->uri->segment(1)); ?>';
@@ -218,21 +289,22 @@ $this->load->view('include/side_menu');
 				let YearChosen = $('#tahun').val();
 				let StatusChosen = $('#sts_so').val();
 				let table_data = $('#my-grid').DataTable({
-					"serverSide": true,
-					"destroy": true,
-					"stateSave": false,
-					"bAutoWidth": false,
-					"oLanguage": {
-						"sSearch": "<b>Live Search : </b>",
-						"sLengthMenu": "_MENU_ &nbsp;&nbsp;<b>Records Per Page</b>&nbsp;&nbsp;",
-						"sInfo": "Showing _START_ to _END_ of _TOTAL_ entries",
-						"sInfoFiltered": "(filtered from _MAX_ total entries)",
-						"sZeroRecords": "No matching records found",
-						"sEmptyTable": "No data available in table",
-						"sLoadingRecords": "Please wait - loading...",
+					"serverSide"	: true,
+					"destroy"		: true,
+					"processing"	: true,
+					"stateSave"		: false,
+					"bAutoWidth"	: false,
+					"oLanguage"	: {
+						"sSearch"			: "<b>Live Search : </b>",
+						"sLengthMenu"		: "_MENU_ &nbsp;&nbsp;<b>Records Per Page</b>&nbsp;&nbsp;",
+						"sInfo"				: "Showing _START_ to _END_ of _TOTAL_ entries",
+						"sInfoFiltered"		: "(filtered from _MAX_ total entries)",
+						"sZeroRecords"		: "No matching records found",
+						"sEmptyTable"		: "No data available in table",
+						"sLoadingRecords"	: "Please wait - loading...",
 						"oPaginate": {
-							"sPrevious": "Prev",
-							"sNext": "Next"
+							"sPrevious"	: "Prev",
+							"sNext"		: "Next"
 						}
 					},
 					"aaSorting": [
@@ -277,11 +349,51 @@ $this->load->view('include/side_menu');
 							"orderable": false
 						}
 					],
-					"sPaginationType": "simple_numbers",
-					"iDisplayLength": 10,
+					"sPaginationType"	: "simple_numbers",
+					"iDisplayLength"	: 5,
 					"aLengthMenu": [
 						[5, 10, 20, 50, 100, 150],
 						[5, 10, 20, 50, 100, 150]
+					],
+					dom				: 'Bfrtip', 
+					buttons			: [
+						{
+							extend: 'pageLength',
+							text:      '<i class="fa fa-list-ol"></i> <b>Show</b>',
+							className: "Btntable"
+						},
+						<?php if ($akses_menu['download'] == '1') { ?>
+						{
+							extend: 'excelHtml5',
+							text:      '<i class="fa fa-download fa-lg"></i> &nbsp;<b>Download Excel</b>',
+							titleAttr: 'Excel',
+							className: "Btntable",
+							title: 'Sales Order - Receive - <?php echo date('d-m-Y h:i');?>',
+							messageTop: 'SISCAL DASHBOARD',
+							exportOptions: {
+									columns: [0,1,2,3,4,5,6]
+							}
+						},
+						<?php } ?>
+						<?php if ($akses_menu['create'] == '1') { ?>
+						{
+							text:      '<i class="fa fa-plus fa-lg"></i> <b>Warehouse Receive</b>',
+							className: "Btntable Btntable1",
+							attr: {
+								title: 'CREATE SO - WAREHOUSE RECEIVE',
+								id: 'btn_add_order'
+							}
+						},
+						{
+							text:      '<i class="fa fa-truck fa-lg"></i> <b>Driver Receive</b>',
+							className: "Btntable Btntable2",
+							attr: {
+								title: 'CREATE SO - DRIVER RECEIVE',
+								id: 'btn_add_driver'
+							}
+						},
+						<?php } ?>
+
 					],
 					"ajax": {
 						url: base_url + '/' + active_controller + '/get_data_display',
@@ -297,6 +409,16 @@ $this->load->view('include/side_menu');
 							$("#my-grid").append('<tbody class="my-grid-error"><tr><th colspan="8">No data found in the server</th></tr></tbody>');
 							$("#my-grid_processing").css("display", "none");
 						}
+					},
+					fnDrawCallback: function(nRow, aData, iDisplayIndex) {
+						$('#my-grid tbody tr').hover(function() {
+							$(this).addClass('highlight');
+						}, function() {
+							$(this).removeClass('highlight');
+						});
+						$('#my-grid tbody tr').each(function(){
+							$(this).find('td:eq(7)').attr('nowrap', 'nowrap');
+						});
 					}
 				});
 			}
