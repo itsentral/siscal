@@ -278,7 +278,7 @@ $this->load->view('include/side_menu');
 </div>
 
 <div class="modal fade" id="FormModalQR">
-	<div class="modal-dialog modal-sm" style="margin-top:250px;">
+	<div class="modal-dialog modal-sm" style="margin-top:200px;">
 		<div class="modal-content modal-cs">
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -297,6 +297,14 @@ $this->load->view('include/side_menu');
 							<option value="">By Sistem</option>
 							<option value="I">Identify No</option>
 							<option value="S">Serial Number</option>
+						</select>						
+					</div>
+
+					<div class="form-group col-sm-12">
+						<label class="control-label">Include Exp Date</label>
+						<select name="flaq_exp" class="form-control" style="width:100%">
+							<option value="N">No</option>
+							<option value="Y">Yes</option>
 						</select>						
 					</div>
 
@@ -320,7 +328,7 @@ $this->load->view('include/side_menu');
 </div>
 
 <div class="modal fade" id="FormModalQRBatch">
-	<div class="modal-dialog modal-sm" style="margin-top:250px;">
+	<div class="modal-dialog modal-sm" style="margin-top:230px;">
 		<div class="modal-content modal-cs">
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -338,6 +346,13 @@ $this->load->view('include/side_menu');
 							<option value="">By Sistem</option>
 							<option value="I">Identify No</option>
 							<option value="S">Serial Number</option>
+						</select>						
+					</div>
+					<div class="form-group col-sm-12">
+						<label class="control-label">Include Exp Date</label>
+						<select name="flaq_exp_batch" class="form-control" style="width:100%">
+							<option value="N">No</option>
+							<option value="Y">Yes</option>
 						</select>						
 					</div>
 				</div>
@@ -600,6 +615,7 @@ $this->load->view('include/side_menu');
 		
 		var flagPrint 		= $('[name="flaq_print"]').val();
 		var flagPengenal 	= $('[name="flaq_pengenal"]').val();
+		var flaqExp 		= $('[name="flaq_exp"]').val();
 		var Code_Print		= $('[name="qr_code"]').val();
 
 		//alert(flagPrint);
@@ -612,7 +628,7 @@ $this->load->view('include/side_menu');
 		
 		//pakek ajax aja ntar gais ya
 
-		$.post(base_url +'/'+ active_controller+'/'+url,{'code':Code_Print,'pengenal':flagPengenal}, function(response) {
+		$.post(base_url +'/'+ active_controller+'/'+url,{'code':Code_Print,'pengenal':flagPengenal,'flaq_exp':flaqExp}, function(response) {
 			//close_spinner_new();
 			
            		//console.log(response);
@@ -645,10 +661,11 @@ $this->load->view('include/side_menu');
 		$('#btnSaveBatch').html('<i class="glyphicon glyphicon-ok"></i> Proses...');
 		$('#btnSaveBatch').attr('disabled', true);
 		
-		var Code_SO	 		  = $('[name="codeso"]').val();
+		var Code_SO	      = $('[name="codeso"]').val();
 		var flagPengenalBatch = $('[name="flaq_pengenal_batch"]').val();
+		var flaqExpBatch      = $('[name="flaq_exp_batch"]').val();
 
-		var Links = base_url + active_controller + '/downloadQRBatch/' + Code_SO + '/' + flagPengenalBatch;
+		var Links = base_url + active_controller + '/downloadQRBatch/' + Code_SO + '/' + flaqExpBatch + '/' + flagPengenalBatch;
 			window.open(Links, '_blank');
 			$('#FormModalQRBatch').modal('hide');
 			$('#btnSaveBatch').html('<i class="glyphicon glyphicon-print"></i> Download');

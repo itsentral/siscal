@@ -2051,6 +2051,7 @@ class Calibration_result extends CI_Controller {
 		if($this->input->post()){
 			$Code_Sentral	= $this->input->post('code');
 			$Code_Pengenal	= $this->input->post('pengenal');
+			$Code_Exp	= $this->input->post('flaq_exp');
 			
 			$rows_Trans		= $this->db->get_where('trans_data_details',array('id'=>$Code_Sentral))->row();
 			$rows_Sentral		= $this->db->get_where('sentral_customer_tools',array('sentral_tool_code'=>$rows_Trans->sentral_code_tool))->row();
@@ -2077,7 +2078,7 @@ class Calibration_result extends CI_Controller {
 			}
 			
 			## GENARATE PDF ##
-			$File_PDF		= $this->GenerateQRFileNew($Code_Sentral, $Code_Pengenal);
+			$File_PDF		= $this->GenerateQRFileNew($Code_Sentral, $Code_Pengenal, $Code_Exp);
 			if(file_exists($Path_PDF)){
 				chmod($Path_PDF, 0777);
 			}
@@ -2186,7 +2187,7 @@ class Calibration_result extends CI_Controller {
 	}
 
 	
-	function GenerateQRFileNew($Code='', $Code_Pengenal=''){
+	function GenerateQRFileNew($Code='', $Code_Pengenal='', $Code_Exp=''){
 		$rows_trans		= $this->db->get_where('trans_data_details',array('id'=>$Code))->row();
 		$rows_header		= $this->db->get_where('sentral_customer_tools',array('sentral_tool_code'=>$rows_trans->sentral_code_tool))->row();
 		$rows_tool		= $this->db->get_where('tools',array('id'=>$rows_header->tool_id))->row();
@@ -2283,13 +2284,16 @@ class Calibration_result extends CI_Controller {
 		}
 
 		$Text_Footer	= "";
-		if(!empty($rows_trans->valid_until) && $rows_trans->valid_until !== '0000-00-00' && $rows_trans->valid_until !== '1970-01-01'){
-			$Text_Footer	='<div style="font-size: 110px;position: fixed; top: 31%; left: 50%;font-family: sans-serif;"><b>'.date('d-m-Y',strtotime($rows_trans->datet)).' Sd/</b></div>
-			<div style="font-size: 110px;position: fixed; top: 41.5%; left: 50%;font-family: sans-serif;"><b>'.date('d-m-Y',strtotime($rows_trans->valid_until)).'</b></div>';
-		}else{
+		if($Code_Exp == "N"){
 			$Text_Footer	='<div style="font-size: 110px;position: fixed; top: 38%; left: 50%;font-family: sans-serif;"><b>'.date('d-m-Y',strtotime($rows_trans->datet)).'<b></div>';
+		}else{
+			if(!empty($rows_trans->valid_until) && $rows_trans->valid_until !== '0000-00-00' && $rows_trans->valid_until !== '1970-01-01'){
+				$Text_Footer	='<div style="font-size: 110px;position: fixed; top: 31%; left: 50%;font-family: sans-serif;"><b>'.date('d-m-Y',strtotime($rows_trans->datet)).' Sd/</b></div>
+				<div style="font-size: 110px;position: fixed; top: 41.5%; left: 50%;font-family: sans-serif;"><b>'.date('d-m-Y',strtotime($rows_trans->valid_until)).'</b></div>';
+			}else{
+				$Text_Footer	='<div style="font-size: 110px;position: fixed; top: 38%; left: 50%;font-family: sans-serif;"><b>'.date('d-m-Y',strtotime($rows_trans->datet)).'<b></div>';
+			}
 		}
-
 		
 		$Header = '
 					<div style="position: fixed;left: 1px;">
@@ -2313,7 +2317,7 @@ class Calibration_result extends CI_Controller {
 		$mpdf->Output($File_Path ,'F');
 	}
 	
-	function downloadQRBatch($Code_SO='', $flagPengenalBatch=''){
+	function downloadQRBatch($Code_SO='', $flaqExpBatch='', $flagPengenalBatch=''){
 
 		$Query_Data		= "SELECT
 								det_tool.*,
@@ -2389,12 +2393,17 @@ class Calibration_result extends CI_Controller {
 		foreach($siswa as $ketK=>$data){
 		
 		$CodeHash	= str_replace('=','',enkripsi_url($data->id));
-		$QR			= 'https://sentral.dutastudy.com/Siscal_CRM/index.php/CertificateGenerate/CertificateAuthorized/'.$CodeHash;
+		$QR		= 'https://sentral.dutastudy.com/Siscal_CRM/index.php/CertificateGenerate/CertificateAuthorized/'.$CodeHash;
+		$date		= "";
 
-		if(!empty($data->valid_until) && $data->valid_until !== '0000-00-00' && $data->valid_until !== '1970-01-01'){
-			$date	= date('d-m-Y',strtotime($data->datet)).' Sd/ '.date('d-m-Y',strtotime($data->valid_until));
-		}else{
+		if($flaqExpBatch == "N"){
 			$date	= date('d-m-Y',strtotime($data->datet));
+		}else{
+			if(!empty($data->valid_until) && $data->valid_until !== '0000-00-00' && $data->valid_until !== '1970-01-01'){
+				$date	= date('d-m-Y',strtotime($data->datet)).' Sd/ '.date('d-m-Y',strtotime($data->valid_until));
+			}else{
+				$date	= date('d-m-Y',strtotime($data->datet));
+			}
 		}
 
 		$codeToolsID		= "";
