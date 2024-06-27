@@ -1751,11 +1751,11 @@ class Schedule_order extends CI_Controller
 				$mail->From				= $rows_Sender->email_from; // sender email
 				$mail->FromName			= $rows_Sender->name_from; // name sender
 
-				// $Email_To				= $Email_Address;
-				// $Email_Name				= $Inisial . ' ' . $Email_Name;
+				$Email_To				= $Email_Address;
+				$Email_Name				= $Inisial . ' ' . $Email_Name;
 
-				$Email_To				= 'boyhaqi888999@gmail.com';
-				$Email_Name				= $Inisial . ' ' . 'BOY HAQI';
+				// $Email_To				= 'boyhaqi888999@gmail.com';
+				// $Email_Name				= $Inisial . ' ' . 'BOY HAQI';
 
 				$mail->AddAddress($Email_To, ucwords(strtolower($Email_Name)));
 				if ($rows_Sender->cc_email) {
